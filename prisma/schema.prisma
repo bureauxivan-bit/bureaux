@@ -1,0 +1,122 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum ProjectCategory {
+  PRIVATE
+  COMMERCIAL
+  ARCHITECTURE
+}
+
+enum LeadType {
+  ESTIMATE
+  CONSULT
+  GENERAL
+}
+
+enum LeadStatus {
+  NEW
+  IN_PROGRESS
+  CLOSED
+}
+
+model Project {
+  id          String          @id @default(cuid())
+  title       String
+  slug        String          @unique
+  year        Int
+  category    ProjectCategory
+  description String?
+  areaM2      Int?
+  location    String?
+  isTop       Boolean         @default(false)
+  order       Int             @default(0)
+  images      ProjectImage[]
+  coverId     String?
+  createdAt   DateTime        @default(now())
+  updatedAt   DateTime        @updatedAt
+}
+
+model ProjectImage {
+  id         String  @id @default(cuid())
+  projectId  String
+  project    Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
+  storageKey String
+  url        String
+  alt        String?
+  width      Int?
+  height     Int?
+  order      Int     @default(0)
+
+  @@index([projectId])
+}
+
+model Service {
+  id          String  @id @default(cuid())
+  number      Int
+  title       String
+  description String?
+  coverUrl    String?
+  order       Int     @default(0)
+}
+
+model TeamMember {
+  id       String  @id @default(cuid())
+  name     String
+  role     String
+  quote    String?
+  photoUrl String?
+  order    Int     @default(0)
+}
+
+model Review {
+  id          String  @id @default(cuid())
+  author      String
+  projectName String?
+  text        String
+  isPublished Boolean @default(true)
+  order       Int     @default(0)
+}
+
+model Faq {
+  id       String @id @default(cuid())
+  question String
+  answer   String
+  order    Int    @default(0)
+}
+
+model Lead {
+  id        String     @id @default(cuid())
+  name      String
+  phone     String
+  type      LeadType   @default(GENERAL)
+  message   String?
+  status    LeadStatus @default(NEW)
+  createdAt DateTime   @default(now())
+}
+
+model SiteSettings {
+  id          String  @id @default("singleton")
+  phone       String?
+  email       String?
+  telegram    String?
+  instagram   String?
+  facebook    String?
+  behance     String?
+  address     String?
+  coordinates String?
+  itemXUrl    String?
+}
+
+model AdminUser {
+  id           String   @id @default(cuid())
+  email        String   @unique
+  passwordHash String
+  createdAt    DateTime @default(now())
+}

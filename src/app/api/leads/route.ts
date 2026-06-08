@@ -1,0 +1,38 @@
+import { NextRequest } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { leadSchema } from '@/lib/validation';
+import { notifyTelegram } from '@/lib/telegram';
+import { rateLimit, clientIp } from '@/lib/rate-limit';
+
+export async function POST(req: NextRequest) {
+  const ip = clientIp(req);
+  const limited = rateLimit(`lead:${ip}`, 5, 60_000);
+  if (!limited.ok) {
+    return Response.json({ error: 'Забагато запитів. Спробуйте за хвилину.' }, { status: 429 });
+  }
+
+  let body: unknown;
+  try { body = await req.json(); } catch { return Response.json({ error: 'Bad request' }, { status: 400 }); }
+
+  const parsed = leadSchema.safeParse(body);
+  if (!parsed.success) {
+    return Response.json({ error: 'Перевірте поля форми', issues: parsed.error.flatten() }, { status: 422 });
+  }
+
+  // Honeypot: silently accept but do nothing (do not tip off bots).
+  if (parsed.data.company) return Response.json({ ok: true });
+
+  const lead = await prisma.lead.create({
+    data: {
+      name: parsed.data.name,
+      phone: parsed.data.phone,
+      message: parsed.data.message || null,
+      type: parsed.data.type,
+    },
+  });
+
+  // Fire-and-forget notification — never block the response.
+  void notifyTelegram(lead);
+
+  return Response.json({ ok: true });
+}
