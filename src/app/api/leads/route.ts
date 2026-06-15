@@ -26,13 +26,13 @@ export async function POST(req: NextRequest) {
     data: {
       name: parsed.data.name,
       phone: parsed.data.phone,
+      email: parsed.data.email || null,
       message: parsed.data.message || null,
       type: parsed.data.type,
     },
   });
 
-  // Fire-and-forget notification — never block the response.
-  void notifyTelegram(lead);
+  await notifyTelegram(lead);
 
   return Response.json({ ok: true });
 }
