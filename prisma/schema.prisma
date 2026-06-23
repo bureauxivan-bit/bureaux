@@ -95,6 +95,7 @@ model Lead {
   id        String     @id @default(cuid())
   name      String
   phone     String
+  email     String?
   type      LeadType   @default(GENERAL)
   message   String?
   status    LeadStatus @default(NEW)
@@ -112,6 +113,7 @@ model SiteSettings {
   address     String?
   coordinates String?
   itemXUrl    String?
+  heroImage   String?
 }
 
 model AdminUser {
@@ -119,4 +121,172 @@ model AdminUser {
   email        String   @unique
   passwordHash String
   createdAt    DateTime @default(now())
+}
+
+enum ClientStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum ClientProjectType {
+  PRIVATE
+  COMMERCIAL
+  ARCHITECTURE
+}
+
+model ClientUser {
+  id             String            @id @default(cuid())
+  name           String
+  email          String            @unique
+  passwordHash   String
+  phone          String
+  projectType    ClientProjectType @default(PRIVATE)
+  projectName    String?
+  projectDetails String?
+  projectAddress String?
+  projectCity    String?
+  status         ClientStatus      @default(PENDING)
+  adminNote      String?
+  stages         ClientStage[]
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+}
+
+enum StageStatus {
+  PENDING
+  ACTIVE
+  DONE
+}
+
+model ClientStage {
+  id               String                @id @default(cuid())
+  clientId         String
+  client           ClientUser            @relation(fields: [clientId], references: [id], onDelete: Cascade)
+  stageIndex       Int
+  status           StageStatus           @default(PENDING)
+  note             String?
+  clientApprovedAt DateTime?
+  files            ClientStageFile[]
+  rooms            ClientRoom[]
+  specItems        ClientSpecItem[]
+  revisions        ClientStageRevision[]
+  createdAt        DateTime              @default(now())
+  updatedAt        DateTime              @updatedAt
+
+  @@unique([clientId, stageIndex])
+  @@index([clientId])
+}
+
+model ClientStageFile {
+  id         String      @id @default(cuid())
+  stageId    String
+  stage      ClientStage @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  name       String
+  url        String
+  storageKey String?
+  createdAt  DateTime    @default(now())
+
+  @@index([stageId])
+}
+
+model ClientRoom {
+  id               String               @id @default(cuid())
+  stageId          String
+  stage            ClientStage          @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  name             String
+  order            Int                  @default(0)
+  clientApprovedAt DateTime?
+  visualizations   ClientVisualization[]
+  revisions        ClientRoomRevision[]
+
+  @@index([stageId])
+}
+
+model ClientRoomRevision {
+  id           String     @id @default(cuid())
+  roomId       String
+  room         ClientRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  text         String
+  isFromClient Boolean    @default(false)
+  createdAt    DateTime   @default(now())
+
+  @@index([roomId])
+}
+
+model ClientStageRevision {
+  id           String      @id @default(cuid())
+  stageId      String
+  stage        ClientStage @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  text         String
+  isFromClient Boolean     @default(false)
+  createdAt    DateTime    @default(now())
+
+  @@index([stageId])
+}
+
+model ClientVisualization {
+  id          String     @id @default(cuid())
+  roomId      String
+  room        ClientRoom @relation(fields: [roomId], references: [id], onDelete: Cascade)
+  url         String
+  description String?
+  order       Int        @default(0)
+
+  @@index([roomId])
+}
+
+model KpProposal {
+  id                 String    @id @default(cuid())
+  code               String    @unique
+  clientName         String
+  objectType         String?
+  areaM2             Int?
+  location           String?
+  service            String?
+  priceDesign        Int?
+  supervisionMonthly Int?
+  startDate          String?
+  durationWeeks      String    @default("~12 тижнів")
+  projectIds         String[]
+  introText          String?
+  validDays          Int       @default(14)
+  status             String    @default("draft")
+  viewCount          Int       @default(0)
+  firstViewedAt      DateTime?
+  ctaClickedAt       DateTime?
+  sentAt             DateTime?
+  viewedAt           DateTime?
+  meetingAt          DateTime?
+  contractAt         DateTime?
+  declinedAt         DateTime?
+  createdAt          DateTime  @default(now())
+  updatedAt          DateTime  @updatedAt
+  events             KpEvent[]
+}
+
+model KpEvent {
+  id        String     @id @default(uuid())
+  kpId      String
+  kp        KpProposal @relation(fields: [kpId], references: [id], onDelete: Cascade)
+  eventType String
+  value     Int?
+  createdAt DateTime   @default(now())
+
+  @@index([kpId])
+  @@index([kpId, eventType])
+}
+
+model ClientSpecItem {
+  id       String      @id @default(cuid())
+  stageId  String
+  stage    ClientStage @relation(fields: [stageId], references: [id], onDelete: Cascade)
+  category String?
+  name     String
+  quantity String?
+  unit     String?
+  note     String?
+  order    Int         @default(0)
+
+  @@index([stageId])
 }

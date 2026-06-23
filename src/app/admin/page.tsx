@@ -26,7 +26,7 @@ export default async function AdminDashboard() {
       <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((s) => (
           <Link key={s.label} href={s.href}
-            className={`rounded-2xl border p-6 transition-colors ${s.accent ? 'border-terra bg-terra/10' : 'border-paper/10 hover:border-paper/30'}`}>
+            className={`border p-6 transition-colors ${s.accent ? 'border-paper bg-paper/15' : 'border-paper/10 hover:border-paper/30'}`}>
             <div className="display-xl text-4xl">{s.value}</div>
             <div className="mt-2 text-sm text-paper/60">{s.label}</div>
           </Link>
@@ -34,14 +34,14 @@ export default async function AdminDashboard() {
       </div>
 
       <h2 className="mt-12 text-sm uppercase tracking-wider text-paper/50">Останні заявки</h2>
-      <div className="mt-4 overflow-hidden rounded-2xl border border-paper/10">
+      <div className="mt-4 overflow-hidden border border-paper/10">
         {recent.length ? recent.map((l) => (
           <div key={l.id} className="flex items-center justify-between gap-4 border-b border-paper/10 px-5 py-4 last:border-0">
             <div className="min-w-0">
               <p className="truncate font-medium">{l.name} · <span className="text-paper/60">{l.phone}</span></p>
-              <p className="text-xs text-paper/40">{LEAD_TYPE_LABELS[l.type]} · {new Date(l.createdAt).toLocaleString('uk-UA')}</p>
+              <p className="text-xs text-paper/40">{LEAD_TYPE_LABELS[l.type]} · {new Date(l.createdAt).toLocaleString('uk-UA', { timeZone: 'Europe/Kyiv' })}</p>
             </div>
-            <span className="shrink-0 rounded-full bg-paper/10 px-3 py-1 text-xs">{LEAD_STATUS_LABELS[l.status]}</span>
+            <span className="shrink-0 bg-paper/10 px-3 py-1 text-xs">{LEAD_STATUS_LABELS[l.status]}</span>
           </div>
         )) : <p className="p-5 text-sm text-paper/50">Заявок поки немає.</p>}
       </div>

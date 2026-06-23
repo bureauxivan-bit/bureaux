@@ -4,7 +4,7 @@ import { LeadForm } from './LeadForm';
 export function FinalCta() {
   return (
     <section className="bg-coal py-24 text-paper lg:py-36">
-      <div className="container-wide grid gap-14 lg:grid-cols-2 lg:items-center">
+      <div className="mx-auto w-full max-w-[1480px] px-8 sm:px-8 lg:px-12 grid gap-14 lg:grid-cols-2 lg:items-center">
         <Reveal>
           <div>
             <h2 className="display-xl text-[clamp(2rem,5vw,4rem)]">
@@ -17,8 +17,8 @@ export function FinalCta() {
           </div>
         </Reveal>
         <Reveal delay={120}>
-          <div className="rounded-3xl border border-paper/10 bg-paper/[0.03] p-7 sm:p-9">
-            <LeadForm type="ESTIMATE" variant="dark" />
+          <div className="border border-paper/10 bg-paper/[0.03] p-7 sm:p-9">
+            <LeadForm type="GENERAL" variant="dark" />
           </div>
         </Reveal>
       </div>

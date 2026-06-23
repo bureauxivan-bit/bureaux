@@ -25,18 +25,18 @@ export default function AdminLogin() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-coal px-4 text-paper">
       <form onSubmit={submit} className="w-full max-w-sm">
-        <div className="display-xl mb-1 text-2xl">BUREAU<span className="text-terra">X</span></div>
+        <div className="display-xl mb-1 text-2xl">BUREAUX</div>
         <p className="mb-8 text-sm text-paper/50">Панель адміністратора</p>
         <input
           type="email" placeholder="Email" value={email} onChange={(e) => setEmail(e.target.value)} required
-          className="mb-3 w-full rounded-xl border border-paper/20 bg-transparent px-4 py-3 outline-none focus:border-terra"
+          className="mb-3 w-full border border-paper/20 bg-transparent px-4 py-3 outline-none focus:border-paper/50"
         />
         <input
           type="password" placeholder="Пароль" value={password} onChange={(e) => setPassword(e.target.value)} required
-          className="mb-3 w-full rounded-xl border border-paper/20 bg-transparent px-4 py-3 outline-none focus:border-terra"
+          className="mb-3 w-full border border-paper/20 bg-transparent px-4 py-3 outline-none focus:border-paper/50"
         />
-        {err && <p className="mb-3 text-sm text-terra">{err}</p>}
-        <button disabled={loading} className="btn-terra w-full disabled:opacity-60">
+        {err && <p className="mb-3 text-sm text-paper/70">{err}</p>}
+        <button disabled={loading} className="btn-admin w-full disabled:opacity-60">
           {loading ? 'Вхід…' : 'Увійти'}
         </button>
       </form>

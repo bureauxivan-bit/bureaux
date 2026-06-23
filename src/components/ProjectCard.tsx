@@ -23,7 +23,7 @@ export function ProjectCard({ project, ratio = 'aspect-[3/4]' }: { project: Card
   const url = cover(project);
   return (
     <Link href={`/projects/${project.slug}`} className="group block">
-      <div className={`relative ${ratio} overflow-hidden rounded-2xl bg-ink/5`}>
+      <div className={`relative ${ratio} overflow-hidden bg-ink/5`}>
         {url ? (
           <Image
             src={url}
@@ -38,12 +38,12 @@ export function ProjectCard({ project, ratio = 'aspect-[3/4]' }: { project: Card
           </div>
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
-        <span className="absolute left-4 top-4 rounded-full bg-paper/85 px-3 py-1 text-[11px] font-semibold uppercase tracking-wider backdrop-blur">
+        <span className="absolute left-4 top-4 bg-paper/85 px-3 py-1 text-[11px] font-normal uppercase tracking-wider backdrop-blur">
           {CATEGORY_LABELS[project.category] ?? project.category}
         </span>
       </div>
       <div className="mt-4 flex items-baseline justify-between">
-        <h3 className="display-xl text-lg transition-colors group-hover:text-terra">{project.title}</h3>
+        <h3 className="display-xl text-lg transition-opacity group-hover:opacity-60">{project.title}</h3>
         <span className="text-sm text-muted">{project.year}</span>
       </div>
     </Link>

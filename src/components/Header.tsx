@@ -1,6 +1,7 @@
-'use client';
-import { useEffect, useState } from 'react';
+﻿'use client';
+import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { useLeadModal } from './LeadModal';
 import type { Settings } from '@/lib/types';
 
@@ -12,76 +13,118 @@ const NAV = [
 
 export function Header({ settings }: { settings: Settings }) {
   const { openEstimate } = useLeadModal();
-  const [scrolled, setScrolled] = useState(false);
   const [menu, setMenu] = useState(false);
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 24);
-    onScroll();
-    window.addEventListener('scroll', onScroll, { passive: true });
-    return () => window.removeEventListener('scroll', onScroll);
-  }, []);
-
   return (
-    <header
-      className={`fixed inset-x-0 top-0 z-50 transition-all duration-500 ${
-        scrolled ? 'bg-paper/85 py-3 backdrop-blur-md shadow-[0_1px_0_rgb(var(--line))]' : 'py-5'
-      }`}
-    >
+    <header className={`fixed inset-x-0 top-0 z-50 py-5 transition-colors duration-300 ${menu ? 'bg-ink' : ''}`}>
       <div className="container-wide flex items-center justify-between">
-        <Link href="/" className="display-xl text-xl tracking-tightest">
-          BUREAU<span className="text-terra">X</span>
+
+        {/* Logo in black box */}
+        <Link href="/" className="inline-flex items-center bg-ink px-3 py-1.5 transition-colors duration-200 hover:bg-ink/70">
+          <Image
+            src="/images/logo_big_inv.png"
+            alt="bureau x"
+            width={0}
+            height={0}
+            sizes="200px"
+            className="h-6 w-auto object-contain"
+            priority
+          />
         </Link>
 
-        <nav className="hidden items-center gap-9 text-sm font-medium lg:flex">
+        {/* Desktop nav — always black rectangles */}
+        <nav className="hidden items-center gap-2 text-xs font-normal uppercase tracking-widest lg:flex">
           {NAV.map((n) => (
-            <a key={n.href} href={n.href} className="link-underline">{n.label}</a>
-          ))}
-          {settings.itemXUrl && (
-            <a href={settings.itemXUrl} target="_blank" rel="noopener" className="link-underline text-muted">
-              Item X ↗
-            </a>
-          )}
-        </nav>
-
-        <div className="flex items-center gap-3">
-          <button onClick={openEstimate} className="btn-terra hidden sm:inline-flex !px-5 !py-2.5 text-xs">
-            Прорахунок проєкту
-          </button>
-          <button
-            onClick={() => setMenu((m) => !m)} aria-label="Меню"
-            className="flex h-10 w-10 items-center justify-center lg:hidden"
-          >
-            <span className="relative block h-3 w-6">
-              <span className={`absolute left-0 h-0.5 w-6 bg-ink transition-all ${menu ? 'top-1.5 rotate-45' : 'top-0'}`} />
-              <span className={`absolute left-0 top-1.5 h-0.5 w-6 bg-ink transition-all ${menu ? 'opacity-0' : ''}`} />
-              <span className={`absolute left-0 h-0.5 w-6 bg-ink transition-all ${menu ? 'top-1.5 -rotate-45' : 'top-3'}`} />
-            </span>
-          </button>
-        </div>
-      </div>
-
-      {/* mobile menu */}
-      <div className={`overflow-hidden lg:hidden ${menu ? 'max-h-[420px]' : 'max-h-0'} transition-all duration-500`}>
-        <div className="container-wide flex flex-col gap-1 border-t border-line bg-paper/95 py-6 backdrop-blur">
-          {NAV.map((n) => (
-            <a key={n.href} href={n.href} onClick={() => setMenu(false)} className="py-2 text-lg font-medium">
+            <a
+              key={n.href}
+              href={n.href}
+              className="bg-ink px-3 py-1.5 text-paper transition-colors duration-200 hover:bg-ink/70"
+            >
               {n.label}
             </a>
           ))}
           {settings.itemXUrl && (
-            <a href={settings.itemXUrl} target="_blank" rel="noopener" className="py-2 text-lg text-muted">Item X ↗</a>
+            <a
+              href={settings.itemXUrl}
+              target="_blank"
+              rel="noopener"
+              className="bg-ink px-3 py-1.5 text-paper transition-colors duration-200 hover:bg-ink/70"
+            >
+              item <em>X</em>
+            </a>
           )}
-          <button onClick={() => { setMenu(false); openEstimate(); }} className="btn-terra mt-3">
+        </nav>
+
+        {/* CTA — black rectangle */}
+        <div className="hidden items-center lg:flex">
+          <button
+            onClick={openEstimate}
+            className="group flex items-center gap-3 bg-ink px-5 py-2 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-ink/70"
+          >
+            <span className="transition-transform duration-300 group-hover:translate-x-1">⟶</span>
             Прорахунок проєкту
           </button>
-          <div className="mt-4 flex flex-col gap-1 text-sm text-muted">
-            {settings.phone && <a href={`tel:${settings.phone.replace(/\s/g, '')}`}>{settings.phone}</a>}
-            <div className="flex gap-4">
-              {settings.telegram && <a href={settings.telegram}>Telegram</a>}
-              {settings.instagram && <a href={settings.instagram}>Instagram</a>}
-              {settings.facebook && <a href={settings.facebook}>Facebook</a>}
-            </div>
+        </div>
+
+        {/* Mobile burger */}
+        <button
+          onClick={() => setMenu((m) => !m)}
+          aria-label="Меню"
+          className="flex h-10 w-10 items-center justify-center bg-ink text-paper lg:hidden"
+        >
+          <span className="relative block h-3 w-6">
+            <span className={`absolute left-0 h-0.5 w-6 bg-current transition-all ${menu ? 'top-1.5 rotate-45' : 'top-0'}`} />
+            <span className={`absolute left-0 top-1.5 h-0.5 w-6 bg-current transition-all ${menu ? 'opacity-0' : ''}`} />
+            <span className={`absolute left-0 h-0.5 w-6 bg-current transition-all ${menu ? 'top-1.5 -rotate-45' : 'top-3'}`} />
+          </span>
+        </button>
+      </div>
+
+      {/* Mobile menu */}
+      <div className={`overflow-hidden lg:hidden ${menu ? 'max-h-[420px]' : 'max-h-0'} transition-all duration-500`}>
+        <div className="container-wide flex flex-col gap-1 bg-ink py-6">
+          {NAV.map((n) => (
+            <a
+              key={n.href}
+              href={n.href}
+              onClick={() => setMenu(false)}
+              className="flex items-center gap-3 py-2 text-sm font-normal uppercase tracking-widest text-paper/80 hover:text-paper"
+            >
+              <span className="inline-block h-1.5 w-1.5 bg-paper opacity-50" />
+              {n.label}
+            </a>
+          ))}
+          {settings.itemXUrl && (
+            <a
+              href={settings.itemXUrl}
+              target="_blank"
+              rel="noopener"
+              className="flex items-center gap-3 py-2 text-sm font-normal uppercase tracking-widest text-paper/60 hover:text-paper"
+            >
+              <span className="inline-block h-1.5 w-1.5 bg-paper/60 opacity-50" />
+              item <em>X</em>
+            </a>
+          )}
+          <button
+            onClick={() => { setMenu(false); openEstimate(); }}
+            className="mt-4 flex items-center gap-3 border border-paper/30 px-5 py-3 text-xs font-normal uppercase tracking-widest text-paper hover:border-paper"
+          >
+            <span>⟶</span>
+            Прорахунок проєкту
+          </button>
+          <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-paper/50">
+            {settings.phone && (
+              <a href={`tel:${settings.phone.replace(/\s/g, '')}`} className="underline underline-offset-2">{settings.phone}</a>
+            )}
+            {settings.telegram && (
+              <a href={settings.telegram} className="underline underline-offset-2">Telegram</a>
+            )}
+            {settings.instagram && (
+              <a href={settings.instagram} className="underline underline-offset-2">Instagram</a>
+            )}
+            {settings.facebook && (
+              <a href={settings.facebook} className="underline underline-offset-2">Facebook</a>
+            )}
           </div>
         </div>
       </div>

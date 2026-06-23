@@ -55,7 +55,7 @@ export function LeadModalProvider({ children }: { children: React.ReactNode }) {
             <div className="absolute inset-0 bg-ink/70 backdrop-blur-sm" onClick={close} />
             <motion.div
               role="dialog" aria-modal="true" aria-label={config.title}
-              className="relative w-full max-w-md rounded-3xl bg-paper p-7 shadow-2xl sm:p-9"
+              className="relative w-full max-w-md bg-paper p-7 shadow-2xl sm:p-9"
               initial={{ y: 40, opacity: 0, scale: 0.98 }}
               animate={{ y: 0, opacity: 1, scale: 1 }}
               exit={{ y: 20, opacity: 0 }}
@@ -70,7 +70,7 @@ export function LeadModalProvider({ children }: { children: React.ReactNode }) {
               <p className="eyebrow mb-3">BUREAUX</p>
               <h3 className="display-xl text-2xl">{config.title}</h3>
               <p className="mb-6 mt-2 text-sm text-muted">{config.subtitle}</p>
-              <LeadForm type={config.type} />
+              <LeadForm type={config.type} onBeforeRedirect={close} />
             </motion.div>
           </motion.div>
         )}

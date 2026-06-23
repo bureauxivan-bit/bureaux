@@ -4,7 +4,7 @@ export default function Privacy() {
     <div className="container-wide max-w-3xl pb-28 pt-36">
       <h1 className="display-xl text-4xl">Політика конфіденційності</h1>
       <p className="mt-6 text-muted">
-        Тут описується, як Bureau X збирає та обробляє персональні дані, надіслані через форми сайту.
+        Тут описується, як bureau x збирає та обробляє персональні дані, надіслані через форми сайту.
         Відредагуйте цей текст відповідно до вимог законодавства.
       </p>
     </div>

@@ -24,7 +24,7 @@ export function ProjectsGrid({ projects }: { projects: P[] }) {
           <button
             key={t.key}
             onClick={() => setCat(t.key)}
-            className={`rounded-full px-5 py-2.5 text-sm font-medium transition-colors ${
+            className={`px-5 py-2.5 text-sm font-medium transition-colors ${
               cat === t.key ? 'bg-ink text-paper' : 'border border-ink/15 text-muted hover:border-ink hover:text-ink'
             }`}
           >

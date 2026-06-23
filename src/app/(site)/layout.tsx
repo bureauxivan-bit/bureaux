@@ -3,6 +3,7 @@ import { getSettings } from '@/lib/data';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { LeadModalProvider } from '@/components/LeadModal';
+import CursorTrail from '@/components/CursorTrail';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.example';
 
@@ -12,7 +13,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    name: 'Bureau X',
+    name: 'bureau x',
     description: "Бюро архітектури та дизайну інтер'єрів у стилі МУАС.",
     url: SITE_URL,
     telephone: settings.phone,
@@ -26,6 +27,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     <LeadModalProvider>
       <Script id="ld-json" type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
+      <CursorTrail />
       <Header settings={settings} />
       <main>{children}</main>
       <Footer settings={settings} />

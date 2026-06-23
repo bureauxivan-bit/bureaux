@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
-import Link from 'next/link';
 import { getProjectBySlug, getAllProjects, coverUrl } from '@/lib/data';
 import { CATEGORY_LABELS } from '@/lib/constants';
 import { CtaButton } from '@/components/CtaButton';
+import { ProjectGallery } from '@/components/ProjectGallery';
+import { ProjectHero } from '@/components/ProjectHero';
 
 export const revalidate = 60;
 
@@ -28,60 +28,65 @@ export default async function ProjectPage({ params }: { params: { slug: string }
   const p = await getProjectBySlug(params.slug);
   if (!p) notFound();
 
+  const cover = coverUrl(p);
+
   const meta = [
-    p.location && { label: 'Локація', value: p.location },
-    p.areaM2 && { label: 'Площа', value: `${p.areaM2} м²` },
-    { label: 'Рік', value: String(p.year) },
-    { label: 'Категорія', value: CATEGORY_LABELS[p.category] },
+    p.location && { label: 'Локація',  value: p.location },
+    p.areaM2   && { label: 'Площа',    value: `${p.areaM2} м²` },
+                  { label: 'Рік',       value: String(p.year) },
+                  { label: 'Тип',       value: CATEGORY_LABELS[p.category] },
   ].filter(Boolean) as { label: string; value: string }[];
 
   return (
-    <article className="pb-28 pt-36">
-      <div className="container-wide">
-        <Link href="/projects" className="link-underline text-sm text-muted">← Усі проєкти</Link>
-        <h1 className="display-xl mt-6 max-w-4xl text-[clamp(2.4rem,7vw,6rem)]">{p.title}</h1>
+    <article>
 
-        <dl className="mt-10 grid gap-6 border-y border-line py-7 sm:grid-cols-4">
-          {meta.map((m) => (
-            <div key={m.label}>
-              <dt className="text-xs uppercase tracking-wider text-muted">{m.label}</dt>
-              <dd className="mt-1 font-medium">{m.value}</dd>
-            </div>
-          ))}
-        </dl>
+      {/* ── Hero with parallax ── */}
+      {cover ? (
+        <ProjectHero cover={cover} title={p.title} meta={meta} />
+      ) : (
+        /* fallback if no cover photo yet */
+        <div className="flex h-64 items-end bg-coal px-5 pb-12 sm:px-8 lg:px-12">
+          <h1 className="display-xl font-normal text-paper text-[clamp(2.4rem,6vw,6rem)]">
+            {p.title}
+          </h1>
+        </div>
+      )}
 
-        {p.description && (
-          <p className="mt-10 max-w-2xl text-lg leading-relaxed text-ink/80">{p.description}</p>
-        )}
-      </div>
-
-      {/* gallery */}
-      <div className="container-wide mt-14 space-y-6">
-        {p.images.length ? (
-          p.images.map((img, i) => (
-            <div
-              key={img.id}
-              className={`relative overflow-hidden rounded-2xl bg-ink/5 ${i % 3 === 0 ? 'aspect-[16/9]' : 'aspect-[3/4] sm:aspect-[16/10]'}`}
-            >
-              <Image
-                src={img.url} alt={img.alt ?? p.title} fill
-                sizes="(max-width: 1024px) 100vw, 1200px"
-                className="object-cover" priority={i === 0}
-              />
-            </div>
-          ))
-        ) : (
-          <div className="flex aspect-[16/9] items-center justify-center rounded-2xl bg-ink/5 text-muted">
-            Фото буде додано
+      {/* ── Description (optional) ── */}
+      {p.description && (
+        <div className="container-wide border-b border-line py-14 sm:py-20">
+          <div className="grid max-w-5xl gap-10 sm:grid-cols-[140px_1fr] sm:gap-16">
+            <p className="eyebrow pt-1">Концепція</p>
+            <p className="text-[1rem] font-light leading-[1.9] text-ink/70">
+              {p.description}
+            </p>
           </div>
-        )}
+        </div>
+      )}
+
+      {/* ── Gallery — full bleed ── */}
+      <div className={`w-full ${p.description ? '' : 'pt-0.5'}`}>
+        <ProjectGallery images={p.images} />
       </div>
 
-      <div className="container-wide mt-20 rounded-3xl bg-coal px-8 py-14 text-center text-paper">
-        <h2 className="display-xl text-3xl">Сподобався проєкт?</h2>
-        <p className="mx-auto mt-3 max-w-md text-paper/60">Обговоримо ваш простір та зробимо безкоштовний прорахунок.</p>
-        <div className="mt-8 flex justify-center"><CtaButton>Прорахунок проєкту</CtaButton></div>
+      {/* ── CTA ── */}
+      <div className="container-wide mt-16 mb-24">
+        <div className="bg-coal px-8 py-16 text-center text-paper sm:py-20">
+          <p className="eyebrow justify-center text-paper/35 before:bg-paper/35">
+            bureau <em>X</em>
+          </p>
+          <h2 className="display-xl mt-5 font-normal text-[clamp(1.8rem,4vw,3.2rem)]">
+            Сподобався проєкт?
+          </h2>
+          <p className="mx-auto mt-4 max-w-sm text-sm font-light leading-relaxed text-paper/50">
+            Обговоримо ваш простір та зробимо безкоштовний прорахунок.
+          </p>
+          <div className="mt-10 flex justify-center">
+            <CtaButton>Прорахунок проєкту</CtaButton>
+          </div>
+        </div>
       </div>
+
     </article>
   );
 }

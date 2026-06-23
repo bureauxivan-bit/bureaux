@@ -11,8 +11,8 @@ export async function getServices() {
   return prisma.service.findMany({ orderBy: { order: 'asc' } });
 }
 
-export async function getTeam() {
-  return prisma.teamMember.findMany({ orderBy: { order: 'asc' } });
+export async function getTeam(limit?: number) {
+  return prisma.teamMember.findMany({ orderBy: { order: 'asc' }, ...(limit ? { take: limit } : {}) });
 }
 
 export async function getReviews() {

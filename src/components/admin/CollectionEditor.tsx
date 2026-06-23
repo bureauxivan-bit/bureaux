@@ -1,5 +1,5 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 export type FieldDef = {
   key: string;
@@ -13,14 +13,17 @@ export function CollectionEditor({
   endpoint,
   title,
   fields,
+  reorderable = false,
 }: {
-  endpoint: string; // e.g. 'services'
+  endpoint: string;
   title: string;
   fields: FieldDef[];
+  reorderable?: boolean;
 }) {
   const [items, setItems] = useState<Item[]>([]);
   const [editing, setEditing] = useState<Item | null>(null);
   const [loading, setLoading] = useState(true);
+  const dragIndex = useRef<number | null>(null);
 
   const load = async () => {
     setLoading(true);
@@ -54,28 +57,58 @@ export function CollectionEditor({
     load();
   };
 
+  const handleDrop = (overIndex: number) => {
+    const from = dragIndex.current;
+    if (from === null || from === overIndex) return;
+    const next = [...items];
+    const [moved] = next.splice(from, 1);
+    next.splice(overIndex, 0, moved);
+    setItems(next);
+    dragIndex.current = null;
+    // persist new order
+    next.forEach((item, i) => {
+      fetch(`/api/admin/${endpoint}/${item.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ order: i }),
+      });
+    });
+  };
+
   const primary = fields[0]?.key ?? 'id';
 
   return (
     <div>
       <div className="flex items-center justify-between">
         <h1 className="display-xl text-2xl">{title}</h1>
-        <button onClick={blank} className="btn-terra !px-5 !py-2.5 text-xs">+ Додати</button>
+        <button onClick={blank} className="btn-admin !px-5 !py-2.5 text-xs">+ Додати</button>
       </div>
 
       {loading ? <p className="mt-6 text-paper/50">Завантаження…</p> : (
         <div className="mt-6 space-y-2">
-          {items.map((it) => (
-            <div key={it.id} className="flex items-center justify-between gap-4 rounded-xl border border-paper/10 px-4 py-3">
+          {items.map((it, index) => (
+            <div
+              key={it.id}
+              className="flex items-center justify-between gap-4 border border-paper/10 px-4 py-3 transition-opacity"
+              draggable={reorderable}
+              onDragStart={() => { dragIndex.current = index; }}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={() => handleDrop(index)}
+            >
               <div className="flex items-center gap-3 truncate">
-                {it.photoUrl || it.coverUrl ? (
-                  <img src={it.photoUrl || it.coverUrl} alt="" className="h-10 w-10 rounded-lg object-cover" />
+                {reorderable && (
+                  <span className="cursor-grab select-none text-paper/30 active:cursor-grabbing" title="Перетягнути">
+                    ⠿
+                  </span>
+                )}
+                {(it.photoUrl || it.coverUrl) ? (
+                  <img src={it.photoUrl || it.coverUrl} alt="" className="h-10 w-10 object-cover" />
                 ) : null}
                 <span className="truncate font-medium">{String(it[primary] || '—')}</span>
               </div>
               <div className="flex shrink-0 gap-2 text-sm">
-                <button onClick={() => setEditing(it)} className="text-paper/70 hover:text-terra">Редагувати</button>
-                <button onClick={() => remove(it.id)} className="text-paper/40 hover:text-terra">Видалити</button>
+                <button onClick={() => setEditing(it)} className="text-paper/70 hover:text-paper">Редагувати</button>
+                <button onClick={() => remove(it.id)} className="text-paper/40 hover:text-paper">Видалити</button>
               </div>
             </div>
           ))}
@@ -86,7 +119,7 @@ export function CollectionEditor({
       {editing && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-black/60" onClick={() => setEditing(null)} />
-          <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl bg-[#1a1917] p-6">
+          <div className="relative max-h-[90vh] w-full max-w-lg overflow-y-auto bg-[#1a1917] p-6">
             <h2 className="display-xl mb-4 text-lg">{editing.id ? 'Редагування' : 'Новий запис'}</h2>
             <div className="space-y-3">
               {fields.map((f) => (
@@ -95,7 +128,7 @@ export function CollectionEditor({
               ))}
             </div>
             <div className="mt-5 flex gap-3">
-              <button onClick={save} className="btn-terra">Зберегти</button>
+              <button onClick={save} className="btn-admin">Зберегти</button>
               <button onClick={() => setEditing(null)} className="text-sm text-paper/60 hover:text-paper">Скасувати</button>
             </div>
           </div>
@@ -106,7 +139,7 @@ export function CollectionEditor({
 }
 
 function Field({ field, value, onChange }: { field: FieldDef; value: any; onChange: (v: any) => void }) {
-  const cls = 'mt-1 w-full rounded-xl border border-paper/20 bg-transparent px-4 py-2.5 outline-none focus:border-terra';
+  const cls = 'mt-1 w-full border border-paper/20 bg-transparent px-4 py-2.5 outline-none focus:border-paper/50';
   if (field.type === 'checkbox') {
     return (
       <label className="flex items-center gap-2 text-sm">
@@ -142,9 +175,9 @@ function ImageField({ value, onChange, cls }: { value: string; onChange: (v: str
   };
   return (
     <div>
-      {value && <img src={value} alt="" className="mb-2 mt-1 h-28 w-full rounded-lg object-cover" />}
+      {value && <img src={value} alt="" className="mb-2 mt-1 h-28 w-full object-cover" />}
       <input type="file" accept="image/*" onChange={(e) => e.target.files?.[0] && upload(e.target.files[0])} className={cls} />
-      {uploading && <p className="mt-1 text-xs text-terra">Завантаження…</p>}
+      {uploading && <p className="mt-1 text-xs text-paper/50">Завантаження…</p>}
     </div>
   );
 }

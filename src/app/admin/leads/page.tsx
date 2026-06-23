@@ -3,7 +3,7 @@ import { useEffect, useState, useCallback } from 'react';
 import { LEAD_TYPE_LABELS, LEAD_STATUS_LABELS } from '@/lib/constants';
 
 type Lead = {
-  id: string; name: string; phone: string; type: string;
+  id: string; name: string; phone: string; email: string | null; type: string;
   message: string | null; status: string; createdAt: string;
 };
 
@@ -35,11 +35,17 @@ export default function LeadsPage() {
     });
   };
 
+  const deleteLead = async (id: string) => {
+    if (!confirm('Видалити заявку?')) return;
+    setLeads((prev) => prev.filter((l) => l.id !== id));
+    await fetch(`/api/admin/leads/${id}`, { method: 'DELETE' });
+  };
+
   return (
     <div>
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h1 className="display-xl text-2xl">Заявки</h1>
-        <a href="/api/admin/leads/export" className="rounded-full border border-paper/20 px-4 py-2 text-sm hover:border-paper/50">
+        <a href="/api/admin/leads/export" className="border border-paper/20 px-4 py-2 text-sm hover:border-paper/50">
           Експорт CSV
         </a>
       </div>
@@ -54,23 +60,31 @@ export default function LeadsPage() {
       <div className="mt-6 space-y-3">
         {loading ? <p className="text-paper/50">Завантаження…</p>
           : leads.length ? leads.map((l) => (
-            <div key={l.id} className="rounded-2xl border border-paper/10 p-5">
+            <div key={l.id} className="border border-paper/10 p-5">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="font-semibold">{l.name}</p>
-                  <a href={`tel:${l.phone}`} className="text-sm text-terra">{l.phone}</a>
+                  <a href={`tel:${l.phone}`} className="text-sm text-paper/70">{l.phone}</a>
+                  {l.email && <a href={`mailto:${l.email}`} className="ml-3 text-sm text-paper/50">{l.email}</a>}
                   <p className="mt-1 text-xs text-paper/40">
-                    {LEAD_TYPE_LABELS[l.type]} · {new Date(l.createdAt).toLocaleString('uk-UA')}
+                    {LEAD_TYPE_LABELS[l.type]} · {new Date(l.createdAt).toLocaleString('uk-UA', { timeZone: 'Europe/Kyiv' })}
                   </p>
                   {l.message && <p className="mt-2 max-w-xl text-sm text-paper/70">{l.message}</p>}
                 </div>
-                <div className="flex gap-1">
-                  {STATUSES.map((s) => (
-                    <button key={s} onClick={() => setLeadStatus(l.id, s)}
-                      className={`rounded-full px-3 py-1.5 text-xs transition-colors ${l.status === s ? 'bg-terra text-paper' : 'bg-paper/10 text-paper/60 hover:bg-paper/20'}`}>
-                      {LEAD_STATUS_LABELS[s]}
-                    </button>
-                  ))}
+                <div className="flex items-center gap-2">
+                  <div className="flex gap-1">
+                    {STATUSES.map((s) => (
+                      <button key={s} onClick={() => setLeadStatus(l.id, s)}
+                        className={`px-3 py-1.5 text-xs transition-colors ${l.status === s ? 'bg-paper text-ink' : 'bg-paper/10 text-paper/60 hover:bg-paper/20'}`}>
+                        {LEAD_STATUS_LABELS[s]}
+                      </button>
+                    ))}
+                  </div>
+                  <button onClick={() => deleteLead(l.id)}
+                    className="ml-1 px-2 py-1.5 text-xs text-paper/30 transition-colors hover:text-red-400"
+                    title="Видалити заявку">
+                    ✕
+                  </button>
                 </div>
               </div>
             </div>
@@ -86,7 +100,7 @@ function Select({ value, onChange, options, placeholder }: {
 }) {
   return (
     <select value={value} onChange={(e) => onChange(e.target.value)}
-      className="rounded-full border border-paper/20 bg-transparent px-4 py-2 text-sm outline-none [&>option]:bg-[#0f0e0d]">
+      className="border border-paper/20 bg-transparent px-4 py-2 text-sm outline-none [&>option]:bg-[#0f0e0d]">
       <option value="">{placeholder}</option>
       {options.map((o) => <option key={o.value} value={o.value}>{o.label}</option>)}
     </select>
