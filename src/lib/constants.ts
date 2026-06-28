@@ -13,10 +13,20 @@ export const LEAD_TYPE_LABELS: Record<string, string> = {
 };
 
 export const LEAD_STATUS_LABELS: Record<string, string> = {
-  NEW: 'Новий',
-  IN_PROGRESS: 'В роботі',
-  CLOSED: 'Закрито',
+  new:       'Новий',
+  qualified: 'Бриф зібрано',
+  kp_sent:   'КП надіслано',
+  kp_viewed: 'КП переглянуто',
+  meeting:   'Зустріч',
+  contract:  'Договір',
+  postponed: 'Відкладено',
+  lost:      'Відмова',
+  not_client:'Не клієнт',
 };
+
+export const LEAD_LOST_REASONS = ['дорого', 'знайшли інших', 'передумали', 'не відповів', 'інше'] as const;
+
+export const FUNNEL_STAGES = ['new', 'qualified', 'kp_sent', 'kp_viewed', 'meeting', 'contract'] as const;
 
 export const CLIENT_STATUS_LABELS: Record<string, string> = {
   PENDING: 'Очікує підтвердження',

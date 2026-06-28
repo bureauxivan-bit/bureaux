@@ -1,8 +1,8 @@
 // Structural type — decoupled from the generated Prisma client so this
 // module type-checks regardless of generation state.
 type Lead = {
-  name: string;
-  phone: string;
+  name: string | null;
+  phone: string | null;
   email?: string | null;
   message: string | null;
   type: string;
@@ -24,8 +24,8 @@ export async function notifyTelegram(lead: Lead): Promise<void> {
   const lines = [
     '🆕 <b>Нова заявка — BUREAUX</b>',
     `Тип: <b>${TYPE_LABEL[lead.type] ?? lead.type}</b>`,
-    `Ім'я: <b>${escapeHtml(lead.name)}</b>`,
-    `Телефон: <b>${escapeHtml(lead.phone)}</b>`,
+    lead.name ? `Ім'я: <b>${escapeHtml(lead.name)}</b>` : '',
+    lead.phone ? `Телефон: <b>${escapeHtml(lead.phone)}</b>` : '',
     lead.email ? `Email: <b>${escapeHtml(lead.email)}</b>` : '',
     lead.message ? `Повідомлення: ${escapeHtml(lead.message)}` : '',
     `🕒 ${lead.createdAt.toLocaleString('uk-UA', { timeZone: 'Europe/Kyiv' })}`,
@@ -78,7 +78,7 @@ export async function notifyKpDraft(p: KpDraftPayload): Promise<void> {
       .filter(Boolean).map(s => escapeHtml(s!)).join(', '),
     p.service ? `Послуга: ${escapeHtml(p.service)}` : '',
     p.priceDesign ? `Ціна-підказка: <b>${p.priceDesign}$</b>` : '',
-    `👉 Обери проекти: ${p.adminUrl}`,
+    `👉 <a href="${p.adminUrl}">Обери проекти в адмінці</a>`,
   ].filter(Boolean);
   await sendTelegram(lines.join('\n'));
 }
