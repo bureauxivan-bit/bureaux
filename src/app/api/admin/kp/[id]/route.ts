@@ -28,6 +28,15 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
     where: { id: params.id },
     data: { ...parsed.data, ...statusDateUpdate },
   });
+
+  // Sync lead funnel status when KP is marked as sent
+  if (parsed.data.status === 'sent' && current?.status !== 'sent') {
+    await prisma.lead.updateMany({
+      where: { kpId: params.id, status: { in: ['new', 'qualified'] } },
+      data: { status: 'kp_sent' },
+    });
+  }
+
   return Response.json(proposal);
 }
 

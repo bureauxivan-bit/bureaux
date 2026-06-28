@@ -24,11 +24,14 @@ export async function POST(req: NextRequest) {
 
   const lead = await prisma.lead.create({
     data: {
+      source: 'site',
       name: parsed.data.name,
       phone: parsed.data.phone,
       email: parsed.data.email || null,
       message: parsed.data.message || null,
       type: parsed.data.type,
+      clientName: parsed.data.name,
+      status: 'new',
     },
   });
 

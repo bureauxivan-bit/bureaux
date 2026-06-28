@@ -20,12 +20,6 @@ enum LeadType {
   GENERAL
 }
 
-enum LeadStatus {
-  NEW
-  IN_PROGRESS
-  CLOSED
-}
-
 model Project {
   id          String          @id @default(cuid())
   title       String
@@ -92,14 +86,32 @@ model Faq {
 }
 
 model Lead {
-  id        String     @id @default(cuid())
-  name      String
-  phone     String
-  email     String?
-  type      LeadType   @default(GENERAL)
-  message   String?
-  status    LeadStatus @default(NEW)
-  createdAt DateTime   @default(now())
+  id              String      @id @default(cuid())
+  // Site form fields
+  name            String?
+  phone           String?
+  email           String?
+  type            LeadType    @default(GENERAL)
+  message         String?
+  // Unified funnel
+  source          String      @default("site")
+  externalId      String?     @unique
+  clientName      String?
+  objectType      String?
+  areaM2          Int?
+  location        String?
+  service         String?
+  status          String      @default("new")
+  lostReason      String?
+  kpId            String?
+  kp              KpProposal? @relation(fields: [kpId], references: [id], onDelete: SetNull)
+  lastClientMsgAt DateTime?
+  pushSentAt      DateTime?
+  createdAt       DateTime    @default(now())
+  updatedAt       DateTime    @updatedAt
+
+  @@index([source])
+  @@index([status])
 }
 
 model SiteSettings {
@@ -246,6 +258,7 @@ model KpProposal {
   service            String?
   priceDesign        Int?
   supervisionMonthly Int?
+  services           Json?
   startDate          String?
   durationWeeks      String    @default("~12 тижнів")
   projectIds         String[]
@@ -263,6 +276,7 @@ model KpProposal {
   createdAt          DateTime  @default(now())
   updatedAt          DateTime  @updatedAt
   events             KpEvent[]
+  leads              Lead[]
 }
 
 model KpEvent {

@@ -43,6 +43,13 @@ export async function POST(req: NextRequest) {
       },
     });
 
+    if (eventType === 'view') {
+      await prisma.lead.updateMany({
+        where: { kpId, status: 'kp_sent' },
+        data: { status: 'kp_viewed' },
+      });
+    }
+
     if (eventType === 'click_cta') {
       const proposal = await prisma.kpProposal.findUnique({ where: { id: kpId } });
       if (proposal && proposal.ctaClickedAt === null) {
