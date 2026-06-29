@@ -1,6 +1,7 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { notifyKpCta } from '@/lib/telegram';
+import { recordStatusChange } from '@/lib/leads';
 
 const VALID_EVENTS = new Set([
   'view', 'time_on_page', 'scroll_price', 'scroll_end',
@@ -44,10 +45,14 @@ export async function POST(req: NextRequest) {
     });
 
     if (eventType === 'view') {
-      await prisma.lead.updateMany({
+      const toUpdate = await prisma.lead.findMany({
         where: { kpId, status: 'kp_sent' },
-        data: { status: 'kp_viewed' },
+        select: { id: true },
       });
+      if (toUpdate.length) {
+        await prisma.lead.updateMany({ where: { kpId, status: 'kp_sent' }, data: { status: 'kp_viewed' } });
+        for (const l of toUpdate) await recordStatusChange(l.id, 'kp_viewed');
+      }
     }
 
     if (eventType === 'click_cta') {

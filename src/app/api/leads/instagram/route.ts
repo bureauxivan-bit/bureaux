@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { recordStatusChange } from '@/lib/leads';
 
 function authOk(req: NextRequest) {
   return req.headers.get('x-api-key') === process.env.MARIA_API_KEY;
@@ -28,6 +29,7 @@ export async function POST(req: NextRequest) {
       data.pushSentAt = null;
     }
     const lead = await prisma.lead.update({ where: { id: existing.id }, data });
+    if (data.status === 'new') recordStatusChange(lead.id, 'new').catch(() => {});
     return Response.json({ id: lead.id, isNew: false });
   }
 
@@ -40,5 +42,6 @@ export async function POST(req: NextRequest) {
       lastClientMsgAt: msgAt,
     },
   });
+  recordStatusChange(lead.id, 'new').catch(() => {});
   return Response.json({ id: lead.id, isNew: true }, { status: 201 });
 }

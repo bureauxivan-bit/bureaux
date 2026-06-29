@@ -3,6 +3,7 @@ import { prisma } from '@/lib/prisma';
 import { leadSchema } from '@/lib/validation';
 import { notifyTelegram } from '@/lib/telegram';
 import { rateLimit, clientIp } from '@/lib/rate-limit';
+import { recordStatusChange } from '@/lib/leads';
 
 export async function POST(req: NextRequest) {
   const ip = clientIp(req);
@@ -35,6 +36,7 @@ export async function POST(req: NextRequest) {
     },
   });
 
+  await recordStatusChange(lead.id, 'new');
   await notifyTelegram(lead);
 
   return Response.json({ ok: true });

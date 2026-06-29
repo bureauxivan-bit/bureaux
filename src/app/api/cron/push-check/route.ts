@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { recordStatusChange } from '@/lib/leads';
 
 const PUSH_DELAY_H = 5;
 const WINDOW_H = 24;
@@ -59,6 +60,7 @@ export async function GET(req: NextRequest) {
       where: { id: { in: expired.map((l) => l.id) } },
       data: { status: 'lost', lostReason: 'не відповів' },
     });
+    for (const l of expired) await recordStatusChange(l.id, 'lost');
   }
 
   // 2. Find leads eligible for push

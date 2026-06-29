@@ -1,5 +1,6 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
+import { recordStatusChange } from '@/lib/leads';
 
 const ALLOWED_STATUSES = new Set([
   'new', 'qualified', 'kp_sent', 'kp_viewed', 'meeting', 'contract', 'postponed', 'lost', 'not_client',
@@ -32,5 +33,6 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (service !== undefined) data.service = service;
 
   const lead = await prisma.lead.update({ where: { id: params.id }, data });
+  if (typeof data.status === 'string') recordStatusChange(lead.id, data.status).catch(() => {});
   return Response.json(lead);
 }
