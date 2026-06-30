@@ -10,12 +10,15 @@ import { CtaButton } from '@/components/CtaButton';
 import { ProjectCard } from '@/components/ProjectCard';
 import { getProjectsByCategory } from '@/lib/data';
 
+export const revalidate = 60;
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
 export const metadata: Metadata = {
   title: { absolute: "Дизайн інтер'єру під ключ у Києві — Bureau X" },
   description:
     "Замовити дизайн інтер'єру квартири, будинку або комерційного приміщення у Києві. Bureau X — авторський підхід, стиль МУАС, повний супровід від ескізу до реалізації.",
+  robots: { index: false, follow: true },
 };
 
 // DRAFT: переписати під голос МУАС, не публікувати як є
@@ -120,30 +123,24 @@ export default async function DyzajnInteruruPage() {
 
       {/* Hero */}
       <section className="container-wide pt-8 pb-16 lg:pb-24">
-        <Reveal>
-          <p className="eyebrow">Послуги</p>
-          <h1 className="display-xl mt-5 max-w-3xl text-[clamp(2rem,5vw,4rem)]">
-            Дизайн інтер'єру під ключ у Києві
-          </h1>
-        </Reveal>
-        <Reveal delay={120}>
-          {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
-          <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted">
-            Авторський підхід, стиль МУАС — від першого брифу до специфікацій під ремонт. Кожен
-            проєкт розробляємо індивідуально: під особистість, функцію простору та спосіб життя
-            клієнта.
-          </p>
-        </Reveal>
-        <Reveal delay={200}>
-          <div className="mt-8">
-            <CtaButton
-              kind="estimate"
-              className="inline-flex items-center gap-3 bg-ink px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-ink/70"
-            >
-              <span>⟶</span> Обговорити ваш інтер'єр
-            </CtaButton>
-          </div>
-        </Reveal>
+        <p className="eyebrow">Послуги</p>
+        <h1 className="display-xl mt-5 max-w-3xl text-[clamp(2rem,5vw,4rem)]">
+          Дизайн інтер'єру під ключ у Києві
+        </h1>
+        {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
+        <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted">
+          Авторський підхід, стиль МУАС — від першого брифу до специфікацій під ремонт. Кожен
+          проєкт розробляємо індивідуально: під особистість, функцію простору та спосіб життя
+          клієнта.
+        </p>
+        <div className="mt-8">
+          <CtaButton
+            kind="estimate"
+            className="inline-flex items-center gap-3 bg-ink px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-ink/70"
+          >
+            <span>⟶</span> Обговорити ваш інтер'єр
+          </CtaButton>
+        </div>
       </section>
 
       {/* Що входить */}

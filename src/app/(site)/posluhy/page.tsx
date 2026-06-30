@@ -70,20 +70,16 @@ export default function PostluhyPage() {
 
       {/* Hero */}
       <section className="container-wide pt-36 pb-16 lg:pt-44 lg:pb-24">
-        <Reveal>
-          <p className="eyebrow">Послуги</p>
-          <h1 className="display-xl mt-5 max-w-3xl text-[clamp(2rem,5vw,4rem)]">
-            Послуги bureau <em>X</em> — від концепції до ключів
-          </h1>
-        </Reveal>
-        <Reveal delay={120}>
-          {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
-          <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted">
-            Ми — архітектурне бюро повного циклу. Проєктуємо, дизайнуємо, будуємо та
-            супроводжуємо — у власному авторському стилі МУАС. Кожен проєкт розробляємо
-            індивідуально, з урахуванням особистості клієнта та функції простору.
-          </p>
-        </Reveal>
+        <p className="eyebrow">Послуги</p>
+        <h1 className="display-xl mt-5 max-w-3xl text-[clamp(2rem,5vw,4rem)]">
+          Послуги bureau <em>X</em> — від концепції до ключів
+        </h1>
+        {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
+        <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted">
+          Ми — архітектурне бюро повного циклу. Проєктуємо, дизайнуємо, будуємо та
+          супроводжуємо — у власному авторському стилі МУАС. Кожен проєкт розробляємо
+          індивідуально, з урахуванням особистості клієнта та функції простору.
+        </p>
       </section>
 
       {/* Services list */}

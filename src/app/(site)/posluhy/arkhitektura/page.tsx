@@ -10,12 +10,15 @@ import { CtaButton } from '@/components/CtaButton';
 import { ProjectCard } from '@/components/ProjectCard';
 import { getProjectsByCategory } from '@/lib/data';
 
+export const revalidate = 60;
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
 export const metadata: Metadata = {
   title: { absolute: 'Архітектурне проєктування у Києві — Bureau X' },
   description:
     'Проєктування приватних будинків, котеджів, комерційних об\'єктів у Київській та інших областях. Bureau X — авторський підхід, досвід 5+ котеджних містечок.',
+  robots: { index: false, follow: true },
 };
 
 // DRAFT: переписати під голос МУАС, не публікувати як є
@@ -120,30 +123,24 @@ export default async function ArkhitekturaPage() {
 
       {/* Hero */}
       <section className="container-wide pt-8 pb-16 lg:pb-24">
-        <Reveal>
-          <p className="eyebrow">Послуги</p>
-          <h1 className="display-xl mt-5 max-w-3xl text-[clamp(2rem,5vw,4rem)]">
-            Архітектурне проєктування — від ескізу до дозволу на будівництво
-          </h1>
-        </Reveal>
-        <Reveal delay={120}>
-          {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
-          <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted">
-            Проєктуємо приватні будинки, котеджі та комерційні об'єкти по всій Україні. Маємо
-            досвід 5+ котеджних містечок та 10 000+ м² реалізованих просторів. Авторська концепція
-            МУАС — у кожному об'єкті.
-          </p>
-        </Reveal>
-        <Reveal delay={200}>
-          <div className="mt-8">
-            <CtaButton
-              kind="estimate"
-              className="inline-flex items-center gap-3 bg-ink px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-ink/70"
-            >
-              <span>⟶</span> Замовити архітектурний проєкт
-            </CtaButton>
-          </div>
-        </Reveal>
+        <p className="eyebrow">Послуги</p>
+        <h1 className="display-xl mt-5 max-w-3xl text-[clamp(2rem,5vw,4rem)]">
+          Архітектурне проєктування — від ескізу до дозволу на будівництво
+        </h1>
+        {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
+        <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted">
+          Проєктуємо приватні будинки, котеджі та комерційні об'єкти по всій Україні. Маємо
+          досвід 5+ котеджних містечок та 10 000+ м² реалізованих просторів. Авторська концепція
+          МУАС — у кожному об'єкті.
+        </p>
+        <div className="mt-8">
+          <CtaButton
+            kind="estimate"
+            className="inline-flex items-center gap-3 bg-ink px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-ink/70"
+          >
+            <span>⟶</span> Замовити архітектурний проєкт
+          </CtaButton>
+        </div>
       </section>
 
       {/* Що ми проєктуємо */}

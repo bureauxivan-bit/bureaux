@@ -10,12 +10,15 @@ import { CtaButton } from '@/components/CtaButton';
 import { ProjectCard } from '@/components/ProjectCard';
 import { getProjectsByCategory } from '@/lib/data';
 
+export const revalidate = 60;
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
 export const metadata: Metadata = {
   title: { absolute: 'Дизайн приватних просторів — квартири, будинки, котеджі · Bureau X Київ' },
   description:
     "Дизайн інтер'єру квартири, приватного будинку або котеджу у Києві. Bureau X — авторський стиль МУАС, повний цикл: концепція, проєкт, реалізація.",
+  robots: { index: false, follow: true },
 };
 
 // DRAFT: переписати під голос МУАС, не публікувати як є
@@ -118,29 +121,23 @@ export default async function PryvatniProstoryPage() {
 
       {/* Hero */}
       <section className="container-wide pt-8 pb-16 lg:pb-24">
-        <Reveal>
-          <p className="eyebrow">Послуги</p>
-          <h1 className="display-xl mt-5 max-w-3xl text-[clamp(2rem,5vw,4rem)]">
-            Дизайн приватних просторів — квартири, будинки, котеджі
-          </h1>
-        </Reveal>
-        <Reveal delay={120}>
-          {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
-          <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted">
-            Авторський стиль МУАС, повний цикл від концепції до реалізації. Кожен проєкт — про вас:
-            вашу особистість, спосіб життя та естетику. Не шаблони — простір зі змістом.
-          </p>
-        </Reveal>
-        <Reveal delay={200}>
-          <div className="mt-8">
-            <CtaButton
-              kind="consult"
-              className="inline-flex items-center gap-3 bg-ink px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-ink/70"
-            >
-              <span>⟶</span> Записатися на консультацію
-            </CtaButton>
-          </div>
-        </Reveal>
+        <p className="eyebrow">Послуги</p>
+        <h1 className="display-xl mt-5 max-w-3xl text-[clamp(2rem,5vw,4rem)]">
+          Дизайн приватних просторів — квартири, будинки, котеджі
+        </h1>
+        {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
+        <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted">
+          Авторський стиль МУАС, повний цикл від концепції до реалізації. Кожен проєкт — про вас:
+          вашу особистість, спосіб життя та естетику. Не шаблони — простір зі змістом.
+        </p>
+        <div className="mt-8">
+          <CtaButton
+            kind="consult"
+            className="inline-flex items-center gap-3 bg-ink px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-ink/70"
+          >
+            <span>⟶</span> Записатися на консультацію
+          </CtaButton>
+        </div>
       </section>
 
       {/* Типи просторів: Квартири / Приватні будинки / Котеджі */}

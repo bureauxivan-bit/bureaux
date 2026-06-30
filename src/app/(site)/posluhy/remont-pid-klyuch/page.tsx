@@ -10,12 +10,15 @@ import { CtaButton } from '@/components/CtaButton';
 import { ProjectCard } from '@/components/ProjectCard';
 import { getProjectsByCategory } from '@/lib/data';
 
+export const revalidate = 60;
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
 export const metadata: Metadata = {
   title: { absolute: 'Ремонт та будівництво під ключ у Києві — Bureau X' },
   description:
     'Ремонт квартири та будинку під ключ у Києві від архітектурного бюро Bureau X. Власна бригада, авторський нагляд, дизайн і ремонт — в одних руках.',
+  robots: { index: false, follow: true },
 };
 
 // DRAFT: переписати під голос МУАС, не публікувати як є
@@ -132,29 +135,23 @@ export default async function RemontPidKlyuchPage() {
 
       {/* Hero */}
       <section className="container-wide pt-8 pb-16 lg:pb-24">
-        <Reveal>
-          <p className="eyebrow">Послуги</p>
-          <h1 className="display-xl mt-5 max-w-3xl text-[clamp(2rem,5vw,4rem)]">
-            Ремонт та будівництво під ключ — від проєкту до переїзду
-          </h1>
-        </Reveal>
-        <Reveal delay={120}>
-          {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
-          <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted">
-            Власна бригада, авторський нагляд і дизайн — в одних руках. Від чистового ремонту
-            квартири до будівництва будинку. Ви отримуєте ключі від готового простору.
-          </p>
-        </Reveal>
-        <Reveal delay={200}>
-          <div className="mt-8">
-            <CtaButton
-              kind="estimate"
-              className="inline-flex items-center gap-3 bg-ink px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-ink/70"
-            >
-              <span>⟶</span> Розрахувати вартість ремонту
-            </CtaButton>
-          </div>
-        </Reveal>
+        <p className="eyebrow">Послуги</p>
+        <h1 className="display-xl mt-5 max-w-3xl text-[clamp(2rem,5vw,4rem)]">
+          Ремонт та будівництво під ключ — від проєкту до переїзду
+        </h1>
+        {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
+        <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted">
+          Власна бригада, авторський нагляд і дизайн — в одних руках. Від чистового ремонту
+          квартири до будівництва будинку. Ви отримуєте ключі від готового простору.
+        </p>
+        <div className="mt-8">
+          <CtaButton
+            kind="estimate"
+            className="inline-flex items-center gap-3 bg-ink px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-ink/70"
+          >
+            <span>⟶</span> Розрахувати вартість ремонту
+          </CtaButton>
+        </div>
       </section>
 
       {/* Що входить */}

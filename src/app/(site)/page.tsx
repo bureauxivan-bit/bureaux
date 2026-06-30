@@ -39,13 +39,13 @@ export default async function HomePage() {
       <FeaturedWorks projects={top} />
 
       <WhyUs />
-      <ItemX url={settings.itemXUrl} />
       <About />
       <Team team={team} />
       <Reviews reviews={reviews} />
       <PricingBlock />
       <HowWeWork />
       <FinalCta />
+      <ItemX url={settings.itemXUrl} />
       <Faq faqs={faqs} />
     </>
   );

@@ -10,12 +10,15 @@ import { CtaButton } from '@/components/CtaButton';
 import { ProjectCard } from '@/components/ProjectCard';
 import { getProjectsByCategory } from '@/lib/data';
 
+export const revalidate = 60;
+
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
 export const metadata: Metadata = {
   title: { absolute: 'Дизайн комерційних приміщень у Києві — Bureau X' },
   description:
     'Дизайн ресторанів, кафе, офісів, магазинів та готелів у Києві від Bureau X. Розуміємо бізнес-логіку простору, реалізуємо під ключ.',
+  robots: { index: false, follow: true },
 };
 
 // DRAFT: переписати під голос МУАС, не публікувати як є
@@ -130,29 +133,23 @@ export default async function KomertsiiniPrymishchennyaPage() {
 
       {/* Hero */}
       <section className="container-wide pt-8 pb-16 lg:pb-24">
-        <Reveal>
-          <p className="eyebrow">Послуги</p>
-          <h1 className="display-xl mt-5 max-w-3xl text-[clamp(2rem,5vw,4rem)]">
-            Дизайн комерційних приміщень — ресторани, офіси, магазини, готелі
-          </h1>
-        </Reveal>
-        <Reveal delay={120}>
-          {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
-          <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted">
-            Розуміємо бізнес-логіку простору і реалізуємо під ключ. Комерційний дизайн — це не
-            декор. Це інструмент для зростання виручки, ефективності команди та лояльності клієнтів.
-          </p>
-        </Reveal>
-        <Reveal delay={200}>
-          <div className="mt-8">
-            <CtaButton
-              kind="estimate"
-              className="inline-flex items-center gap-3 bg-ink px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-ink/70"
-            >
-              <span>⟶</span> Обговорити комерційний проєкт
-            </CtaButton>
-          </div>
-        </Reveal>
+        <p className="eyebrow">Послуги</p>
+        <h1 className="display-xl mt-5 max-w-3xl text-[clamp(2rem,5vw,4rem)]">
+          Дизайн комерційних приміщень — ресторани, офіси, магазини, готелі
+        </h1>
+        {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
+        <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted">
+          Розуміємо бізнес-логіку простору і реалізуємо під ключ. Комерційний дизайн — це не
+          декор. Це інструмент для зростання виручки, ефективності команди та лояльності клієнтів.
+        </p>
+        <div className="mt-8">
+          <CtaButton
+            kind="estimate"
+            className="inline-flex items-center gap-3 bg-ink px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-ink/70"
+          >
+            <span>⟶</span> Обговорити комерційний проєкт
+          </CtaButton>
+        </div>
       </section>
 
       {/* Типи об'єктів */}

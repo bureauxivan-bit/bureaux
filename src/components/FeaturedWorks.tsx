@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { Reveal } from '@/components/Reveal';
 import { CATEGORY_LABELS } from '@/lib/constants';
 
@@ -56,11 +57,12 @@ export function FeaturedWorks({ projects }: { projects: P[] }) {
                     {/* Image */}
                     <div className={`relative ${ar} overflow-hidden bg-ink/5`}>
                       {url ? (
-                        <img
+                        <Image
                           src={url}
                           alt={p.title}
-                          className="h-full w-full object-cover transition-transform duration-[1100ms] ease-out group-hover:scale-[1.04]"
-                          loading="lazy"
+                          fill
+                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                          className="object-cover transition-transform duration-[1100ms] ease-out group-hover:scale-[1.04]"
                         />
                       ) : (
                         <div className="flex h-full items-center justify-center">

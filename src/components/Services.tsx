@@ -4,13 +4,15 @@ import { Reveal } from './Reveal';
 
 type Service = { id: string; number: number; title: string; description: string | null; coverUrl: string | null };
 
-const SERVICE_HREFS: Record<number, string> = {
-  1: '/posluhy/dyzajn-intereru',
-  2: '/posluhy/arkhitektura',
-  3: '/posluhy/remont-pid-klyuch',
-  4: '/posluhy/komertsiini-prymishchennia',
-  5: '/posluhy/pryvatni-prostory',
-};
+function getServiceHref(title: string): string {
+  const t = title.toLowerCase();
+  if (t.includes('інтер')) return '/posluhy/dyzajn-intereru';
+  if (t.includes('архітектур')) return '/posluhy/arkhitektura';
+  if (t.includes('ремонт')) return '/posluhy/remont-pid-klyuch';
+  if (t.includes('комерц')) return '/posluhy/komertsiini-prymishchennia';
+  if (t.includes('приватн')) return '/posluhy/pryvatni-prostory';
+  return '/posluhy';
+}
 
 export function Services({ services }: { services: Service[] }) {
   if (!services.length) return null;
@@ -39,7 +41,7 @@ export function Services({ services }: { services: Service[] }) {
       {/* images grid */}
       <div className="container-wide grid grid-cols-1 gap-2.5 sm:grid-cols-3">
         {services.map((s, i) => {
-          const href = SERVICE_HREFS[s.number] ?? '/posluhy';
+          const href = getServiceHref(s.title);
           return (
             <Reveal key={s.id} delay={i * 80}>
               <Link href={href} className="group block">
