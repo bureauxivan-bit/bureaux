@@ -46,6 +46,18 @@ export async function getProjectBySlug(slug: string) {
   });
 }
 
+export async function getProjectsByCategory(
+  category: 'PRIVATE' | 'COMMERCIAL' | 'ARCHITECTURE',
+  take = 3,
+) {
+  return prisma.project.findMany({
+    where: { category },
+    orderBy: [{ order: 'asc' }, { year: 'desc' }],
+    include: { images: { orderBy: { order: 'asc' } } },
+    take,
+  });
+}
+
 /** Returns the cover image URL for a project, falling back to first image. */
 export function coverUrl(p: { coverId: string | null; images: { id: string; url: string }[] }) {
   if (p.coverId) {
