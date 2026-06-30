@@ -5,7 +5,7 @@ import { Footer } from '@/components/Footer';
 import { LeadModalProvider } from '@/components/LeadModal';
 import CursorTrail from '@/components/CursorTrail';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.example';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
 export default async function SiteLayout({ children }: { children: React.ReactNode }) {
   const settings = await getSettings();

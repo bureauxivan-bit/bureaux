@@ -28,7 +28,7 @@ const body = localFont({
   display: 'swap',
 });
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.example';
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
