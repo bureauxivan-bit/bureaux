@@ -162,10 +162,10 @@ export default async function RemontPidKlyuchPage() {
         <Reveal>
           <h2 className="display-xl text-[clamp(1.5rem,3vw,2.5rem)]">Що входить</h2>
         </Reveal>
-        <div className="mt-10 grid gap-0 border-t border-line sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-10 grid gap-6 pt-8 border-t border-line sm:grid-cols-2 lg:grid-cols-3">
           {INCLUDES.map((item, i) => (
             <Reveal key={item} delay={i * 50}>
-              <div className="flex items-start gap-4 border-b border-line py-5 pr-6">
+              <div className="flex items-start gap-4 py-3 pr-6">
                 <span className="mt-0.5 shrink-0 text-[10px] uppercase tracking-[0.28em] text-muted">
                   {String(i + 1).padStart(2, '0')}
                 </span>
@@ -184,10 +184,10 @@ export default async function RemontPidKlyuchPage() {
               Чому краще ніж окремі підрядники
             </h2>
           </Reveal>
-          <div className="mt-10 grid gap-0 border-t border-paper/10 sm:grid-cols-2">
+          <div className="mt-10 grid gap-8 pt-8 border-t border-paper/10 sm:grid-cols-2">
             {ADVANTAGES.map((a, i) => (
               <Reveal key={a.t} delay={i * 60}>
-                <div className="border-b border-paper/10 py-7 pr-10 sm:border-r sm:[&:nth-child(2n)]:border-r-0">
+                <div className="py-4 pr-10">
                   <h3 className="display-xl text-base font-normal">{a.t}</h3>
                   {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
                   <p className="mt-2 text-sm leading-relaxed text-paper/55">{a.d}</p>

@@ -160,10 +160,10 @@ export default async function KomertsiiniPrymishchennyaPage() {
         <Reveal>
           <h2 className="display-xl text-[clamp(1.5rem,3vw,2.5rem)]">Типи об'єктів</h2>
         </Reveal>
-        <div className="mt-10 grid gap-0 border-t border-line sm:grid-cols-2">
+        <div className="mt-10 grid gap-8 pt-8 border-t border-line sm:grid-cols-2">
           {OBJECT_TYPES.map((o, i) => (
             <Reveal key={o.t} delay={i * 60}>
-              <div className="border-b border-line py-7 pr-10 sm:border-r sm:[&:nth-child(2n)]:border-r-0">
+              <div className="py-4 pr-10">
                 <h3 className="display-xl text-lg font-normal">{o.t}</h3>
                 {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
                 <p className="mt-2 text-sm leading-relaxed text-muted">{o.d}</p>
@@ -181,10 +181,10 @@ export default async function KomertsiiniPrymishchennyaPage() {
               Специфіка комерційного дизайну
             </h2>
           </Reveal>
-          <div className="mt-10 grid gap-0 border-t border-paper/10 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-10 grid gap-6 pt-8 border-t border-paper/10 sm:grid-cols-2 lg:grid-cols-3">
             {SPECIFICS.map((item, i) => (
               <Reveal key={item} delay={i * 50}>
-                <div className="flex items-start gap-4 border-b border-paper/10 py-5 pr-6">
+                <div className="flex items-start gap-4 py-3 pr-6">
                   <span className="mt-0.5 shrink-0 text-[10px] uppercase tracking-[0.28em] text-paper/30">
                     {String(i + 1).padStart(2, '0')}
                   </span>

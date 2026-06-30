@@ -148,10 +148,10 @@ export default async function PryvatniProstoryPage() {
         <Reveal>
           <h2 className="display-xl text-[clamp(1.5rem,3vw,2.5rem)]">Для яких просторів</h2>
         </Reveal>
-        <div className="mt-10 grid gap-0 border-t border-line lg:grid-cols-3">
+        <div className="mt-10 grid gap-8 pt-8 border-t border-line lg:grid-cols-3">
           {SPACE_TYPES.map((s, i) => (
             <Reveal key={s.t} delay={i * 60}>
-              <div className="border-b border-line py-7 pr-10 lg:border-r lg:[&:last-child]:border-r-0">
+              <div className="py-4 pr-10">
                 <h3 className="display-xl text-lg font-normal">{s.t}</h3>
                 {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
                 <p className="mt-2 text-sm leading-relaxed text-muted">{s.d}</p>

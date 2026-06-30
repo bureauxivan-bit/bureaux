@@ -47,10 +47,10 @@ export function HowWeWork() {
         <h2 className="display-xl mt-5 text-[clamp(2rem,5vw,4rem)]">Як ми працюємо</h2>
       </Reveal>
 
-      <div className="mt-14 grid gap-0 border-t border-line sm:grid-cols-2 lg:grid-cols-3">
+      <div className="mt-10 grid gap-8 pt-10 border-t border-line sm:grid-cols-2 lg:grid-cols-3">
         {STEPS.map((s, i) => (
           <Reveal key={s.num} delay={i * 60}>
-            <div className="border-b border-line py-8 pr-8 sm:border-r last:border-b-0 sm:[&:nth-child(2n)]:border-r-0 lg:[&:nth-child(2n)]:border-r lg:[&:nth-child(3n)]:border-r-0">
+            <div className="py-4 pr-8">
               <span className="text-[10px] font-normal uppercase tracking-[0.28em] text-muted">
                 {s.num}
               </span>
