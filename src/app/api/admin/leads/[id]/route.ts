@@ -5,7 +5,7 @@ import { requireAdmin } from '@/lib/auth';
 export async function PATCH(req: NextRequest, { params }: { params: { id: string } }) {
   const unauth = await requireAdmin(); if (unauth) return unauth;
   const body = await req.json().catch(() => ({}));
-  const allowed = ['lostReason', 'status', 'objectType', 'areaM2', 'location', 'service', 'clientName'];
+  const allowed = ['lostReason', 'status', 'objectType', 'areaM2', 'location', 'service', 'clientName', 'kpId'];
   const data = Object.fromEntries(Object.entries(body).filter(([k]) => allowed.includes(k)));
   const lead = await prisma.lead.update({ where: { id: params.id }, data });
   return Response.json(lead);

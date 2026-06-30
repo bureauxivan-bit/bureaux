@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState, useRef, useCallback } from 'react';
-import { type KpServices, deriveServices, ARCH_RATE, DESIGN_RATE, SUPERVISION_DEFAULT, MIN_AREA, ARCH_MIN, DESIGN_MIN, calcServicePrice } from '@/lib/kp-services';
+import { useSearchParams } from 'next/navigation';
+import { type KpServices, deriveServices, servicesFromString, ARCH_RATE, DESIGN_RATE, SUPERVISION_DEFAULT, MIN_AREA, ARCH_MIN, DESIGN_MIN, calcServicePrice } from '@/lib/kp-services';
 
 type Analytics = {
   lastViewedAt: string | null;
@@ -92,6 +93,9 @@ function serviceLabel(services: KpServices): string {
 }
 
 export default function KpPage() {
+  const searchParams = useSearchParams();
+  const fromLeadId = useRef<string | null>(null);
+
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [projects, setProjects] = useState<ProjectOption[]>([]);
   const [loading, setLoading] = useState(true);
@@ -103,6 +107,27 @@ export default function KpPage() {
   const introManual = useRef(false);
 
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : '';
+
+  // Pre-fill from lead when navigated from /admin/leads
+  useEffect(() => {
+    const leadId = searchParams.get('fromLead');
+    if (!leadId) return;
+    fromLeadId.current = leadId;
+    const area = searchParams.get('areaM2');
+    const service = searchParams.get('service') ?? '';
+    const areaNum = area ? Number(area) : null;
+    setEditing({});
+    setF({
+      ...BLANK,
+      clientName: searchParams.get('name') ?? '',
+      objectType: searchParams.get('objectType') ?? '',
+      areaM2: areaNum,
+      location: searchParams.get('location') ?? '',
+      services: service ? servicesFromString(service, areaNum) : {},
+    });
+    introManual.current = false;
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -231,7 +256,18 @@ export default function KpPage() {
       const saved = await res.json();
       setSavedCode(saved.code);
       await load();
-      if (isNew) setEditing(saved);
+      if (isNew) {
+        setEditing(saved);
+        // Link KP back to the lead it was created from
+        if (fromLeadId.current) {
+          await fetch(`/api/admin/leads/${fromLeadId.current}`, {
+            method: 'PATCH',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ kpId: saved.id }),
+          });
+          fromLeadId.current = null;
+        }
+      }
     }
     setSaving(false);
   };
@@ -254,12 +290,10 @@ export default function KpPage() {
     setCopied(true); setTimeout(() => setCopied(false), 2000);
   };
 
-  // Funnel for current month
+  // Funnel for rolling 30-day window
   const now = new Date();
-  const monthProposals = proposals.filter((p) => {
-    const d = new Date(p.createdAt);
-    return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
-  });
+  const thirtyDaysAgo = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+  const monthProposals = proposals.filter((p) => new Date(p.createdAt) >= thirtyDaysAgo);
   const funnel = {
     created: monthProposals.length,
     sent: monthProposals.filter((p) => ['sent', 'viewed', 'meeting', 'contract'].includes(p.status)).length,
@@ -471,7 +505,7 @@ export default function KpPage() {
       {/* Funnel — current month */}
       <div className="mt-6 border border-paper/10">
         <div className="px-5 py-3 border-b border-paper/10">
-          <p className="text-xs text-paper/40 uppercase tracking-widest">Воронка — поточний місяць</p>
+          <p className="text-xs text-paper/40 uppercase tracking-widest">Воронка — останні 30 днів</p>
         </div>
         <div className="grid grid-cols-5 divide-x divide-paper/10">
           {[

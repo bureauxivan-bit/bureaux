@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, useCallback } from 'react';
+import { useRouter } from 'next/navigation';
 import { LEAD_STATUS_LABELS, LEAD_LOST_REASONS, FUNNEL_STAGES, LEAD_TYPE_LABELS } from '@/lib/constants';
 
 type Lead = {
@@ -234,12 +235,24 @@ function LeadHistory({ leadId }: { leadId: string }) {
 
 // ── Main page ─────────────────────────────────────────────────────────────────
 export default function LeadsPage() {
+  const router = useRouter();
   const [leads, setLeads] = useState<Lead[]>([]);
   const [filterStatus, setFilterStatus] = useState('');
   const [filterSource, setFilterSource] = useState('');
   const [loading, setLoading] = useState(true);
   const [tab, setTab] = useState<'list' | 'dashboard'>('list');
   const [expandedHistory, setExpandedHistory] = useState<Set<string>>(new Set());
+
+  const openCreateKp = (l: Lead) => {
+    const params = new URLSearchParams({ fromLead: l.id });
+    const name = l.clientName || l.name || '';
+    if (name) params.set('name', name);
+    if (l.objectType) params.set('objectType', l.objectType);
+    if (l.areaM2) params.set('areaM2', String(l.areaM2));
+    if (l.location) params.set('location', l.location);
+    if (l.service) params.set('service', l.service);
+    router.push(`/admin/kp?${params.toString()}`);
+  };
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -363,10 +376,15 @@ export default function LeadsPage() {
                           {l.type && l.source === 'site' && LEAD_TYPE_LABELS[l.type] && (
                             <span>{LEAD_TYPE_LABELS[l.type]}</span>
                           )}
-                          {l.kpId && (
-                            <a href={`/admin/kp?id=${l.kpId}`} className="text-paper/50 hover:text-paper/80 underline">
-                              КП →
+                          {l.kpId ? (
+                            <a href="/admin/kp" className="text-green-400 hover:text-green-300 underline">
+                              КП ✓
                             </a>
+                          ) : (
+                            <button onClick={() => openCreateKp(l)}
+                              className="text-paper/50 hover:text-paper/80 underline">
+                              → Створити КП
+                            </button>
                           )}
                           <button onClick={() => toggleHistory(l.id)}
                             className="text-paper/30 hover:text-paper/60 transition-colors">
