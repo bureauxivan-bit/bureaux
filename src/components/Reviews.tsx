@@ -1,54 +1,76 @@
-'use client';
-import { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import Script from 'next/script';
 import { Reveal } from './Reveal';
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
 type Review = { id: string; author: string; projectName: string | null; text: string };
 
 export function Reviews({ reviews }: { reviews: Review[] }) {
-  const [i, setI] = useState(0);
   if (!reviews.length) return null;
-  const go = (d: number) => setI((p) => (p + d + reviews.length) % reviews.length);
-  const r = reviews[i];
+
+  const reviewLd = {
+    '@context': 'https://schema.org',
+    '@type': 'LocalBusiness',
+    name: 'Bureau X',
+    url: SITE_URL,
+    review: reviews.map((r) => ({
+      '@type': 'Review',
+      author: { '@type': 'Person', name: r.author },
+      reviewBody: r.text,
+      ...(r.projectName ? { name: r.projectName } : {}),
+    })),
+  };
 
   return (
     <section className="container-wide py-24 lg:py-36">
+      <Script
+        id="ld-reviews"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewLd) }}
+      />
+
       <Reveal>
-      <div className="flex items-end justify-between">
         <h2 className="display-xl text-[clamp(2rem,5vw,4rem)]">Відгуки</h2>
-        <div className="flex gap-3">
-          <button onClick={() => go(-1)} aria-label="Назад"
-            className="flex h-12 w-12 items-center justify-center border border-ink/20 transition-colors hover:bg-ink hover:text-paper">←</button>
-          <button onClick={() => go(1)} aria-label="Далі"
-            className="flex h-12 w-12 items-center justify-center border border-ink/20 transition-colors hover:bg-ink hover:text-paper">→</button>
-        </div>
-      </div>
       </Reveal>
 
-      <div className="relative mt-12 min-h-[220px]">
-        <AnimatePresence mode="wait">
-          <motion.blockquote
-            key={r.id}
-            initial={{ opacity: 0, y: 24 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -24 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            className="max-w-4xl"
-          >
-            <p className="display-xl text-lg leading-snug sm:text-xl">«{r.text}»</p>
-            <footer className="mt-7 flex items-center gap-3 text-sm">
-              <span className="h-px w-10 bg-ink" />
-              <span className="font-normal">{r.author}</span>
-              {r.projectName && <span className="text-muted">· {r.projectName}</span>}
-            </footer>
-          </motion.blockquote>
-        </AnimatePresence>
+      {/* Desktop grid */}
+      <div className="mt-12 hidden gap-px bg-line sm:grid sm:grid-cols-2 lg:grid-cols-3">
+        {reviews.map((r, i) => (
+          <Reveal key={r.id} delay={i * 60}>
+            <blockquote className="flex h-full flex-col bg-paper p-7 lg:p-9">
+              <p className="display-xl flex-1 text-base leading-relaxed lg:text-lg">«{r.text}»</p>
+              <footer className="mt-6 flex items-center gap-3 text-sm">
+                <span className="h-px w-8 shrink-0 bg-ink" />
+                <div>
+                  <span className="font-normal">{r.author}</span>
+                  {r.projectName && (
+                    <span className="mt-0.5 block text-xs text-muted">{r.projectName}</span>
+                  )}
+                </div>
+              </footer>
+            </blockquote>
+          </Reveal>
+        ))}
       </div>
 
-      <div className="mt-8 flex gap-2">
-        {reviews.map((_, idx) => (
-          <button key={idx} onClick={() => setI(idx)} aria-label={`Відгук ${idx + 1}`}
-            className={`h-1 transition-all ${idx === i ? 'w-10 bg-ink' : 'w-4 bg-ink/15'}`} />
+      {/* Mobile horizontal scroll with snap */}
+      <div className="-mx-5 mt-10 flex snap-x snap-mandatory overflow-x-auto gap-3 px-5 pb-4 sm:hidden">
+        {reviews.map((r) => (
+          <blockquote
+            key={r.id}
+            className="flex w-[85vw] shrink-0 snap-center flex-col border border-line p-6"
+          >
+            <p className="display-xl flex-1 text-base leading-relaxed">«{r.text}»</p>
+            <footer className="mt-5 flex items-center gap-3 text-sm">
+              <span className="h-px w-7 shrink-0 bg-ink" />
+              <div>
+                <span className="font-normal">{r.author}</span>
+                {r.projectName && (
+                  <span className="mt-0.5 block text-xs text-muted">{r.projectName}</span>
+                )}
+              </div>
+            </footer>
+          </blockquote>
         ))}
       </div>
     </section>
