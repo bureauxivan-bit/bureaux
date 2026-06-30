@@ -107,10 +107,10 @@ export function Header({ settings }: { settings: Settings }) {
           )}
           <button
             onClick={() => { setMenu(false); openEstimate(); }}
-            className="mt-4 flex items-center gap-3 border border-paper/30 px-5 py-3 text-xs font-normal uppercase tracking-widest text-paper hover:border-paper"
+            className="mt-4 flex items-center gap-3 bg-paper px-5 py-3 text-xs font-normal uppercase tracking-widest text-coal transition-opacity duration-200 hover:opacity-85"
           >
             <span>⟶</span>
-            Прорахунок проєкту
+            Безкоштовний прорахунок
           </button>
           <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-paper/50">
             {settings.phone && (

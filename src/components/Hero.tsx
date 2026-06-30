@@ -41,11 +41,11 @@ export function Hero({ heroImage }: { heroImage?: string | null }) {
           {/* CTA — arrow style */}
           <div className="shrink-0 lg:pb-1">
             <CtaButton
-              kind="consult"
-              className="group inline-flex items-center gap-3 border border-paper/50 px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-paper transition-all duration-300 hover:border-paper hover:bg-paper hover:text-coal"
+              kind="estimate"
+              className="group inline-flex items-center gap-3 bg-paper px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-coal transition-opacity duration-200 hover:opacity-85"
             >
               <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
-              Безкоштовна консультація
+              Безкоштовний прорахунок
             </CtaButton>
           </div>
 
