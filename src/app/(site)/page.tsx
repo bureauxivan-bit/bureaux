@@ -12,6 +12,7 @@ import { FinalCta } from '@/components/FinalCta';
 import { FeaturedWorks } from '@/components/FeaturedWorks';
 import { Reveal } from '@/components/Reveal';
 import { PricingBlock } from '@/components/PricingBlock';
+import { HowWeWork } from '@/components/HowWeWork';
 import {
   getServices, getTopProjects, getTeam, getReviews, getFaq, getSettings,
 } from '@/lib/data';
@@ -43,6 +44,7 @@ export default async function HomePage() {
       <Team team={team} />
       <Reviews reviews={reviews} />
       <PricingBlock />
+      <HowWeWork />
       <FinalCta />
       <Faq faqs={faqs} />
     </>
