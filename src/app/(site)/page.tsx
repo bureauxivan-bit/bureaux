@@ -1,3 +1,4 @@
+import type { Metadata } from 'next';
 import Link from 'next/link';
 import { Hero } from '@/components/Hero';
 import { Services } from '@/components/Services';
@@ -15,6 +16,13 @@ import {
 } from '@/lib/data';
 
 export const revalidate = 60;
+
+export const metadata: Metadata = {
+  title: {
+    absolute: "Bureau X — Дизайн інтер’єру та архітектура під ключ · Київ",
+  },
+  description: "Bureau X — архітектурне бюро у Києві. Дизайн інтер’єру квартир і будинків, архітектурне проєктування, ремонт під ключ. Авторський стиль МУАС. Понад 10 000 м² реалізованих просторів. Консультація безкоштовно.",
+};
 
 export default async function HomePage() {
   const [services, top, team, reviews, faqs, settings] = await Promise.all([

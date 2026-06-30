@@ -5,8 +5,10 @@ import { CtaButton } from '@/components/CtaButton';
 import type { Metadata } from 'next';
 
 export const metadata: Metadata = {
-  title: 'Студія — bureau X',
-  description: 'Молоде подружжя архітекторів, що створили Молодий Український Архітектурний Стиль (МУАС).',
+  title: {
+    absolute: 'Про бюро — авторський стиль МУАС · Bureau X Київ',
+  },
+  description: 'Молоде подружжя архітекторів, що створили Молодий Український Архітектурний Стиль (МУАС). Понад 5 років та 10 000+ м² реалізованих просторів у Києві та Україні.',
 };
 
 export const revalidate = 60;
