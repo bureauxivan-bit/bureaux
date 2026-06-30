@@ -52,9 +52,12 @@ export const kpProposalSchema = z.object({
   objectType: z.string().optional().nullable(),
   areaM2: z.coerce.number().int().positive().optional().nullable(),
   location: z.string().optional().nullable(),
+  // Legacy single-service fields — kept for backward compat; nulled when new `services` is saved
   service: z.string().optional().nullable(),
   priceDesign: z.coerce.number().int().positive().optional().nullable(),
   supervisionMonthly: z.coerce.number().int().positive().optional().nullable(),
+  // New multi-service structure (JSONB)
+  services: z.record(z.any()).optional(),
   startDate: z.string().optional().nullable(),
   durationWeeks: z.string().default('~12 тижнів'),
   projectIds: z.array(z.string()).default([]),

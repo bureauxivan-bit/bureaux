@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useRef } from 'react';
 import Link from 'next/link';
+import { type KpServices, countEnabled, isArchDesignCombo, MIN_AREA } from '@/lib/kp-services';
 
 export type KpCase = {
   title: string;
@@ -17,9 +18,7 @@ export type KpTemplateProps = {
   objectType?: string | null;
   areaM2?: number | null;
   location?: string | null;
-  service?: string | null;
-  priceDesign?: number | null;
-  supervisionMonthly?: number | null;
+  services: KpServices;
   startDate?: string | null;
   durationWeeks: string;
   introText?: string | null;
@@ -179,6 +178,7 @@ const CSS = `
 }
 
 /* PRICE */
+.kp-page .kp-row-note { padding: 4px 26px 14px; border-bottom: 1px solid var(--kp-line); font-size: 12px; color: var(--kp-grey); line-height: 1.45; }
 .kp-page .kp-price-grid { display: grid; grid-template-columns: 1.25fr 1fr; gap: 0; border: 1px solid var(--kp-ls); }
 .kp-page .kp-calc { border-right: 1px solid var(--kp-ls); }
 .kp-page .kp-row {
@@ -296,9 +296,8 @@ const CSS = `
 `;
 
 export function KpTemplate({
-  code, kpId, clientName, objectType, areaM2, location, service,
-  priceDesign, supervisionMonthly, startDate, durationWeeks,
-  introText, validDays, createdAt, cases, telegramUrl,
+  code, kpId, clientName, objectType, areaM2, location, services,
+  startDate, durationWeeks, introText, validDays, createdAt, cases, telegramUrl,
 }: KpTemplateProps) {
   const pageRef = useRef<HTMLDivElement>(null);
   const startTimeRef = useRef<number>(Date.now());
@@ -368,7 +367,21 @@ export function KpTemplate({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [kpId]);
 
-  const serviceLabel = service ?? 'дизайн інтер\'єру';
+  const arch = services.architecture;
+  const design = services.design;
+  const supervision = services.supervision;
+  const enabledCount = countEnabled(services);
+  const isCombo = enabledCount > 1;
+  const archDesignCombo = isArchDesignCombo(services);
+
+  const serviceLabelText = [
+    arch?.enabled ? 'Архпроєкт' : null,
+    design?.enabled ? 'Дизайн' : null,
+    supervision?.enabled ? 'Супровід' : null,
+  ].filter(Boolean).join(' + ') || null;
+
+  const hasAnyPrice = !!(arch?.enabled || design?.enabled || supervision?.enabled);
+
   const date = new Date(createdAt).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' });
 
   return (
@@ -397,7 +410,7 @@ export function KpTemplate({
               {objectType && <span className="kp-chip"><span>Тип</span>{objectType}</span>}
               {areaM2 && <span className="kp-chip"><span>Площа</span>{areaM2} м²</span>}
               {location && <span className="kp-chip"><span>Локація</span>{location}</span>}
-              {serviceLabel && <span className="kp-chip"><span>Послуга</span>{serviceLabel}</span>}
+              {serviceLabelText && <span className="kp-chip"><span>Послуга</span>{serviceLabelText}</span>}
             </div>
           </div>
         </header>
@@ -468,7 +481,7 @@ export function KpTemplate({
         </section>
 
         {/* PRICE */}
-        {priceDesign && (
+        {hasAnyPrice && (
           <section id="kp-price">
             <div className="kp-wrap">
               <div className="kp-sec-head rv">
@@ -480,22 +493,79 @@ export function KpTemplate({
               </div>
               <div className="kp-price-grid">
                 <div className="kp-calc rv">
-                  {areaM2 && service && (
-                    <div className="kp-row">
-                      <span>Дизайн-проект · {areaM2} м²</span>
-                      <span>{fmt(priceDesign)}</span>
-                    </div>
-                  )}
-                  {supervisionMonthly && (
+
+                  {/* Architecture row */}
+                  {arch?.enabled && (() => {
+                    const isFixed = !areaM2 || areaM2 < MIN_AREA;
+                    return (
+                      <>
+                        <div className="kp-row">
+                          <span>
+                            {isFixed
+                              ? 'Архітектурний проєкт (фіксована вартість)'
+                              : `Архітектурний проєкт · ${areaM2} м² × ${arch.rate ?? 40}$`}
+                          </span>
+                          <span>{arch.price ? fmt(arch.price) : '—'}</span>
+                        </div>
+                        {isFixed && (
+                          <div className="kp-row-note">
+                            Для об&apos;єктів до 120 м² діє фіксована вартість проєкту, адже обсяг роботи — планування, візуалізація, креслення, специфікація — однаковий незалежно від площі.
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+
+                  {/* Design row */}
+                  {design?.enabled && (() => {
+                    const isFixed = !areaM2 || areaM2 < MIN_AREA;
+                    return (
+                      <>
+                        <div className="kp-row">
+                          <span>
+                            {isFixed
+                              ? 'Дизайн-проєкт (фіксована вартість)'
+                              : `Дизайн-проєкт · ${areaM2} м² × ${design.rate ?? 60}$`}
+                          </span>
+                          <span>{design.price ? fmt(design.price) : '—'}</span>
+                        </div>
+                        {isFixed && (
+                          <div className="kp-row-note">
+                            Для об&apos;єктів до 120 м² діє фіксована вартість проєкту, адже обсяг роботи — планування, візуалізація, креслення, специфікація — однаковий незалежно від площі.
+                          </div>
+                        )}
+                        {archDesignCombo && (
+                          <div className="kp-row-note">
+                            Вартість дизайн-проєкту попередня та буде уточнена після остаточного затвердження архітектурного проєкту.
+                          </div>
+                        )}
+                      </>
+                    );
+                  })()}
+
+                  {/* Supervision row — always separate, not in total */}
+                  {supervision?.enabled && (
                     <div className="kp-row">
                       <span>Авторський супровід · щомісячно</span>
-                      <span>{fmt(supervisionMonthly)}/міс</span>
+                      <span>{supervision.monthly ? fmt(supervision.monthly) : fmt(800)}/міс</span>
                     </div>
                   )}
-                  <div className="kp-row total">
-                    <span>{serviceLabel}</span>
-                    <span>{fmt(priceDesign)}</span>
-                  </div>
+
+                  {/* Total row — only for single service (excluding supervision-only) */}
+                  {!isCombo && arch?.enabled && arch.price && (
+                    <div className="kp-row total">
+                      <span>Архітектурний проєкт</span>
+                      <span>{fmt(arch.price)}</span>
+                    </div>
+                  )}
+                  {!isCombo && design?.enabled && design.price && !arch?.enabled && (
+                    <div className="kp-row total">
+                      <span>Дизайн-проєкт</span>
+                      <span>{fmt(design.price)}</span>
+                    </div>
+                  )}
+                  {/* Combo: no total row */}
+
                 </div>
                 <div className="kp-price-aside rv">
                   <div className="kp-eye">Що входить</div>

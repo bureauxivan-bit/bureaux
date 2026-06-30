@@ -4,6 +4,7 @@ import { prisma } from '@/lib/prisma';
 import { coverUrl } from '@/lib/data';
 import { CATEGORY_LABELS } from '@/lib/constants';
 import { KpTemplate } from '@/components/kp/KpTemplate';
+import { deriveServices } from '@/lib/kp-services';
 
 export const dynamic = 'force-dynamic';
 
@@ -44,6 +45,14 @@ export default async function KpPage({ params }: { params: { code: string } }) {
   const telegramUrl =
     process.env.NEXT_PUBLIC_TELEGRAM_URL ?? 'https://t.me/bureau_x_arch';
 
+  const services = deriveServices({
+    services: proposal.services,
+    service: proposal.service,
+    priceDesign: proposal.priceDesign,
+    supervisionMonthly: proposal.supervisionMonthly,
+    areaM2: proposal.areaM2,
+  });
+
   return (
     <KpTemplate
       code={proposal.code}
@@ -52,9 +61,7 @@ export default async function KpPage({ params }: { params: { code: string } }) {
       objectType={proposal.objectType}
       areaM2={proposal.areaM2}
       location={proposal.location}
-      service={proposal.service}
-      priceDesign={proposal.priceDesign}
-      supervisionMonthly={proposal.supervisionMonthly}
+      services={services}
       startDate={proposal.startDate}
       durationWeeks={proposal.durationWeeks}
       introText={proposal.introText}

@@ -1,5 +1,6 @@
 'use client';
 import { useEffect, useState, useRef, useCallback } from 'react';
+import { type KpServices, deriveServices, ARCH_RATE, DESIGN_RATE, SUPERVISION_DEFAULT, MIN_AREA, ARCH_MIN, DESIGN_MIN, calcServicePrice } from '@/lib/kp-services';
 
 type Analytics = {
   lastViewedAt: string | null;
@@ -11,8 +12,9 @@ type Analytics = {
 
 type Proposal = {
   id: string; code: string; clientName: string; objectType: string | null;
-  areaM2: number | null; location: string | null; service: string | null;
-  priceDesign: number | null; supervisionMonthly: number | null;
+  areaM2: number | null; location: string | null;
+  service: string | null; priceDesign: number | null; supervisionMonthly: number | null;
+  services: KpServices | null;
   startDate: string | null; durationWeeks: string; projectIds: string[];
   introText: string | null; validDays: number; status: string;
   viewCount: number; createdAt: string;
@@ -24,19 +26,27 @@ type Proposal = {
 
 type ProjectOption = { id: string; title: string; category: string; areaM2: number | null; location: string | null; };
 
-const BLANK: Omit<Proposal, 'id' | 'code' | 'viewCount' | 'createdAt' | 'firstViewedAt' | 'ctaClickedAt' | 'sentAt' | 'viewedAt' | 'meetingAt' | 'contractAt' | 'declinedAt' | 'analytics'> = {
-  clientName: '', objectType: '', areaM2: null, location: '', service: '',
-  priceDesign: null, supervisionMonthly: null, startDate: '', durationWeeks: '~12 тижнів',
+type FormState = {
+  clientName: string;
+  objectType: string;
+  areaM2: number | null;
+  location: string;
+  services: KpServices;
+  startDate: string;
+  durationWeeks: string;
+  projectIds: string[];
+  introText: string;
+  validDays: number;
+  status: string;
+};
+
+const BLANK: FormState = {
+  clientName: '', objectType: '', areaM2: null, location: '',
+  services: {},
+  startDate: '', durationWeeks: '~12 тижнів',
   projectIds: [], introText: '', validDays: 14, status: 'draft',
 };
 
-const SERVICES = ['Дизайн інтер\'єру', 'Дизайн + супровід', 'Архпроєкт'];
-const PRICE_RATES: Record<string, number> = {
-  'Дизайн інтер\'єру': 60, 'Дизайн + супровід': 60, 'Архпроєкт': 40,
-};
-const SUPERVISION_DEFAULTS: Record<string, number> = {
-  'Дизайн + супровід': 800,
-};
 const CATEGORY_LABELS: Record<string, string> = {
   PRIVATE: 'Приватний', COMMERCIAL: 'Комерційний', ARCHITECTURE: 'Архітектура',
 };
@@ -49,11 +59,17 @@ const STATUS_COLOR: Record<string, string> = {
   meeting: 'text-orange-400', contract: 'text-green-400', declined: 'text-red-400',
 };
 
-function generateIntro(f: typeof BLANK) {
+function generateIntro(f: FormState) {
   if (!f.clientName) return '';
-  const parts = [f.service, f.objectType, f.areaM2 ? `${f.areaM2} м²` : null, f.location ? `у ${f.location}` : null]
+  const svc = f.services;
+  const parts: string[] = [];
+  if (svc.architecture?.enabled) parts.push('архітектурне проєктування');
+  if (svc.design?.enabled) parts.push('дизайн інтер\'єру');
+  if (svc.supervision?.enabled) parts.push('авторський супровід');
+  const svcStr = parts.join(' + ');
+  const meta = [svcStr || null, f.objectType || null, f.areaM2 ? `${f.areaM2} м²` : null, f.location ? `у ${f.location}` : null]
     .filter(Boolean).join(' ');
-  return `${f.clientName}, на Ваш запит ми сформували комерційну пропозицію для ${parts} — з релевантними проектами, прозорим розрахунком вартості та термінами, врахованими під Ваш графік.`;
+  return `${f.clientName}, на Ваш запит ми сформували комерційну пропозицію для ${meta} — з релевантними проектами, прозорим розрахунком вартості та термінами, врахованими під Ваш графік.`;
 }
 
 function fmtTime(secs: number | null): string {
@@ -67,12 +83,20 @@ function fmtDate(d: string | null): string {
   return new Date(d).toLocaleDateString('uk-UA', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
 }
 
+function serviceLabel(services: KpServices): string {
+  const parts: string[] = [];
+  if (services.architecture?.enabled) parts.push('Архпроєкт');
+  if (services.design?.enabled) parts.push('Дизайн');
+  if (services.supervision?.enabled) parts.push('Супровід');
+  return parts.join(' + ') || '—';
+}
+
 export default function KpPage() {
   const [proposals, setProposals] = useState<Proposal[]>([]);
   const [projects, setProjects] = useState<ProjectOption[]>([]);
   const [loading, setLoading] = useState(true);
   const [editing, setEditing] = useState<Partial<Proposal> | null>(null);
-  const [f, setF] = useState<typeof BLANK>(BLANK);
+  const [f, setF] = useState<FormState>(BLANK);
   const [saving, setSaving] = useState(false);
   const [savedCode, setSavedCode] = useState('');
   const [copied, setCopied] = useState(false);
@@ -96,22 +120,12 @@ export default function KpPage() {
 
   useEffect(() => { load(); }, [load]);
 
-  useEffect(() => {
-    if (editing?.id) return;
-    if (f.service) {
-      setF((prev) => ({
-        ...prev,
-        priceDesign: (f.areaM2 && PRICE_RATES[f.service!]) ? f.areaM2 * PRICE_RATES[f.service!] : prev.priceDesign,
-        supervisionMonthly: SUPERVISION_DEFAULTS[f.service!] ?? null,
-      }));
-    }
-  }, [f.areaM2, f.service, editing?.id]);
-
+  // Auto-generate intro (only when not manually edited)
   useEffect(() => {
     if (editing?.id || introManual.current) return;
     setF((prev) => ({ ...prev, introText: generateIntro(f) }));
   // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [f.clientName, f.service, f.objectType, f.areaM2, f.location]);
+  }, [f.clientName, f.services, f.objectType, f.areaM2, f.location]);
 
   const openNew = () => { introManual.current = false; setEditing({}); setF(BLANK); setSavedCode(''); };
 
@@ -119,27 +133,92 @@ export default function KpPage() {
     introManual.current = true;
     setEditing(p);
     setF({
-      clientName: p.clientName, objectType: p.objectType ?? '',
-      areaM2: p.areaM2, location: p.location ?? '', service: p.service ?? '',
-      priceDesign: p.priceDesign, supervisionMonthly: p.supervisionMonthly,
-      startDate: p.startDate ?? '', durationWeeks: p.durationWeeks,
-      projectIds: p.projectIds, introText: p.introText ?? '',
-      validDays: p.validDays, status: p.status,
+      clientName: p.clientName,
+      objectType: p.objectType ?? '',
+      areaM2: p.areaM2,
+      location: p.location ?? '',
+      services: deriveServices(p),
+      startDate: p.startDate ?? '',
+      durationWeeks: p.durationWeeks,
+      projectIds: p.projectIds,
+      introText: p.introText ?? '',
+      validDays: p.validDays,
+      status: p.status,
     });
     setSavedCode(p.code);
   };
 
+  const toggleService = (key: keyof KpServices) => {
+    setF((prev) => {
+      const current = prev.services[key];
+      const enabled = !current?.enabled;
+      const updated: KpServices = { ...prev.services };
+      if (!enabled) {
+        delete updated[key];
+      } else {
+        if (key === 'architecture') updated.architecture = { enabled: true, rate: ARCH_RATE, price: calcServicePrice(ARCH_RATE, prev.areaM2) };
+        if (key === 'design') updated.design = { enabled: true, rate: DESIGN_RATE, price: calcServicePrice(DESIGN_RATE, prev.areaM2) };
+        if (key === 'supervision') updated.supervision = { enabled: true, monthly: SUPERVISION_DEFAULT };
+      }
+      return { ...prev, services: updated };
+    });
+  };
+
+  // Recalculate prices when area changes
+  useEffect(() => {
+    setF((prev) => {
+      const updated = { ...prev.services };
+      if (updated.architecture?.enabled) {
+        updated.architecture = { ...updated.architecture, price: calcServicePrice(ARCH_RATE, prev.areaM2) };
+      }
+      if (updated.design?.enabled) {
+        updated.design = { ...updated.design, price: calcServicePrice(DESIGN_RATE, prev.areaM2) };
+      }
+      return { ...prev, services: updated };
+    });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [f.areaM2]);
+
+  const setServicePrice = (key: 'architecture' | 'design', value: string) => {
+    setF((prev) => ({
+      ...prev,
+      services: {
+        ...prev.services,
+        [key]: { ...prev.services[key], price: value ? Number(value) : null },
+      },
+    }));
+  };
+
+  const setSupervisionMonthly = (value: string) => {
+    setF((prev) => ({
+      ...prev,
+      services: {
+        ...prev.services,
+        supervision: { ...prev.services.supervision, enabled: true, monthly: value ? Number(value) : SUPERVISION_DEFAULT },
+      },
+    }));
+  };
+
+  const suggestedPrice = (rate: number): number | null => calcServicePrice(rate, f.areaM2);
+
   const save = async () => {
     setSaving(true);
     const payload = {
-      ...f,
+      clientName: f.clientName,
+      objectType: f.objectType || null,
       areaM2: f.areaM2 ? Number(f.areaM2) : null,
-      priceDesign: f.priceDesign ? Number(f.priceDesign) : null,
-      supervisionMonthly: f.supervisionMonthly ? Number(f.supervisionMonthly) : null,
-      validDays: Number(f.validDays),
-      objectType: f.objectType || null, location: f.location || null,
-      service: f.service || null, startDate: f.startDate || null,
+      location: f.location || null,
+      services: f.services,
+      // Null old fields — backward compat handled by deriveServices on read
+      service: null,
+      priceDesign: null,
+      supervisionMonthly: null,
+      startDate: f.startDate || null,
+      durationWeeks: f.durationWeeks,
+      projectIds: f.projectIds,
       introText: f.introText || null,
+      validDays: Number(f.validDays),
+      status: f.status,
     };
     const isNew = !editing?.id;
     const url = isNew ? '/api/admin/kp' : `/api/admin/kp/${editing!.id}`;
@@ -190,6 +269,10 @@ export default function KpPage() {
   };
 
   if (editing !== null) {
+    const arch = f.services.architecture;
+    const design = f.services.design;
+    const supervision = f.services.supervision;
+
     return (
       <div>
         <div className="flex items-center gap-4 mb-8">
@@ -219,26 +302,73 @@ export default function KpPage() {
                   placeholder="Київ" className={inp} />
               </Field>
             </div>
-            <Field label="Послуга">
-              <select value={f.service ?? ''} onChange={(e) => setF((p) => ({ ...p, service: e.target.value }))}
-                className={inp + ' [&>option]:bg-[#0f0e0d]'}>
-                <option value="">— оберіть —</option>
-                {SERVICES.map((s) => <option key={s} value={s}>{s}</option>)}
-              </select>
-            </Field>
 
-            <p className="text-xs text-paper/40 uppercase tracking-widest pt-2">Вартість</p>
-            <div className="grid grid-cols-2 gap-4">
-              <Field label="Вартість дизайну, $">
-                <input type="number" value={f.priceDesign ?? ''}
-                  onChange={(e) => setF((p) => ({ ...p, priceDesign: e.target.value ? Number(e.target.value) : null }))}
-                  placeholder="auto" className={inp} />
-              </Field>
-              <Field label="Супровід $/міс">
-                <input type="number" value={f.supervisionMonthly ?? ''}
-                  onChange={(e) => setF((p) => ({ ...p, supervisionMonthly: e.target.value ? Number(e.target.value) : null }))}
-                  placeholder="800" className={inp} />
-              </Field>
+            {/* Services checkboxes */}
+            <p className="text-xs text-paper/40 uppercase tracking-widest pt-2">Послуги</p>
+            <div className="border border-paper/10 divide-y divide-paper/10">
+              {/* Architecture */}
+              <div className="p-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" checked={!!arch?.enabled} onChange={() => toggleService('architecture')}
+                    className="accent-paper shrink-0" />
+                  <span className="text-sm font-semibold">Архітектурне проєктування</span>
+                  <span className="ml-auto text-xs text-paper/40">
+                    {f.areaM2 && f.areaM2 < MIN_AREA ? `мін. ${ARCH_MIN.toLocaleString('uk-UA')}$` : `${ARCH_RATE}$/м²`}
+                  </span>
+                </label>
+                {arch?.enabled && (
+                  <div className="mt-3 pl-7">
+                    <Field label="Вартість, $">
+                      <input type="number" value={arch.price ?? ''}
+                        onChange={(e) => setServicePrice('architecture', e.target.value)}
+                        placeholder={suggestedPrice(ARCH_RATE)?.toString() ?? 'площа × 40'}
+                        className={inp} />
+                    </Field>
+                  </div>
+                )}
+              </div>
+
+              {/* Design */}
+              <div className="p-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" checked={!!design?.enabled} onChange={() => toggleService('design')}
+                    className="accent-paper shrink-0" />
+                  <span className="text-sm font-semibold">Дизайн інтер'єру</span>
+                  <span className="ml-auto text-xs text-paper/40">
+                    {f.areaM2 && f.areaM2 < MIN_AREA ? `мін. ${DESIGN_MIN.toLocaleString('uk-UA')}$` : `${DESIGN_RATE}$/м²`}
+                  </span>
+                </label>
+                {design?.enabled && (
+                  <div className="mt-3 pl-7">
+                    <Field label="Вартість, $">
+                      <input type="number" value={design.price ?? ''}
+                        onChange={(e) => setServicePrice('design', e.target.value)}
+                        placeholder={suggestedPrice(DESIGN_RATE)?.toString() ?? 'площа × 60'}
+                        className={inp} />
+                    </Field>
+                  </div>
+                )}
+              </div>
+
+              {/* Supervision */}
+              <div className="p-4">
+                <label className="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" checked={!!supervision?.enabled} onChange={() => toggleService('supervision')}
+                    className="accent-paper shrink-0" />
+                  <span className="text-sm font-semibold">Авторський супровід</span>
+                  <span className="ml-auto text-xs text-paper/40">$/міс</span>
+                </label>
+                {supervision?.enabled && (
+                  <div className="mt-3 pl-7">
+                    <Field label="$/міс">
+                      <input type="number" value={supervision.monthly ?? ''}
+                        onChange={(e) => setSupervisionMonthly(e.target.value)}
+                        placeholder={String(SUPERVISION_DEFAULT)}
+                        className={inp} />
+                    </Field>
+                  </div>
+                )}
+              </div>
             </div>
 
             <p className="text-xs text-paper/40 uppercase tracking-widest pt-2">Терміни</p>
@@ -368,6 +498,7 @@ export default function KpPage() {
           : proposals.length === 0 ? <p className="text-paper/50">КП ще немає.</p>
           : proposals.map((p) => {
             const a = p.analytics;
+            const svc = p.services ? serviceLabel(p.services as KpServices) : (p.service ?? '—');
             return (
               <div key={p.id} className="border border-paper/10 p-5">
                 <div className="flex flex-wrap items-start justify-between gap-4">
@@ -383,8 +514,7 @@ export default function KpPage() {
                       {[p.objectType, p.areaM2 ? `${p.areaM2} м²` : null, p.location].filter(Boolean).join(' · ')}
                     </p>
                     <p className="text-xs text-paper/30 mt-1">
-                      {new Date(p.createdAt).toLocaleDateString('uk-UA')}
-                      {p.service && ` · ${p.service}`}
+                      {new Date(p.createdAt).toLocaleDateString('uk-UA')} · {svc}
                     </p>
 
                     {/* Behavioral analytics */}
