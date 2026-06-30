@@ -9,7 +9,7 @@ const ROWS = [
   {
     name: 'Архітектурне проєктування',
     price: 'від $40/м²',
-    note: null,
+    note: 'Повний проєкт: ескіз, планування, конструктивні рішення, робочі креслення — від концепції до дозволу на будівництво',
   },
   {
     name: 'Авторський супровід реалізації',
@@ -21,11 +21,6 @@ const ROWS = [
     price: 'від 120 м²',
     note: "Менші об'єкти рахуємо як 120 м²: дизайн від $7200, архітектура від $4800",
   },
-  {
-    name: 'Терміни',
-    price: null,
-    note: 'Дизайн-проєкт 1,5–3 міс, архітектура від 1 міс',
-  },
 ];
 
 export function PricingBlock() {
@@ -33,7 +28,7 @@ export function PricingBlock() {
     <section id="pricing" className="container-wide scroll-mt-24 py-24 lg:py-36">
       <Reveal>
         <p className="eyebrow">Вартість</p>
-        <h2 className="display-xl mt-5 text-[clamp(2rem,5vw,4rem)]">Орієнтовна вартість</h2>
+        <h2 className="display-xl mt-5 text-[clamp(2rem,5vw,4rem)]">Вартість послуг</h2>
       </Reveal>
 
       <div className="mt-14 border-t border-line">
