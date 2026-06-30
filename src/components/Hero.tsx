@@ -10,7 +10,7 @@ export function Hero({ heroImage }: { heroImage?: string | null }) {
       <div className="absolute inset-0">
         <Image
           src={src}
-          alt="bureau x — interior design"
+          alt="Bureau X — дизайн інтер'єру та архітектура під ключ, Київ"
           fill
           sizes="100vw"
           className="object-cover object-center"
