@@ -18,10 +18,8 @@ export const metadata: Metadata = {
   title: { absolute: "Дизайн інтер'єру під ключ у Києві — Bureau X" },
   description:
     "Замовити дизайн інтер'єру квартири, будинку або комерційного приміщення у Києві. Bureau X — авторський підхід, стиль МУАС, повний супровід від ескізу до реалізації.",
-  robots: { index: false, follow: true },
 };
 
-// DRAFT: переписати під голос МУАС, не публікувати як є
 const FAQS = [
   {
     id: 'di-1',
@@ -55,7 +53,6 @@ const FAQS = [
   },
 ];
 
-// DRAFT: переписати під голос МУАС, не публікувати як є
 const INCLUDES = [
   'Вимірювання та обмірний план',
   'Планувальне рішення та зонування',
@@ -65,7 +62,6 @@ const INCLUDES = [
   'Специфікації матеріалів, меблів і декору',
 ];
 
-// DRAFT: переписати під голос МУАС, не публікувати як є
 const OBJECTS = [
   { t: 'Квартири', d: 'Від студій до великих апартаментів. Оптимізуємо планування під спосіб життя.' },
   { t: 'Приватні будинки', d: 'Просторові й багаторівневі рішення. Узгоджуємо з архітектурним проєктом.' },
@@ -127,7 +123,6 @@ export default async function DyzajnInteruruPage() {
         <h1 className="display-xl mt-5 max-w-3xl text-[clamp(2rem,5vw,4rem)]">
           Дизайн інтер'єру під ключ у Києві
         </h1>
-        {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
         <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted">
           Авторський підхід, стиль МУАС — від першого брифу до специфікацій під ремонт. Кожен
           проєкт розробляємо індивідуально: під особистість, функцію простору та спосіб життя
@@ -169,8 +164,7 @@ export default async function DyzajnInteruruPage() {
             <h2 className="display-xl text-[clamp(1.5rem,3vw,2.5rem)]">Авторський стиль МУАС</h2>
           </Reveal>
           <Reveal delay={120}>
-            {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
-            <p className="mt-6 max-w-2xl text-base leading-relaxed text-paper/70">
+                <p className="mt-6 max-w-2xl text-base leading-relaxed text-paper/70">
               МУАС — Молодий Український Архітектурний Стиль — це авторська концепція Bureau X.
               Поєднуємо сучасну естетику з українськими традиціями та символами. Три принципи:
               особистий — про вас, функціональний — про місце, смисловий — про що має бути цей
@@ -190,8 +184,7 @@ export default async function DyzajnInteruruPage() {
             <Reveal key={o.t} delay={i * 60}>
               <div className="py-4 pr-10">
                 <h3 className="display-xl text-lg font-normal">{o.t}</h3>
-                {/* DRAFT: переписати під голос МУАС, не публікувати як є */}
-                <p className="mt-2 text-sm leading-relaxed text-muted">{o.d}</p>
+                        <p className="mt-2 text-sm leading-relaxed text-muted">{o.d}</p>
               </div>
             </Reveal>
           ))}
