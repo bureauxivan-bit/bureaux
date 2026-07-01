@@ -18,7 +18,6 @@ export const metadata: Metadata = {
   title: { absolute: 'Архітектурне проєктування у Києві — Bureau X' },
   description:
     'Проєктування приватних будинків, котеджів, комерційних об\'єктів у Київській та інших областях. Bureau X — авторський підхід, досвід 5+ котеджних містечок.',
-  robots: { index: false, follow: true },
 };
 
 const FAQS = [

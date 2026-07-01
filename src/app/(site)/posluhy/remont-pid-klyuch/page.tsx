@@ -18,7 +18,6 @@ export const metadata: Metadata = {
   title: { absolute: 'Ремонт та будівництво під ключ у Києві — Bureau X' },
   description:
     'Ремонт квартири та будинку під ключ у Києві від архітектурного бюро Bureau X. Власна бригада, авторський нагляд, дизайн і ремонт — в одних руках.',
-  robots: { index: false, follow: true },
 };
 
 const FAQS = [

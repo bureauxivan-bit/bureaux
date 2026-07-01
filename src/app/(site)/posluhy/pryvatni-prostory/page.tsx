@@ -18,7 +18,6 @@ export const metadata: Metadata = {
   title: { absolute: 'Дизайн приватних просторів — квартири, будинки, котеджі · Bureau X Київ' },
   description:
     "Дизайн інтер'єру квартири, приватного будинку або котеджу у Києві. Bureau X — авторський стиль МУАС, повний цикл: концепція, проєкт, реалізація.",
-  robots: { index: false, follow: true },
 };
 
 const FAQS = [
