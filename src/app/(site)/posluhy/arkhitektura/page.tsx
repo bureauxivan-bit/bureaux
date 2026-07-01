@@ -3,7 +3,7 @@ import Script from 'next/script';
 import Link from 'next/link';
 import { Reveal } from '@/components/Reveal';
 import { PricingBlock } from '@/components/PricingBlock';
-import { HowWeWork } from '@/components/HowWeWork';
+import { HowWeWork, type WorkStep } from '@/components/HowWeWork';
 import { Faq } from '@/components/Faq';
 import { FinalCta } from '@/components/FinalCta';
 import { CtaButton } from '@/components/CtaButton';
@@ -66,6 +66,29 @@ const INCLUDES = [
   'Архітектурні рішення — фасади, розрізи, вузли; те, як об\'єкт виглядає й тримається.',
   'Конструктивні рішення та розрахунки — щоб красиве стояло, а не тріщало.',
   'Робочі креслення для будівництва — комплект, готовий до дозволу й до бригади.',
+];
+
+const PROCESS_STEPS: WorkStep[] = [
+  {
+    title: 'Бриф',
+    desc: 'Знайомство з ділянкою, об\'єктом і задачею. Виїзд або відеозустріч — фіксуємо вихідні дані.',
+  },
+  {
+    title: 'Ескізний проєкт',
+    desc: 'Концепція та планування, зафіксований напрям до погодження.',
+  },
+  {
+    title: 'Архітектурні рішення',
+    desc: 'Фасади, розрізи, вузли; те, як об\'єкт виглядає й тримається.',
+  },
+  {
+    title: 'Робочі креслення',
+    desc: 'Повний комплект для отримання дозволу й початку будівництва. Бригада заходить із документом, а не з питаннями.',
+  },
+  {
+    title: 'Авторський нагляд',
+    desc: 'Контроль реалізації на майданчику. Відповідаємо за відповідність проєкту.',
+  },
 ];
 
 const breadcrumbLd = {
@@ -231,7 +254,7 @@ export default async function ArkhitekturaPage() {
 
       {/* Process */}
       <div className="border-t border-line">
-        <HowWeWork />
+        <HowWeWork steps={PROCESS_STEPS} note="Кожен етап фіксується в договорі. Зміна завдання після затвердження ескізу — окрема домовленість." />
       </div>
 
       {/* FAQ */}
