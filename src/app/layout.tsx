@@ -44,9 +44,9 @@ export const metadata: Metadata = {
     siteName: 'Bureau X',
     images: [
       {
-        url: '/images/artboard.png',
+        url: '/images/og.png',
         width: 1200,
-        height: 630,
+        height: 779,
         alt: "Bureau X — дизайн інтер'єру та архітектура під ключ, Київ",
       },
     ],
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
   twitter: {
     card: 'summary_large_image',
     site: '@bureaux_ua',
-    images: ['/images/artboard.png'],
+    images: ['/images/og.png'],
   },
 };
 
