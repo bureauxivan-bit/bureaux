@@ -15,7 +15,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     '@graph': [
       {
         '@type': ['LocalBusiness', 'ProfessionalService'],
-        name: 'Bureau X',
+        name: 'bureau X',
         description: "Архітектурне бюро та студія дизайну інтер'єрів. Авторський стиль МУАС.",
         url: SITE_URL,
         telephone: settings.phone,
@@ -39,7 +39,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       },
       {
         '@type': 'WebSite',
-        name: 'Bureau X',
+        name: 'bureau X',
         url: SITE_URL,
       },
     ],

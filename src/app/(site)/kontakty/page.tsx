@@ -8,9 +8,9 @@ import { getSettings } from '@/lib/data';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Контакти — Bureau X, архітектурне бюро · Київ' },
+  title: { absolute: 'Контакти — bureau X, архітектурне бюро · Київ' },
   description:
-    'Зв\'яжіться з Bureau X: телефон, email, адреса у Києві. Запишіться на безкоштовну консультацію.',
+    'Зв\'яжіться з bureau X: телефон, email, адреса у Києві. Запишіться на безкоштовну консультацію.',
 };
 
 const breadcrumbLd = {
@@ -28,7 +28,7 @@ export default async function KontaktyPage() {
   const localBusinessLd = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    name: 'Bureau X',
+    name: 'bureau X',
     url: SITE_URL,
     telephone: settings.phone ?? '+380989498648',
     email: settings.email ?? 'bureaux.ivan@gmail.com',

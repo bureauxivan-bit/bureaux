@@ -15,9 +15,9 @@ export const revalidate = 60;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Ремонт та будівництво під ключ у Києві — Bureau X' },
+  title: { absolute: 'Ремонт та будівництво під ключ у Києві — bureau X' },
   description:
-    'Ремонт квартири та будинку під ключ у Києві від архітектурного бюро Bureau X. Власна бригада, авторський нагляд, дизайн і ремонт — в одних руках.',
+    'Ремонт квартири та будинку під ключ у Києві від архітектурного бюро bureau X. Власна бригада, авторський нагляд, дизайн і ремонт — в одних руках.',
 };
 
 const FAQS = [
@@ -105,7 +105,7 @@ const serviceLd = {
   name: 'Ремонт та будівництво під ключ',
   description:
     'Ремонт квартири та будинку під ключ у Києві. Власна бригада, авторський нагляд, дизайн і реалізація в одних руках.',
-  provider: { '@type': 'LocalBusiness', name: 'Bureau X', url: SITE_URL },
+  provider: { '@type': 'LocalBusiness', name: 'bureau X', url: SITE_URL },
   areaServed: ['Київ', 'Київська область'],
   url: `${SITE_URL}/posluhy/remont-pid-klyuch`,
 };

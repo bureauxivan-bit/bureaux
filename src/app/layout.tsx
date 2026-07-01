@@ -33,21 +33,21 @@ const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Bureau X — Дизайн інтер'єру та архітектура під ключ · Київ",
-    template: '%s · Bureau X',
+    default: "bureau X — Дизайн інтер'єру та архітектура під ключ · Київ",
+    template: '%s · bureau X',
   },
   description:
-    "Bureau X — архітектурне бюро у Києві. Дизайн інтер'єру квартир і будинків, архітектурне проєктування, ремонт під ключ. Авторський стиль МУАС.",
+    "bureau X — архітектурне бюро у Києві. Дизайн інтер'єру квартир і будинків, архітектурне проєктування, ремонт під ключ. Авторський стиль МУАС.",
   openGraph: {
     type: 'website',
     locale: 'uk_UA',
-    siteName: 'Bureau X',
+    siteName: 'bureau X',
     images: [
       {
         url: '/images/og.png',
         width: 1200,
         height: 779,
-        alt: "Bureau X — дизайн інтер'єру та архітектура під ключ, Київ",
+        alt: "bureau X — дизайн інтер'єру та архітектура під ключ, Київ",
       },
     ],
   },

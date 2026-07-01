@@ -5,9 +5,9 @@ import { ProjectsGrid } from '@/components/ProjectsGrid';
 export const revalidate = 60;
 export const metadata: Metadata = {
   title: {
-    absolute: "Портфоліо — реалізовані проєкти дизайну інтер'єру та архітектури · Bureau X",
+    absolute: "Портфоліо — реалізовані проєкти дизайну інтер'єру та архітектури · bureau X",
   },
-  description: "Портфоліо реалізованих проєктів Bureau X — дизайн інтер'єру квартир і будинків, архітектура, комерційні об'єкти. Київ та Україна.",
+  description: "Портфоліо реалізованих проєктів bureau X — дизайн інтер'єру квартир і будинків, архітектура, комерційні об'єкти. Київ та Україна.",
 };
 
 export default async function ProjectsPage() {

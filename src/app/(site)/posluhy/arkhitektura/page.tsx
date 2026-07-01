@@ -15,9 +15,9 @@ export const revalidate = 60;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Архітектурне проєктування у Києві — Bureau X' },
+  title: { absolute: 'Архітектурне проєктування у Києві — bureau X' },
   description:
-    'Проєктування приватних будинків, котеджів, комерційних об\'єктів у Київській та інших областях. Bureau X — авторський підхід, досвід 5+ котеджних містечок.',
+    'Проєктування приватних будинків, котеджів, комерційних об\'єктів у Київській та інших областях. bureau X — авторський підхід, досвід 5+ котеджних містечок.',
 };
 
 const FAQS = [
@@ -106,7 +106,7 @@ const serviceLd = {
   name: 'Архітектурне проєктування',
   description:
     'Проєктування приватних будинків, котеджів і комерційних об\'єктів. Від ескізу до повного пакету дозвільної документації. Авторський стиль МУАС.',
-  provider: { '@type': 'LocalBusiness', name: 'Bureau X', url: SITE_URL },
+  provider: { '@type': 'LocalBusiness', name: 'bureau X', url: SITE_URL },
   areaServed: ['Київ', 'Україна'],
   url: `${SITE_URL}/posluhy/arkhitektura`,
 };

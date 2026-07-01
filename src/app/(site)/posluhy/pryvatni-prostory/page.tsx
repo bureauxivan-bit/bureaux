@@ -15,9 +15,9 @@ export const revalidate = 60;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Дизайн приватних просторів — квартири, будинки, котеджі · Bureau X Київ' },
+  title: { absolute: 'Дизайн приватних просторів — квартири, будинки, котеджі · bureau X Київ' },
   description:
-    "Дизайн інтер'єру квартири, приватного будинку або котеджу у Києві. Bureau X — авторський стиль МУАС, повний цикл: концепція, проєкт, реалізація.",
+    "Дизайн інтер'єру квартири, приватного будинку або котеджу у Києві. bureau X — авторський стиль МУАС, повний цикл: концепція, проєкт, реалізація.",
 };
 
 const FAQS = [
@@ -84,7 +84,7 @@ const serviceLd = {
   name: 'Дизайн приватних просторів',
   description:
     "Дизайн інтер'єру квартир, будинків і котеджів у Києві. Авторський стиль МУАС, повний цикл від концепції до реалізації.",
-  provider: { '@type': 'LocalBusiness', name: 'Bureau X', url: SITE_URL },
+  provider: { '@type': 'LocalBusiness', name: 'bureau X', url: SITE_URL },
   areaServed: ['Київ', 'Україна'],
   url: `${SITE_URL}/posluhy/pryvatni-prostory`,
 };

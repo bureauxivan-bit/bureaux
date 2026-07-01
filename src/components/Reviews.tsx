@@ -11,7 +11,7 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
   const reviewLd = {
     '@context': 'https://schema.org',
     '@type': 'LocalBusiness',
-    name: 'Bureau X',
+    name: 'bureau X',
     url: SITE_URL,
     review: reviews.map((r) => ({
       '@type': 'Review',

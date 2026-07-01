@@ -7,7 +7,7 @@ import { FinalCta } from '@/components/FinalCta';
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
 export const metadata: Metadata = {
-  title: { absolute: "Послуги — дизайн інтер'єру, архітектура, ремонт під ключ · Bureau X" },
+  title: { absolute: "Послуги — дизайн інтер'єру, архітектура, ремонт під ключ · bureau X" },
   description:
     "Архітектурне бюро повного циклу у Києві. Дизайн інтер'єру, архітектурне проєктування, будівництво та ремонт під ключ, авторський стиль МУАС.",
 };

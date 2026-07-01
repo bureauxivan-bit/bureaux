@@ -659,7 +659,7 @@ export function KpTemplate({
               </div>
               <div className="kp-rev rv">
                 <div className="q">Безмежно дякую за чудову роботу! З вами приємно мати справу. Через півроку-рік прийду вже до вас за дизайном своєї квартири.</div>
-                <div className="who"><b>Клієнтка bureau X</b> · повертається за новим проектом</div>
+                <div className="who"><b>Клієнтка bureau <i>X</i></b> · повертається за новим проектом</div>
               </div>
             </div>
           </div>
@@ -697,7 +697,7 @@ export function KpTemplate({
           <div className="kp-wrap">
             <div className="kp-logo">bureau <i>X</i></div>
             <div>architecture &amp; design · простір під ваш спосіб життя</div>
-            <div style={{ marginTop: 6 }}>© 2026 bureau X · 200+ реалізованих проектів</div>
+            <div style={{ marginTop: 6 }}>© 2026 bureau <i>X</i> · 200+ реалізованих проектів</div>
           </div>
         </footer>
 

@@ -15,9 +15,9 @@ export const revalidate = 60;
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
 export const metadata: Metadata = {
-  title: { absolute: 'Дизайн комерційних приміщень у Києві — Bureau X' },
+  title: { absolute: 'Дизайн комерційних приміщень у Києві — bureau X' },
   description:
-    'Дизайн ресторанів, кафе, офісів, магазинів та готелів у Києві від Bureau X. Розуміємо бізнес-логіку простору, реалізуємо під ключ.',
+    'Дизайн ресторанів, кафе, офісів, магазинів та готелів у Києві від bureau X. Розуміємо бізнес-логіку простору, реалізуємо під ключ.',
 };
 
 const FAQS = [
@@ -111,7 +111,7 @@ const serviceLd = {
   name: 'Дизайн комерційних приміщень',
   description:
     'Дизайн та реалізація комерційних просторів у Києві: ресторани, офіси, магазини, готелі. Розуміємо бізнес-логіку простору.',
-  provider: { '@type': 'LocalBusiness', name: 'Bureau X', url: SITE_URL },
+  provider: { '@type': 'LocalBusiness', name: 'bureau X', url: SITE_URL },
   areaServed: ['Київ', 'Україна'],
   url: `${SITE_URL}/posluhy/komertsiini-prymishchennia`,
 };
