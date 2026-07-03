@@ -24,11 +24,23 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   };
 }
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
+
 export default async function ProjectPage({ params }: { params: { slug: string } }) {
   const p = await getProjectBySlug(params.slug);
   if (!p) notFound();
 
   const cover = coverUrl(p);
+
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Головна', item: SITE_URL },
+      { '@type': 'ListItem', position: 2, name: 'Проєкти', item: `${SITE_URL}/projects` },
+      { '@type': 'ListItem', position: 3, name: p.title, item: `${SITE_URL}/projects/${p.slug}` },
+    ],
+  };
 
   const meta = [
     p.location && { label: 'Локація',  value: p.location },
@@ -39,6 +51,11 @@ export default async function ProjectPage({ params }: { params: { slug: string }
 
   return (
     <article>
+      <script
+        id="ld-bc-project"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
 
       {/* ── Hero with parallax ── */}
       {cover ? (

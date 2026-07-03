@@ -13,18 +13,37 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
     '@context': 'https://schema.org',
     '@graph': [
       {
-        '@type': ['LocalBusiness', 'ProfessionalService'],
+        '@type': ['Organization', 'LocalBusiness', 'ProfessionalService'],
+        '@id': `${SITE_URL}/#organization`,
         name: 'bureau X',
+        alternateName: 'bureauX',
         description: "Архітектурне бюро та студія дизайну інтер'єрів. Авторський стиль МУАС.",
         url: SITE_URL,
+        logo: `${SITE_URL}/images/logo_big.png`,
+        image: `${SITE_URL}/images/og.png`,
         telephone: settings.phone,
         email: settings.email,
-        address: { '@type': 'PostalAddress', addressLocality: 'Київ', addressCountry: 'UA' },
+        founder: [
+          { '@type': 'Person', name: 'Іван Руденко', jobTitle: 'Співзасновник, архітектор' },
+          { '@type': 'Person', name: "Дар'я Руденко-Фортуна", jobTitle: 'Співзасновниця, архітекторка' },
+        ],
+        address: {
+          '@type': 'PostalAddress',
+          streetAddress: settings.address ?? '',
+          addressLocality: 'Київ',
+          addressCountry: 'UA',
+        },
         geo: { '@type': 'GeoCoordinates', latitude: 50.45444, longitude: 30.52361 },
-        areaServed: ['Київ', 'Україна'],
+        areaServed: ['Київ', 'Україна', 'Дистанційно — весь світ'],
         priceRange: '$$$$',
         openingHours: 'Mo-Fr 09:00-18:00',
-        sameAs: [settings.instagram, settings.facebook, settings.behance].filter(Boolean),
+        sameAs: [
+          settings.instagram,
+          settings.facebook,
+          settings.behance,
+          settings.telegram,
+          'https://www.pinterest.com/bureau_x/',
+        ].filter(Boolean),
         hasOfferCatalog: {
           '@type': 'OfferCatalog',
           itemListElement: [

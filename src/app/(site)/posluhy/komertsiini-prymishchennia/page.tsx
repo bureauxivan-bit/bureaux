@@ -113,6 +113,17 @@ const serviceLd = {
   provider: { '@type': 'LocalBusiness', name: 'bureau X', url: SITE_URL },
   areaServed: ['Київ', 'Україна'],
   url: `${SITE_URL}/posluhy/komertsiini-prymishchennia`,
+  offers: {
+    '@type': 'Offer',
+    priceCurrency: 'USD',
+    priceSpecification: {
+      '@type': 'UnitPriceSpecification',
+      minPrice: 60,
+      priceCurrency: 'USD',
+      unitText: 'за м²',
+    },
+    description: 'Повний проєкт під реалізацію — від $60/м².',
+  },
 };
 
 export default async function KomertsiiniPrymishchennyaPage() {

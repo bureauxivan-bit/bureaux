@@ -13,11 +13,27 @@ export const metadata: Metadata = {
 
 export const revalidate = 60;
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
+
+const breadcrumbLd = {
+  '@context': 'https://schema.org',
+  '@type': 'BreadcrumbList',
+  itemListElement: [
+    { '@type': 'ListItem', position: 1, name: 'Головна', item: SITE_URL },
+    { '@type': 'ListItem', position: 2, name: 'Про бюро', item: `${SITE_URL}/studio` },
+  ],
+};
+
 export default async function StudioPage() {
   const team = await getTeam();
 
   return (
     <main className="pt-20 lg:pt-24">
+      <script
+        id="ld-bc-studio"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
+      />
 
       {/* Hero heading */}
       <div className="container-wide py-12 lg:py-20">

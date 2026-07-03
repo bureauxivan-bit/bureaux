@@ -87,6 +87,17 @@ const serviceLd = {
   provider: { '@type': 'LocalBusiness', name: 'bureau X', url: SITE_URL },
   areaServed: ['Київ', 'Україна'],
   url: `${SITE_URL}/posluhy/dyzajn-intereru`,
+  offers: {
+    '@type': 'Offer',
+    priceCurrency: 'USD',
+    priceSpecification: {
+      '@type': 'UnitPriceSpecification',
+      minPrice: 60,
+      priceCurrency: 'USD',
+      unitText: 'за м²',
+    },
+    description: "Повний дизайн-проєкт — від $60/м². Мінімальний проєкт 120 м² (від $7 200).",
+  },
 };
 
 export default async function DyzajnInteruruPage() {

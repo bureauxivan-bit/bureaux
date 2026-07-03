@@ -108,6 +108,17 @@ const serviceLd = {
   provider: { '@type': 'LocalBusiness', name: 'bureau X', url: SITE_URL },
   areaServed: ['Київ', 'Україна'],
   url: `${SITE_URL}/posluhy/arkhitektura`,
+  offers: {
+    '@type': 'Offer',
+    priceCurrency: 'USD',
+    priceSpecification: {
+      '@type': 'UnitPriceSpecification',
+      minPrice: 40,
+      priceCurrency: 'USD',
+      unitText: 'за м²',
+    },
+    description: 'Повний архітектурний проєкт — від $40/м². Мінімальний проєкт 120 м² (від $4 800).',
+  },
 };
 
 export default async function ArkhitekturaPage() {

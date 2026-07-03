@@ -107,6 +107,31 @@ const serviceLd = {
   provider: { '@type': 'LocalBusiness', name: 'bureau X', url: SITE_URL },
   areaServed: ['Київ', 'Київська область'],
   url: `${SITE_URL}/posluhy/remont-pid-klyuch`,
+  offers: [
+    {
+      '@type': 'Offer',
+      name: 'Реалізація «під ключ» (проєкт + ремонт)',
+      priceCurrency: 'USD',
+      priceSpecification: {
+        '@type': 'UnitPriceSpecification',
+        minPrice: 1400,
+        priceCurrency: 'USD',
+        unitText: 'за м²',
+      },
+    },
+    {
+      '@type': 'Offer',
+      name: 'Авторський нагляд',
+      priceCurrency: 'USD',
+      priceSpecification: {
+        '@type': 'UnitPriceSpecification',
+        price: 800,
+        priceCurrency: 'USD',
+        unitText: 'на місяць',
+      },
+      description: 'Київ; інші міста та країни — перерахунок за запитом.',
+    },
+  ],
 };
 
 export default async function RemontPidKlyuchPage() {
