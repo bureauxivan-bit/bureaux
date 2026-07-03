@@ -1,4 +1,3 @@
-import Script from 'next/script';
 import { getSettings } from '@/lib/data';
 import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
@@ -47,7 +46,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
 
   return (
     <LeadModalProvider>
-      <Script id="ld-json" type="application/ld+json"
+      <script id="ld-json" type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <CursorTrail />
       <Header settings={settings} />

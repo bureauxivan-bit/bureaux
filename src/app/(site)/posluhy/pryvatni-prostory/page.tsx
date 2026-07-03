@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import Link from 'next/link';
 import { Reveal } from '@/components/Reveal';
 import { PricingBlock } from '@/components/PricingBlock';
@@ -94,12 +93,12 @@ export default async function PryvatniProstoryPage() {
 
   return (
     <>
-      <Script
+      <script
         id="ld-bc-priv"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
-      <Script
+      <script
         id="ld-svc-priv"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}

@@ -1,4 +1,3 @@
-import Script from 'next/script';
 import { FaqAccordion } from './FaqAccordion';
 
 type FaqItem = { id: string; question: string; answer: string };
@@ -18,7 +17,7 @@ export function Faq({ faqs }: { faqs: FaqItem[] }) {
 
   return (
     <section className="container-wide py-24 lg:py-36">
-      <Script
+      <script
         id="ld-faq"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}

@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import Link from 'next/link';
 import { Reveal } from '@/components/Reveal';
 import { PricingBlock } from '@/components/PricingBlock';
@@ -116,12 +115,12 @@ export default async function ArkhitekturaPage() {
 
   return (
     <>
-      <Script
+      <script
         id="ld-bc-arh"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
-      <Script
+      <script
         id="ld-svc-arh"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceLd) }}

@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import Link from 'next/link';
 import { Reveal } from '@/components/Reveal';
 import { LeadForm } from '@/components/LeadForm';
@@ -45,12 +44,12 @@ export default async function KontaktyPage() {
 
   return (
     <>
-      <Script
+      <script
         id="ld-bc-kontakty"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
       />
-      <Script
+      <script
         id="ld-lb-kontakty"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(localBusinessLd) }}

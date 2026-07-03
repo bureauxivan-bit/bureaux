@@ -1,4 +1,3 @@
-import Script from 'next/script';
 import { Reveal } from './Reveal';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
@@ -23,7 +22,7 @@ export function Reviews({ reviews }: { reviews: Review[] }) {
 
   return (
     <section className="container-wide py-24 lg:py-36">
-      <Script
+      <script
         id="ld-reviews"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewLd) }}

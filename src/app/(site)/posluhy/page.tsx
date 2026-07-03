@@ -1,5 +1,4 @@
 import type { Metadata } from 'next';
-import Script from 'next/script';
 import Link from 'next/link';
 import { Reveal } from '@/components/Reveal';
 import { FinalCta } from '@/components/FinalCta';
@@ -62,7 +61,7 @@ const breadcrumbLd = {
 export default function PostluhyPage() {
   return (
     <>
-      <Script
+      <script
         id="ld-breadcrumb-posluhy"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbLd) }}
