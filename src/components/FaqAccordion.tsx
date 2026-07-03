@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Reveal } from './Reveal';
 
 type FaqItem = { id: string; question: string; answer: string };
@@ -39,19 +39,17 @@ export function FaqAccordion({ faqs }: { faqs: FaqItem[] }) {
                 </span>
               </button>
 
-              <AnimatePresence initial={false}>
-                {isOpen && (
-                  <motion.div
-                    initial={{ height: 0, opacity: 0 }}
-                    animate={{ height: 'auto', opacity: 1 }}
-                    exit={{ height: 0, opacity: 0 }}
-                    transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-                    className="overflow-hidden"
-                  >
-                    <p className="pb-7 pr-14 text-sm leading-relaxed text-muted">{f.answer}</p>
-                  </motion.div>
-                )}
-              </AnimatePresence>
+              {/* Always mounted so answers are present in server-rendered HTML
+                  (AI crawlers don't execute JS); open/close is animation only. */}
+              <motion.div
+                initial={false}
+                animate={{ height: isOpen ? 'auto' : 0, opacity: isOpen ? 1 : 0 }}
+                transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden"
+                aria-hidden={!isOpen}
+              >
+                <p className="pb-7 pr-14 text-sm leading-relaxed text-muted">{f.answer}</p>
+              </motion.div>
             </div>
           );
         })}

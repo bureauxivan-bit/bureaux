@@ -159,7 +159,13 @@ export default async function KomertsiiniPrymishchennyaPage() {
         <h1 className="display-xl mt-5 max-w-3xl text-[clamp(2rem,5vw,4rem)]">
           Дизайн комерційних приміщень — ресторани, готелі, офіси
         </h1>
-        <p className="mt-8 max-w-2xl text-base leading-relaxed text-muted">
+        {/* Прямий відповідь-абзац для AEO: що це, для кого, скільки коштує */}
+        <p className="mt-8 max-w-2xl text-base leading-relaxed">
+          Дизайн комерційних приміщень у bureau X — ресторани, кафе, готелі, офіси й шоуруми
+          у Києві та по всій Україні. Повний проєкт під реалізацію — від $60/м². Строки
+          залежать від площі й складності — фіксуємо після брифу.
+        </p>
+        <p className="mt-5 max-w-2xl text-base leading-relaxed text-muted">
           Комерційний інтер'єр має заробляти: приводити відвідувача, утримувати його й змушувати
           повертатися. Тут ми ставимо сміливі рішення, вау-зони й фотозони — з українським
           характером, який вирізняє вас із десятка однакових.
