@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   title: { absolute: "Дизайн інтер'єру під ключ у Києві — bureau X" },
   description:
     "Замовити дизайн інтер'єру квартири, будинку або комерційного приміщення у Києві. bureau X — авторський підхід, стиль МУАС, повний супровід від ескізу до реалізації.",
+  alternates: { canonical: '/posluhy/dyzajn-intereru' },
 };
 
 const FAQS = [

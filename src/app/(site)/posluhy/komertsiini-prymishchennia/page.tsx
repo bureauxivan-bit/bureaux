@@ -17,6 +17,7 @@ export const metadata: Metadata = {
   title: { absolute: 'Дизайн комерційних приміщень у Києві — bureau X' },
   description:
     'Дизайн ресторанів, кафе, офісів, магазинів та готелів у Києві від bureau X. Розуміємо бізнес-логіку простору, реалізуємо під ключ.',
+  alternates: { canonical: '/posluhy/komertsiini-prymishchennia' },
 };
 
 const FAQS = [

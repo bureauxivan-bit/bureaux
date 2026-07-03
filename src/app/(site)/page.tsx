@@ -24,6 +24,7 @@ export const metadata: Metadata = {
     absolute: "bureau X — Дизайн інтер’єру та архітектура під ключ · Київ",
   },
   description: "bureau X — архітектурне бюро у Києві. Дизайн інтер’єру квартир і будинків, архітектурне проєктування, ремонт під ключ. Авторський стиль МУАС. Від $40/м².",
+  alternates: { canonical: '/' },
 };
 
 export default async function HomePage() {

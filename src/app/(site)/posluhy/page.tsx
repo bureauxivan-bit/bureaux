@@ -9,6 +9,7 @@ export const metadata: Metadata = {
   title: { absolute: "Послуги — дизайн інтер'єру, архітектура, ремонт під ключ · bureau X" },
   description:
     "Архітектурне бюро повного циклу у Києві. Дизайн інтер'єру, архітектурне проєктування, будівництво та ремонт під ключ, авторський стиль МУАС.",
+  alternates: { canonical: '/posluhy' },
 };
 
 const SERVICES = [

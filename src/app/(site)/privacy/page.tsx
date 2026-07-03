@@ -1,4 +1,4 @@
-export const metadata = { title: 'Політика конфіденційності' };
+export const metadata = { title: 'Політика конфіденційності', alternates: { canonical: '/privacy' } };
 export default function Privacy() {
   return (
     <div className="container-wide max-w-3xl pb-28 pt-36">

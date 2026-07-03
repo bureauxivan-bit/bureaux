@@ -8,6 +8,7 @@ export const metadata: Metadata = {
     absolute: "Портфоліо — реалізовані проєкти дизайну інтер'єру та архітектури · bureau X",
   },
   description: "Портфоліо реалізованих проєктів bureau X — дизайн інтер'єру квартир і будинків, архітектура, комерційні об'єкти. Київ та Україна.",
+  alternates: { canonical: '/projects' },
 };
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';

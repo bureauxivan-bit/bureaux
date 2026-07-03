@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Link from 'next/link';
 
-export const metadata: Metadata = { title: 'Дякуємо' };
+export const metadata: Metadata = { title: 'Дякуємо', alternates: { canonical: '/thank-you' } };
 
 export default function ThankYou() {
   return (

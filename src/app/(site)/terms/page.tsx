@@ -1,4 +1,4 @@
-export const metadata = { title: 'Правила та умови' };
+export const metadata = { title: 'Правила та умови', alternates: { canonical: '/terms' } };
 export default function Terms() {
   return (
     <div className="container-wide max-w-3xl pb-28 pt-36">

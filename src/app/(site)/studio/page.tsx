@@ -9,6 +9,7 @@ export const metadata: Metadata = {
     absolute: 'Про бюро — авторський стиль МУАС · bureau X Київ',
   },
   description: 'Молоде подружжя архітекторів, що створили Молодий Український Архітектурний Стиль (МУАС). Понад 5 років та 10 000+ м² реалізованих просторів у Києві та Україні.',
+  alternates: { canonical: '/studio' },
 };
 
 export const revalidate = 60;
@@ -28,7 +29,7 @@ export default async function StudioPage() {
   const team = await getTeam();
 
   return (
-    <main className="pt-20 lg:pt-24">
+    <div className="pt-20 lg:pt-24">
       <script
         id="ld-bc-studio"
         type="application/ld+json"
@@ -87,6 +88,6 @@ export default async function StudioPage() {
         </div>
       </div>
 
-    </main>
+    </div>
   );
 }

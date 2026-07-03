@@ -10,6 +10,7 @@ export const metadata: Metadata = {
   title: { absolute: 'Контакти — bureau X, архітектурне бюро · Київ' },
   description:
     'Зв\'яжіться з bureau X: телефон, email, адреса у Києві. Запишіться на безкоштовну консультацію.',
+  alternates: { canonical: '/kontakty' },
 };
 
 const breadcrumbLd = {

@@ -20,6 +20,7 @@ export async function generateMetadata({ params }: { params: { slug: string } })
   return {
     title: p.title,
     description: p.description ?? `Проєкт ${p.title} — ${CATEGORY_LABELS[p.category]}, ${p.year}.`,
+    alternates: { canonical: `/projects/${params.slug}` },
     openGraph: { title: p.title, images: img ? [img] : [] },
   };
 }
