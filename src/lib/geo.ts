@@ -18,7 +18,7 @@ const LOCAL: GeoInfo = { country: 'Локально', city: '—', isp: '—' };
 // Cloudflare deliberately NOT listed: iCloud Private Relay routes real Safari
 // users through Cloudflare IPs.
 const DATACENTER_RE =
-  /amazon|aws|google llc|google cloud|microsoft|azure|digitalocean|hetzner|ovh|alibaba|tencent|huawei cloud|oracle|linode|akamai|vultr|leaseweb|m247|datacamp|contabo|scaleway|fastly|f\.n\.s\. holdings|hosting|data ?cent/i;
+  /amazon|aws|google llc|google cloud|microsoft|azure|digitalocean|hetzner|ovh|alibaba|tencent|huawei cloud|oracle|linode|akamai|vultr|leaseweb|m247|datacamp|contabo|scaleway|fastly|f\.n\.s\. holdings|hosting|data ?cent|facebook|meta platforms|twitter|bytedance|tiktok/i;
 
 export function isDatacenterIsp(isp: string): boolean {
   return DATACENTER_RE.test(isp);
