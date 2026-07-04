@@ -88,6 +88,11 @@ async function trackVisit(req: NextRequest, res: NextResponse) {
   const parsedUa = parseUserAgent(userAgent);
   if (!parsedUa.looksHuman) return;
 
+  // Real browsers always send Accept-Language on page loads. Crawler fetchers
+  // that fake a browser UA (Google's page renderer posing as a Nexus 5, etc.)
+  // typically omit it.
+  if (!req.headers.get('accept-language')) return;
+
   const alreadyNotifiedThisSession = req.cookies.has(VISIT_SESSION_COOKIE);
   const isNewVisitor = !req.cookies.has(VISITOR_COOKIE);
 
