@@ -62,6 +62,10 @@ async function trackVisit(req: NextRequest, res: NextResponse) {
   const userAgent = req.headers.get('user-agent') || '';
   if (!userAgent || isBotUserAgent(userAgent)) return;
 
+  // Monitors and scripts send a UA that parses to no browser/OS — not a person.
+  const parsedUa = parseUserAgent(userAgent);
+  if (!parsedUa.looksHuman) return;
+
   const alreadyNotifiedThisSession = req.cookies.has(VISIT_SESSION_COOKIE);
   const isNewVisitor = !req.cookies.has(VISITOR_COOKIE);
 
@@ -84,7 +88,7 @@ async function trackVisit(req: NextRequest, res: NextResponse) {
 
   try {
     const ip = clientIp(req);
-    const { device, os, browser } = parseUserAgent(userAgent);
+    const { device, os, browser } = parsedUa;
     const language = req.headers.get('accept-language')?.split(',')[0]?.trim() || 'Невідомо';
     const referrer = req.headers.get('referer') || 'Пряме відвідування';
     const url = `${req.nextUrl.pathname}${req.nextUrl.search}`;
