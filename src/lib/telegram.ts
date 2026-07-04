@@ -83,6 +83,8 @@ type VisitPayload = {
   language: string;
   referrer: string;
   url: string;
+  /** utm_source / utm_medium / utm_content, e.g. "ig / social / link_in_bio" */
+  utm?: string;
   isNewVisitor: boolean;
 };
 
@@ -99,8 +101,9 @@ export async function notifyVisit(v: VisitPayload): Promise<void> {
     `🧭 Браузер: ${escapeHtml(v.browser)}`,
     `🗣 Мова: ${escapeHtml(v.language)}`,
     `↩️ Джерело: ${escapeHtml(v.referrer)}`,
+    v.utm ? `📣 Кампанія: ${escapeHtml(v.utm)}` : '',
     `🔗 Сторінка: ${escapeHtml(v.url)}`,
-  ];
+  ].filter(Boolean);
   await sendAnalytics(lines.join('\n'));
 }
 
