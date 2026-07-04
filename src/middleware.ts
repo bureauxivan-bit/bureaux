@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest, type NextFetchEvent } from 'next/server';
 import { jwtVerify } from 'jose';
 import { notifyVisit } from '@/lib/telegram';
-import { lookupGeo } from '@/lib/geo';
+import { lookupGeo, isDatacenterIsp } from '@/lib/geo';
 import { parseUserAgent, isBotUserAgent } from '@/lib/ua';
 
 const ADMIN_COOKIE = 'bx_session';
@@ -154,9 +154,14 @@ async function trackVisit(req: NextRequest, res: NextResponse) {
       city: geoCity,
     });
 
+    // Scraper fleets fake real-browser UAs but run from hosting providers.
+    if (isDatacenterIsp(isp)) {
+      console.log('[analytics] skipped datacenter visit:', { ip, isp, url });
+      return;
+    }
+
     console.log('[analytics] visit:', { ip, url, isNewVisitor });
-    await notifyVisit({
-      timestamp: new Date(),
+    const visit = {
       ip,
       country,
       city,
@@ -169,9 +174,31 @@ async function trackVisit(req: NextRequest, res: NextResponse) {
       url,
       utm: utm || undefined,
       isNewVisitor,
-    });
+    };
+    await Promise.all([
+      notifyVisit({ timestamp: new Date(), ...visit }),
+      logVisit(req.nextUrl.origin, visit),
+    ]);
   } catch (err) {
     console.error('[analytics] trackVisit failed:', err);
+  }
+}
+
+/** Persists the visit for monthly stats. Prisma can't run in edge middleware,
+ *  so this POSTs to an internal Node route. Best-effort. */
+async function logVisit(origin: string, visit: Record<string, unknown>) {
+  try {
+    const res = await fetch(`${origin}/api/track`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-track-secret': process.env.AUTH_SECRET ?? '',
+      },
+      body: JSON.stringify(visit),
+    });
+    if (!res.ok) console.error('[analytics] logVisit rejected:', res.status);
+  } catch (err) {
+    console.error('[analytics] logVisit failed:', err);
   }
 }
 

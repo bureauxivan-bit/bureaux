@@ -302,6 +302,25 @@ model KpEvent {
   @@index([kpId, eventType])
 }
 
+model Visit {
+  id        String   @id @default(cuid())
+  ip        String
+  country   String?
+  city      String?
+  isp       String?
+  device    String?
+  os        String?
+  browser   String?
+  language  String?
+  referrer  String?
+  utm       String?
+  page      String
+  isNew     Boolean  @default(false)
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 model ClientSpecItem {
   id       String      @id @default(cuid())
   stageId  String

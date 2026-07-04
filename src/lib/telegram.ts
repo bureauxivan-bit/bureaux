@@ -48,7 +48,7 @@ function escapeHtml(s: string) {
 
 /** Sends to the analytics chat (falls back to the lead bot's token, kept in a separate chat).
  *  Best-effort, but logs failures so `vercel logs` shows why a message didn't arrive. */
-async function sendAnalytics(text: string): Promise<void> {
+export async function sendAnalytics(text: string): Promise<void> {
   const token = (process.env.TELEGRAM_ANALYTICS_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN)?.trim();
   const chatId = process.env.TELEGRAM_ANALYTICS_CHAT_ID?.trim();
   if (!token || !chatId) {
