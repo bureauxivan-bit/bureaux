@@ -59,7 +59,13 @@ async function sendAnalytics(text: string): Promise<void> {
     const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
+      body: JSON.stringify({
+        chat_id: chatId,
+        text,
+        parse_mode: 'HTML',
+        // Referrer URLs would otherwise expand into huge link-preview cards.
+        link_preview_options: { is_disabled: true },
+      }),
     });
     if (!res.ok) {
       console.error('[analytics] telegram rejected:', res.status, await res.text());
