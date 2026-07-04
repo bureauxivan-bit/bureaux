@@ -66,11 +66,13 @@ async function trackVisit(req: NextRequest, res: NextResponse) {
 
   // Next.js link prefetches and client-router fetches aren't page views —
   // hovering the nav can prefetch several routes at once, each of which
-  // would otherwise count as a separate visit.
+  // would otherwise count as a separate visit. Note: Next strips its internal
+  // headers (rsc, next-router-prefetch) before middleware runs, so detect
+  // router fetches by the ?_rsc= query param and browser fetches by
+  // sec-fetch-dest (real document navigations always say "document").
   const dest = req.headers.get('sec-fetch-dest');
   if (
-    req.headers.get('rsc') ||
-    req.headers.get('next-router-prefetch') ||
+    req.nextUrl.searchParams.has('_rsc') ||
     req.headers.get('purpose') === 'prefetch' ||
     req.headers.get('sec-purpose')?.includes('prefetch') ||
     (dest && dest !== 'document')
