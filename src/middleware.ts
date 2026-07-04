@@ -11,8 +11,28 @@ const VISIT_SESSION_COOKIE = 'bx_visit_sid';
 const VISIT_SESSION_MAX_AGE = 30 * 60; // one Telegram notification per 30 min per visitor
 const VISITOR_MAX_AGE = 60 * 60 * 24 * 365;
 
-// Internal areas aren't "site visits" for analytics purposes (owner/client traffic, not prospects).
-const ANALYTICS_EXCLUDE = ['/admin', '/miy-proekt'];
+// Only real public pages count as visits. Anything else (/wp-includes, /vendor/…)
+// is vulnerability scanners probing for WordPress/PHP — they 404 but would spam
+// the analytics chat. /admin and /miy-proekt are internal, not prospect traffic.
+// Keep in sync with src/app/(site) routes when adding public pages.
+const TRACKED_PREFIXES = [
+  '/projects',
+  '/posluhy',
+  '/studio',
+  '/kontakty',
+  '/muas',
+  '/privacy',
+  '/terms',
+  '/thank-you',
+  '/kp',
+  '/login',
+  '/register',
+];
+
+function isTrackedPath(pathname: string): boolean {
+  if (pathname === '/') return true;
+  return TRACKED_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+}
 
 async function isValid(token: string | undefined, secret: string, role?: string) {
   if (!token) return false;
@@ -37,7 +57,7 @@ function clientIp(req: NextRequest): string {
  *  notification per visitor per 30-minute visit session. */
 async function trackVisit(req: NextRequest, res: NextResponse) {
   const { pathname } = req.nextUrl;
-  if (ANALYTICS_EXCLUDE.some((p) => pathname === p || pathname.startsWith(`${p}/`))) return;
+  if (!isTrackedPath(pathname)) return;
 
   const userAgent = req.headers.get('user-agent') || '';
   if (!userAgent || isBotUserAgent(userAgent)) return;
