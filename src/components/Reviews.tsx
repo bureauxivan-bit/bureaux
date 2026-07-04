@@ -1,33 +1,15 @@
 import { Reveal } from './Reveal';
 
-const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
-
 type Review = { id: string; author: string; projectName: string | null; text: string };
 
+// Без Review JSON-LD навмисно: Google з 2019 ігнорує self-serving відгуки
+// (розмітку відгуків про компанію на її ж сайті), а без reviewRating вона
+// ще й невалідна. Текст відгуків у HTML — цього достатньо для AI-краулерів.
 export function Reviews({ reviews }: { reviews: Review[] }) {
   if (!reviews.length) return null;
 
-  const reviewLd = {
-    '@context': 'https://schema.org',
-    '@type': 'LocalBusiness',
-    name: 'bureau X',
-    url: SITE_URL,
-    review: reviews.map((r) => ({
-      '@type': 'Review',
-      author: { '@type': 'Person', name: r.author },
-      reviewBody: r.text,
-      ...(r.projectName ? { name: r.projectName } : {}),
-    })),
-  };
-
   return (
     <section className="container-wide py-24 lg:py-36">
-      <script
-        id="ld-reviews"
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(reviewLd) }}
-      />
-
       <Reveal>
         <h2 className="display-xl text-[clamp(2rem,5vw,4rem)]">Відгуки</h2>
       </Reveal>
