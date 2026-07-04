@@ -53,11 +53,30 @@ function clientIp(req: NextRequest): string {
   );
 }
 
+// Same-visitor duplicate guard (per edge isolate): parallel requests race past
+// the cookie check before either response lands, so cookies alone can't dedup.
+const recentlyNotified = new Map<string, number>();
+const NOTIFY_DEDUP_MS = 60_000;
+
 /** Fired via waitUntil — must not delay the response. Sends at most one Telegram
  *  notification per visitor per 30-minute visit session. */
 async function trackVisit(req: NextRequest, res: NextResponse) {
   const { pathname } = req.nextUrl;
   if (!isTrackedPath(pathname)) return;
+
+  // Next.js link prefetches and client-router fetches aren't page views —
+  // hovering the nav can prefetch several routes at once, each of which
+  // would otherwise count as a separate visit.
+  const dest = req.headers.get('sec-fetch-dest');
+  if (
+    req.headers.get('rsc') ||
+    req.headers.get('next-router-prefetch') ||
+    req.headers.get('purpose') === 'prefetch' ||
+    req.headers.get('sec-purpose')?.includes('prefetch') ||
+    (dest && dest !== 'document')
+  ) {
+    return;
+  }
 
   const userAgent = req.headers.get('user-agent') || '';
   if (!userAgent || isBotUserAgent(userAgent)) return;
@@ -86,8 +105,19 @@ async function trackVisit(req: NextRequest, res: NextResponse) {
 
   if (alreadyNotifiedThisSession) return;
 
+  const ip = clientIp(req);
+  const dedupKey = `${ip}|${userAgent}`;
+  const now = Date.now();
+  const lastNotified = recentlyNotified.get(dedupKey);
+  if (lastNotified && now - lastNotified < NOTIFY_DEDUP_MS) return;
+  recentlyNotified.set(dedupKey, now);
+  if (recentlyNotified.size > 500) {
+    for (const [key, ts] of recentlyNotified) {
+      if (now - ts > NOTIFY_DEDUP_MS) recentlyNotified.delete(key);
+    }
+  }
+
   try {
-    const ip = clientIp(req);
     const { device, os, browser } = parsedUa;
     const language = req.headers.get('accept-language')?.split(',')[0]?.trim() || 'Невідомо';
     const referrer = req.headers.get('referer') || 'Пряме відвідування';
