@@ -66,10 +66,11 @@ async function trackVisit(req: NextRequest, res: NextResponse) {
 
   // Next.js link prefetches and client-router fetches aren't page views —
   // hovering the nav can prefetch several routes at once, each of which
-  // would otherwise count as a separate visit. Note: Next strips its internal
-  // headers (rsc, next-router-prefetch) before middleware runs, so detect
-  // router fetches by the ?_rsc= query param and browser fetches by
-  // sec-fetch-dest (real document navigations always say "document").
+  // would otherwise count as a separate visit. Next/Vercel strip their
+  // internal markers (rsc header, ?_rsc param) before middleware runs, so
+  // the reliable signal is sec-fetch-dest: browsers set it to "document"
+  // for real navigations and "empty" for fetch()-based prefetches, and
+  // servers can't strip it. _rsc/purpose checks kept as belt-and-suspenders.
   const dest = req.headers.get('sec-fetch-dest');
   if (
     req.nextUrl.searchParams.has('_rsc') ||
