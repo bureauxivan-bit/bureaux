@@ -62,31 +62,42 @@ async function trackVisit(req: NextRequest, res: NextResponse) {
 
   if (alreadyNotifiedThisSession) return;
 
-  const ip = clientIp(req);
-  const { device, os, browser } = parseUserAgent(userAgent);
-  const language = req.headers.get('accept-language')?.split(',')[0]?.trim() || 'Невідомо';
-  const referrer = req.headers.get('referer') || 'Пряме відвідування';
-  const url = `${req.nextUrl.pathname}${req.nextUrl.search}`;
-  // Vercel populates req.geo at the edge — used as fallback if the geo API is down.
-  const { country, city, isp } = await lookupGeo(ip, {
-    country: req.geo?.country,
-    city: req.geo?.city ? decodeURIComponent(req.geo.city) : undefined,
-  });
+  try {
+    const ip = clientIp(req);
+    const { device, os, browser } = parseUserAgent(userAgent);
+    const language = req.headers.get('accept-language')?.split(',')[0]?.trim() || 'Невідомо';
+    const referrer = req.headers.get('referer') || 'Пряме відвідування';
+    const url = `${req.nextUrl.pathname}${req.nextUrl.search}`;
+    // Vercel populates req.geo at the edge — used as fallback if the geo API is down.
+    let geoCity: string | undefined;
+    try {
+      geoCity = req.geo?.city ? decodeURIComponent(req.geo.city) : undefined;
+    } catch {
+      geoCity = req.geo?.city;
+    }
+    const { country, city, isp } = await lookupGeo(ip, {
+      country: req.geo?.country,
+      city: geoCity,
+    });
 
-  await notifyVisit({
-    timestamp: new Date(),
-    ip,
-    country,
-    city,
-    isp,
-    device,
-    os,
-    browser,
-    language,
-    referrer,
-    url,
-    isNewVisitor,
-  });
+    console.log('[analytics] visit:', { ip, url, isNewVisitor });
+    await notifyVisit({
+      timestamp: new Date(),
+      ip,
+      country,
+      city,
+      isp,
+      device,
+      os,
+      browser,
+      language,
+      referrer,
+      url,
+      isNewVisitor,
+    });
+  } catch (err) {
+    console.error('[analytics] trackVisit failed:', err);
+  }
 }
 
 export async function middleware(req: NextRequest, event: NextFetchEvent) {

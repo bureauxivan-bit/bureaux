@@ -46,18 +46,29 @@ function escapeHtml(s: string) {
   return s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]!));
 }
 
-/** Sends to the analytics chat (falls back to the lead bot's token, kept in a separate chat). Best-effort. */
+/** Sends to the analytics chat (falls back to the lead bot's token, kept in a separate chat).
+ *  Best-effort, but logs failures so `vercel logs` shows why a message didn't arrive. */
 async function sendAnalytics(text: string): Promise<void> {
-  const token = process.env.TELEGRAM_ANALYTICS_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
-  const chatId = process.env.TELEGRAM_ANALYTICS_CHAT_ID;
-  if (!token || !chatId) return;
+  const token = (process.env.TELEGRAM_ANALYTICS_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN)?.trim();
+  const chatId = process.env.TELEGRAM_ANALYTICS_CHAT_ID?.trim();
+  if (!token || !chatId) {
+    console.warn('[analytics] skipped: env missing', { hasToken: !!token, hasChatId: !!chatId });
+    return;
+  }
   try {
-    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+    const res = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
     });
-  } catch {}
+    if (!res.ok) {
+      console.error('[analytics] telegram rejected:', res.status, await res.text());
+    } else {
+      console.log('[analytics] sent ok');
+    }
+  } catch (err) {
+    console.error('[analytics] telegram fetch failed:', err);
+  }
 }
 
 type VisitPayload = {
