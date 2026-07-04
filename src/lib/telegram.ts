@@ -46,6 +46,72 @@ function escapeHtml(s: string) {
   return s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]!));
 }
 
+/** Sends to the analytics chat (falls back to the lead bot's token, kept in a separate chat). Best-effort. */
+async function sendAnalytics(text: string): Promise<void> {
+  const token = process.env.TELEGRAM_ANALYTICS_BOT_TOKEN || process.env.TELEGRAM_BOT_TOKEN;
+  const chatId = process.env.TELEGRAM_ANALYTICS_CHAT_ID;
+  if (!token || !chatId) return;
+  try {
+    await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text, parse_mode: 'HTML' }),
+    });
+  } catch {}
+}
+
+type VisitPayload = {
+  timestamp: Date;
+  ip: string;
+  country: string;
+  city: string;
+  isp: string;
+  device: string;
+  os: string;
+  browser: string;
+  language: string;
+  referrer: string;
+  url: string;
+  isNewVisitor: boolean;
+};
+
+/** Sends a site-visit notification to the analytics Telegram chat. Best-effort. */
+export async function notifyVisit(v: VisitPayload): Promise<void> {
+  const lines = [
+    `${v.isNewVisitor ? '🟢 <b>Новий відвідувач</b>' : '🔵 <b>Повторний візит</b>'} — BUREAUX`,
+    `🕒 ${v.timestamp.toLocaleString('uk-UA', { timeZone: 'Europe/Kyiv' })}`,
+    `🌐 IP: <code>${escapeHtml(v.ip)}</code>`,
+    `📍 ${escapeHtml(v.city)}, ${escapeHtml(v.country)}`,
+    `📡 Провайдер: ${escapeHtml(v.isp)}`,
+    `📱 Пристрій: ${escapeHtml(v.device)}`,
+    `💻 ОС: ${escapeHtml(v.os)}`,
+    `🧭 Браузер: ${escapeHtml(v.browser)}`,
+    `🗣 Мова: ${escapeHtml(v.language)}`,
+    `↩️ Джерело: ${escapeHtml(v.referrer)}`,
+    `🔗 Сторінка: ${escapeHtml(v.url)}`,
+  ];
+  await sendAnalytics(lines.join('\n'));
+}
+
+type ServerErrorPayload = {
+  timestamp: Date;
+  message: string;
+  stack?: string;
+  url?: string;
+};
+
+/** Sends a server-error alert to the analytics Telegram chat. Best-effort. */
+export async function notifyServerError(e: ServerErrorPayload): Promise<void> {
+  const lines = [
+    '🚨 <b>Помилка сервера — BUREAUX</b>',
+    `🕒 ${e.timestamp.toLocaleString('uk-UA', { timeZone: 'Europe/Kyiv' })}`,
+    e.url ? `🔗 ${escapeHtml(e.url)}` : '',
+    `⚠️ ${escapeHtml(e.message).slice(0, 500)}`,
+    e.stack ? `<pre>${escapeHtml(e.stack).slice(0, 800)}</pre>` : '',
+  ].filter(Boolean);
+  await sendAnalytics(lines.join('\n'));
+}
+
 async function sendTelegram(text: string): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;

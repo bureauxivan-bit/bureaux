@@ -1,8 +1,18 @@
-import { NextResponse, type NextRequest } from 'next/server';
+import { NextResponse, type NextRequest, type NextFetchEvent } from 'next/server';
 import { jwtVerify } from 'jose';
+import { notifyVisit } from '@/lib/telegram';
+import { lookupGeo } from '@/lib/geo';
+import { parseUserAgent, isBotUserAgent } from '@/lib/ua';
 
 const ADMIN_COOKIE = 'bx_session';
 const CLIENT_COOKIE = 'bx_client';
+const VISITOR_COOKIE = 'bx_vid';
+const VISIT_SESSION_COOKIE = 'bx_visit_sid';
+const VISIT_SESSION_MAX_AGE = 30 * 60; // one Telegram notification per 30 min per visitor
+const VISITOR_MAX_AGE = 60 * 60 * 24 * 365;
+
+// Internal areas aren't "site visits" for analytics purposes (owner/client traffic, not prospects).
+const ANALYTICS_EXCLUDE = ['/admin', '/miy-proekt'];
 
 async function isValid(token: string | undefined, secret: string, role?: string) {
   if (!token) return false;
@@ -15,11 +25,76 @@ async function isValid(token: string | undefined, secret: string, role?: string)
   }
 }
 
-export async function middleware(req: NextRequest) {
+function clientIp(req: NextRequest): string {
+  return (
+    req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ||
+    req.headers.get('x-real-ip') ||
+    'unknown'
+  );
+}
+
+/** Fired via waitUntil — must not delay the response. Sends at most one Telegram
+ *  notification per visitor per 30-minute visit session. */
+async function trackVisit(req: NextRequest, res: NextResponse) {
+  const { pathname } = req.nextUrl;
+  if (ANALYTICS_EXCLUDE.some((p) => pathname === p || pathname.startsWith(`${p}/`))) return;
+
+  const userAgent = req.headers.get('user-agent') || '';
+  if (!userAgent || isBotUserAgent(userAgent)) return;
+
+  const alreadyNotifiedThisSession = req.cookies.has(VISIT_SESSION_COOKIE);
+  const isNewVisitor = !req.cookies.has(VISITOR_COOKIE);
+
+  // Cookie writes must happen before the first `await` so they land on the
+  // response before middleware() returns it (waitUntil runs after that).
+  res.cookies.set(VISIT_SESSION_COOKIE, '1', {
+    maxAge: VISIT_SESSION_MAX_AGE,
+    httpOnly: true,
+    sameSite: 'lax',
+  });
+  if (isNewVisitor) {
+    res.cookies.set(VISITOR_COOKIE, '1', {
+      maxAge: VISITOR_MAX_AGE,
+      httpOnly: true,
+      sameSite: 'lax',
+    });
+  }
+
+  if (alreadyNotifiedThisSession) return;
+
+  const ip = clientIp(req);
+  const { device, os, browser } = parseUserAgent(userAgent);
+  const language = req.headers.get('accept-language')?.split(',')[0]?.trim() || 'Невідомо';
+  const referrer = req.headers.get('referer') || 'Пряме відвідування';
+  const url = `${req.nextUrl.pathname}${req.nextUrl.search}`;
+  // Vercel populates req.geo at the edge — used as fallback if the geo API is down.
+  const { country, city, isp } = await lookupGeo(ip, {
+    country: req.geo?.country,
+    city: req.geo?.city ? decodeURIComponent(req.geo.city) : undefined,
+  });
+
+  await notifyVisit({
+    timestamp: new Date(),
+    ip,
+    country,
+    city,
+    isp,
+    device,
+    os,
+    browser,
+    language,
+    referrer,
+    url,
+    isNewVisitor,
+  });
+}
+
+export async function middleware(req: NextRequest, event: NextFetchEvent) {
   const { pathname } = req.nextUrl;
   const secret = process.env.AUTH_SECRET ?? '';
 
-  // Admin routes
+  let response: NextResponse;
+
   if (pathname.startsWith('/admin')) {
     const isLogin = pathname === '/admin/login';
     const token = req.cookies.get(ADMIN_COOKIE)?.value;
@@ -28,43 +103,45 @@ export async function middleware(req: NextRequest) {
     if (!isLogin && !valid) {
       const url = req.nextUrl.clone();
       url.pathname = '/admin/login';
-      return NextResponse.redirect(url);
-    }
-    if (isLogin && valid) {
+      response = NextResponse.redirect(url);
+    } else if (isLogin && valid) {
       const url = req.nextUrl.clone();
       url.pathname = '/admin';
-      return NextResponse.redirect(url);
+      response = NextResponse.redirect(url);
+    } else {
+      response = NextResponse.next();
     }
-    return NextResponse.next();
-  }
-
-  // Client dashboard — requires approved client session
-  if (pathname.startsWith('/miy-proekt')) {
+  } else if (pathname.startsWith('/miy-proekt')) {
+    // Client dashboard — requires approved client session
     const token = req.cookies.get(CLIENT_COOKIE)?.value;
     const valid = await isValid(token, secret, 'client');
     if (!valid) {
       const url = req.nextUrl.clone();
       url.pathname = '/login';
-      return NextResponse.redirect(url);
+      response = NextResponse.redirect(url);
+    } else {
+      response = NextResponse.next();
     }
-    return NextResponse.next();
-  }
-
-  // Client login — redirect to dashboard if already logged in
-  if (pathname === '/login') {
+  } else if (pathname === '/login') {
+    // Client login — redirect to dashboard if already logged in
     const token = req.cookies.get(CLIENT_COOKIE)?.value;
     const valid = await isValid(token, secret, 'client');
     if (valid) {
       const url = req.nextUrl.clone();
       url.pathname = '/miy-proekt';
-      return NextResponse.redirect(url);
+      response = NextResponse.redirect(url);
+    } else {
+      response = NextResponse.next();
     }
-    return NextResponse.next();
+  } else {
+    response = NextResponse.next();
   }
 
-  return NextResponse.next();
+  event.waitUntil(trackVisit(req, response));
+
+  return response;
 }
 
 export const config = {
-  matcher: ['/admin/:path*', '/miy-proekt/:path*', '/login'],
+  matcher: ['/((?!api|_next/static|_next/image|favicon.ico|.*\\..*).*)'],
 };
