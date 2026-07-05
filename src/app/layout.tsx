@@ -73,6 +73,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         `}</Script>
       </head>
       <body>
+        <Script src="https://www.googletagmanager.com/gtag/js?id=G-1CVLYKWRZR" strategy="afterInteractive" />
+        <Script id="ga4" strategy="afterInteractive">{`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-1CVLYKWRZR');
+        `}</Script>
         {plausible && (
           <Script defer data-domain={plausible} src="https://plausible.io/js/script.js" strategy="afterInteractive" />
         )}
