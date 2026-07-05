@@ -35,6 +35,47 @@ function top(counter: Map<string, number>, n: number): [string, number][] {
   return [...counter.entries()].sort((a, b) => b[1] - a[1]).slice(0, n);
 }
 
+function fmtDuration(totalSeconds: number): string {
+  const s = Math.round(totalSeconds);
+  if (s < 60) return `${s} с`;
+  return `${Math.floor(s / 60)} хв ${String(s % 60).padStart(2, '0')} с`;
+}
+
+/** Engagement block from PageStat beacons (time on page, scroll depth). */
+async function buildEngagement(start: Date, end: Date): Promise<string> {
+  const stats = await prisma.pageStat.findMany({
+    where: { createdAt: { gte: start, lt: end } },
+    select: { page: true, seconds: true, scroll: true },
+  });
+  if (stats.length === 0) return '';
+
+  const avgSeconds = stats.reduce((a, s) => a + s.seconds, 0) / stats.length;
+  const avgScroll = stats.reduce((a, s) => a + s.scroll, 0) / stats.length;
+
+  // Pages people actually read: highest average time, needs 2+ views to count.
+  const perPage = new Map<string, { sec: number; n: number }>();
+  for (const s of stats) {
+    const e = perPage.get(s.page) ?? { sec: 0, n: 0 };
+    e.sec += s.seconds;
+    e.n += 1;
+    perPage.set(s.page, e);
+  }
+  const readable = [...perPage.entries()]
+    .filter(([, e]) => e.n >= 2)
+    .map(([page, e]) => [page, e.sec / e.n] as [string, number])
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, 3);
+
+  return [
+    '',
+    '⏱ <b>Залученість:</b>',
+    `Середній час на сторінці: ${fmtDuration(avgSeconds)} · Прокрутка: ${Math.round(avgScroll)}%`,
+    readable.length
+      ? `Найдовше читають:\n${readable.map(([p, s], i) => `${i + 1}. ${esc(p)} — ${fmtDuration(s)}`).join('\n')}`
+      : '',
+  ].filter((l) => l !== '').join('\n');
+}
+
 function count(map: Map<string, number>, key: string) {
   map.set(key, (map.get(key) ?? 0) + 1);
 }
@@ -109,6 +150,7 @@ export async function buildStatsReport(
     `🌆 Міста: ${line(top(cities, 5))}`,
     `📱 Пристрої: ${line(top(devices, 3))}`,
     `🧭 Браузери: ${line(top(browsers, 3))}`,
+    await buildEngagement(start, end),
   ].filter((l) => l !== '').join('\n');
 
   return { text, visits: visits.length };

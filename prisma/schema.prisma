@@ -321,6 +321,16 @@ model Visit {
   @@index([createdAt])
 }
 
+model PageStat {
+  id        String   @id
+  page      String
+  seconds   Int      @default(0)
+  scroll    Int      @default(0)
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+}
+
 model ClientSpecItem {
   id       String      @id @default(cuid())
   stageId  String

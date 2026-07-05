@@ -3,6 +3,7 @@ import { Header } from '@/components/Header';
 import { Footer } from '@/components/Footer';
 import { LeadModalProvider } from '@/components/LeadModal';
 import CursorTrail from '@/components/CursorTrail';
+import { EngagementTracker } from '@/components/EngagementTracker';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
@@ -68,6 +69,7 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <script id="ld-json" type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <CursorTrail />
+      <EngagementTracker />
       <Header settings={settings} />
       <main>{children}</main>
       <Footer settings={settings} />
