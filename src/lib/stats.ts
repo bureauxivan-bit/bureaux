@@ -21,6 +21,13 @@ function sourceLabel(referrer: string | null, siteHost: string): string {
     if (host.includes(siteHost)) return 'внутрішні';
     if (host.includes('instagram')) return 'Instagram';
     if (host.includes('facebook') || host === 'fb.com') return 'Facebook';
+    // AI assistants — checked before Google so gemini.google.com isn't
+    // swallowed by the generic google match. Relevant for AEO tracking.
+    if (host.includes('chatgpt') || host.includes('openai')) return 'ChatGPT';
+    if (host.includes('claude') || host.includes('anthropic')) return 'Claude';
+    if (host.includes('perplexity')) return 'Perplexity';
+    if (host.includes('gemini')) return 'Gemini';
+    if (host.includes('copilot')) return 'Copilot';
     if (host.includes('google')) return 'Google';
     if (host.includes('t.me') || host.includes('telegram')) return 'Telegram';
     if (host.includes('tiktok')) return 'TikTok';
