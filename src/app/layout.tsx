@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import localFont from 'next/font/local';
 import Script from 'next/script';
+import { Analytics } from '@vercel/analytics/next';
 import { SmoothScroll } from '@/components/SmoothScroll';
 import { CustomCursor } from '@/components/CustomCursor';
 import './globals.css';
@@ -96,6 +97,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <SmoothScroll />
         <CustomCursor />
         {children}
+        <Analytics />
       </body>
     </html>
   );
