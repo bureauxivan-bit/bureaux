@@ -321,6 +321,16 @@ model Visit {
   @@index([createdAt])
 }
 
+model Event {
+  id        String   @id @default(cuid())
+  name      String
+  page      String?
+  createdAt DateTime @default(now())
+
+  @@index([createdAt])
+  @@index([name])
+}
+
 model PageStat {
   id        String   @id
   page      String

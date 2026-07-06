@@ -1,5 +1,7 @@
 ﻿import Image from 'next/image';
 import { CtaButton } from './CtaButton';
+import { ProjectsButton } from './ProjectsButton';
+import { ScrollCue } from './ScrollCue';
 
 export function Hero({ heroImage }: { heroImage?: string | null }) {
   const src = heroImage || '/images/hero.jpg';
@@ -38,19 +40,24 @@ export function Hero({ heroImage }: { heroImage?: string | null }) {
             </p>
           </div>
 
-          {/* CTA — arrow style */}
-          <div className="shrink-0 lg:pb-1">
+          {/* CTAs — primary (estimate) + softer secondary (projects) */}
+          <div className="flex shrink-0 flex-col gap-3 sm:flex-row sm:items-center lg:pb-1">
             <CtaButton
               kind="estimate"
-              className="group inline-flex items-center gap-3 bg-paper px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-coal transition-opacity duration-200 hover:opacity-85"
+              className="group inline-flex items-center justify-center gap-3 bg-paper px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-coal transition-opacity duration-200 hover:opacity-85"
             >
               <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
               Безкоштовний прорахунок
             </CtaButton>
+            <ProjectsButton
+              className="inline-flex items-center justify-center border border-paper/40 px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-paper/10"
+            />
           </div>
 
         </div>
       </div>
+
+      <ScrollCue />
     </section>
   );
 }

@@ -48,6 +48,34 @@ function fmtDuration(totalSeconds: number): string {
   return `${Math.floor(s / 60)} хв ${String(s % 60).padStart(2, '0')} с`;
 }
 
+/** Conversion funnel: visits → CTA clicks → submitted leads, in one window. */
+async function buildFunnel(start: Date, end: Date, visits: number): Promise<string> {
+  const [events, leads] = await Promise.all([
+    prisma.event.groupBy({
+      by: ['name'],
+      where: { createdAt: { gte: start, lt: end } },
+      _count: true,
+    }),
+    prisma.lead.count({ where: { source: 'site', createdAt: { gte: start, lt: end } } }),
+  ]);
+  const byName = new Map(events.map((e) => [e.name, e._count]));
+  const estimate = byName.get('cta_estimate') ?? 0;
+  const projects = byName.get('cta_projects') ?? 0;
+  const ctaTotal = estimate + (byName.get('cta_consult') ?? 0);
+
+  // Nothing wired yet in this window — skip the block entirely.
+  if (ctaTotal === 0 && projects === 0 && leads === 0) return '';
+
+  const pct = (n: number) => (visits > 0 ? ` (${Math.round((n / visits) * 100)}%)` : '');
+  return [
+    '',
+    '🎯 <b>Конверсія:</b>',
+    `Кліки «Прорахунок»: ${ctaTotal}${pct(ctaTotal)}`,
+    `Кліки «Переглянути проєкти»: ${projects}${pct(projects)}`,
+    `Заявки: <b>${leads}</b>${pct(leads)}`,
+  ].join('\n');
+}
+
 /** Engagement block from PageStat beacons (time on page, scroll depth). */
 async function buildEngagement(start: Date, end: Date): Promise<string> {
   const stats = await prisma.pageStat.findMany({
@@ -157,6 +185,7 @@ export async function buildStatsReport(
     `🌆 Міста: ${line(top(cities, 5))}`,
     `📱 Пристрої: ${line(top(devices, 3))}`,
     `🧭 Браузери: ${line(top(browsers, 3))}`,
+    await buildFunnel(start, end, visits.length),
     await buildEngagement(start, end),
   ].filter((l) => l !== '').join('\n');
 

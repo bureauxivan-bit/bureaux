@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
 import type { LeadType } from '@/lib/types';
 import { PhoneInput } from './PhoneInput';
+import { trackEvent } from '@/lib/track';
 
 type FormValues = { name: string; phone: string; email?: string; company?: string };
 
@@ -39,6 +40,7 @@ export function LeadForm({
       if (typeof window !== 'undefined' && (window as any).fbq) {
         (window as any).fbq('track', 'Lead');
       }
+      trackEvent('lead_submitted');
       onBeforeRedirect?.();
       // wait for modal exit animation before navigating
       setTimeout(() => router.push('/thank-you'), onBeforeRedirect ? 350 : 0);
