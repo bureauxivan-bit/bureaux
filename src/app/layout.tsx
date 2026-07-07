@@ -88,12 +88,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             title="gtm" height="0" width="0" style={{ display: 'none', visibility: 'hidden' }} />
         </noscript>
         {/* End Google Tag Manager (noscript) */}
+        {/* Google gtag.js — грузится один раз, обслуживает и GA4, и Google Ads */}
         <Script src="https://www.googletagmanager.com/gtag/js?id=G-1CVLYKWRZR" strategy="afterInteractive" />
         <Script id="ga4" strategy="afterInteractive">{`
           window.dataLayer = window.dataLayer || [];
           function gtag(){dataLayer.push(arguments);}
           gtag('js', new Date());
           gtag('config', 'G-1CVLYKWRZR');
+          gtag('config', 'AW-18299482202'); // Google Ads — контекстна реклама
         `}</Script>
         {plausible && (
           <Script defer data-domain={plausible} src="https://plausible.io/js/script.js" strategy="afterInteractive" />
