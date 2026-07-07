@@ -67,9 +67,12 @@ async function buildFunnel(start: Date, end: Date, visits: number): Promise<stri
   if (ctaTotal === 0 && projects === 0 && leads === 0) return '';
 
   const pct = (n: number) => (visits > 0 ? ` (${Math.round((n / visits) * 100)}%)` : '');
+  // Built from the code point at runtime: as a source literal this emoji gets
+  // escaped to a broken "🎯" string by the Vercel build minifier.
+  const target = String.fromCodePoint(0x1f3af);
   return [
     '',
-    '🎯 <b>Конверсія:</b>',
+    `${target} <b>Конверсія:</b>`,
     `Кліки «Прорахунок»: ${ctaTotal}${pct(ctaTotal)}`,
     `Кліки «Переглянути проєкти»: ${projects}${pct(projects)}`,
     `Заявки: <b>${leads}</b>${pct(leads)}`,
