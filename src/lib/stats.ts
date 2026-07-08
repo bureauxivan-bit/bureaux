@@ -16,6 +16,7 @@ function esc(s: string) {
 /** Human label for a referrer URL. */
 function sourceLabel(referrer: string | null, siteHost: string): string {
   if (!referrer || referrer === 'Пряме відвідування') return 'прямі';
+  if (referrer === 'Google Ads') return 'Google Ads';
   try {
     const host = new URL(referrer).hostname.replace(/^(www|l|lm|m)\./, '');
     if (host.includes(siteHost)) return 'внутрішні';

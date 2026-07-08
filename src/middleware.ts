@@ -128,17 +128,26 @@ async function trackVisit(req: NextRequest, res: NextResponse) {
   try {
     const { device, os, browser } = parsedUa;
     const language = req.headers.get('accept-language')?.split(',')[0]?.trim() || 'Невідомо';
-    const referrer = req.headers.get('referer') || 'Пряме відвідування';
 
     // Show UTM as a separate campaign line; strip tracking junk (fbclid & co)
     // from the displayed page URL so it stays readable.
     const params = req.nextUrl.searchParams;
+    // Google Ads sends gclid/gbraid/gad_* instead of utm — treat those as a paid
+    // click so the referrer reads "Google Ads", not organic Google.
+    const isGoogleAds =
+      params.has('gclid') || params.has('gbraid') || params.has('wbraid') ||
+      params.get('gad_source') != null;
+    const referrer = isGoogleAds
+      ? 'Google Ads'
+      : req.headers.get('referer') || 'Пряме відвідування';
     const utm = [params.get('utm_source'), params.get('utm_medium'), params.get('utm_content') || params.get('utm_campaign')]
       .filter(Boolean)
       .join(' / ');
     const cleanParams = new URLSearchParams();
     for (const [key, value] of params) {
-      if (!/^(utm_|fbclid|gclid|yclid|msclkid|igsh|ttclid|_rsc)/.test(key)) cleanParams.set(key, value);
+      if (!/^(utm_|fbclid|gclid|gbraid|wbraid|gad_|yclid|msclkid|igsh|ttclid|_rsc)/.test(key)) {
+        cleanParams.set(key, value);
+      }
     }
     const qs = cleanParams.toString();
     const url = req.nextUrl.pathname + (qs ? `?${qs}` : '');
