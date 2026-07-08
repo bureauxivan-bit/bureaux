@@ -57,6 +57,11 @@ export const metadata: Metadata = {
     site: '@bureaux_ua',
     images: ['/images/og.png'],
   },
+  // Set GOOGLE_SITE_VERIFICATION to the code from Search Console
+  // (Settings → Ownership verification → HTML tag → the content="..." value).
+  verification: process.env.GOOGLE_SITE_VERIFICATION
+    ? { google: process.env.GOOGLE_SITE_VERIFICATION }
+    : undefined,
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

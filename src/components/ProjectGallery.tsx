@@ -40,7 +40,15 @@ function FadeRow({ children, index }: { children: React.ReactNode; index: number
   );
 }
 
-export function ProjectGallery({ images }: { images: Img[] }) {
+export function ProjectGallery({
+  images,
+  altPrefix,
+}: {
+  images: Img[];
+  /** SEO/accessibility fallback for images with no stored alt, e.g.
+   *  "Дизайн інтер'єру — Малеч, Київ · bureau X". */
+  altPrefix?: string;
+}) {
   if (!images.length) {
     return (
       <div className="flex aspect-[16/9] items-center justify-center bg-ink/5 text-sm text-muted">
@@ -67,7 +75,7 @@ export function ProjectGallery({ images }: { images: Img[] }) {
                 >
                   <img
                     src={img.url}
-                    alt={img.alt ?? ''}
+                    alt={img.alt || altPrefix || ''}
                     width={img.width ?? undefined}
                     height={img.height ?? undefined}
                     className="block w-full h-auto transition-transform duration-700 ease-out group-hover:scale-[1.02]"

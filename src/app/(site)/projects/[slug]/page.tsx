@@ -84,7 +84,10 @@ export default async function ProjectPage({ params }: { params: { slug: string }
 
       {/* ── Gallery — full bleed ── */}
       <div className={`w-full ${p.description ? '' : 'pt-0.5'}`}>
-        <ProjectGallery images={p.images} />
+        <ProjectGallery
+          images={p.images}
+          altPrefix={`${CATEGORY_LABELS[p.category]} — ${p.title}${p.location ? `, ${p.location}` : ''} · bureau X`}
+        />
       </div>
 
       {/* ── CTA ── */}
