@@ -4,6 +4,8 @@ import { Footer } from '@/components/Footer';
 import { LeadModalProvider } from '@/components/LeadModal';
 import CursorTrail from '@/components/CursorTrail';
 import { EngagementTracker } from '@/components/EngagementTracker';
+import { FloatingContact } from '@/components/FloatingContact';
+import { LeadPopup } from '@/components/LeadPopup';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
@@ -73,6 +75,8 @@ export default async function SiteLayout({ children }: { children: React.ReactNo
       <Header settings={settings} />
       <main>{children}</main>
       <Footer settings={settings} />
+      <FloatingContact phone={settings.phone} telegram={settings.telegram} instagram={settings.instagram} />
+      <LeadPopup />
     </LeadModalProvider>
   );
 }

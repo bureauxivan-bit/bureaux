@@ -59,24 +59,30 @@ async function buildFunnel(start: Date, end: Date, visits: number): Promise<stri
     prisma.lead.count({ where: { source: 'site', createdAt: { gte: start, lt: end } } }),
   ]);
   const byName = new Map(events.map((e) => [e.name, e._count]));
-  const estimate = byName.get('cta_estimate') ?? 0;
-  const projects = byName.get('cta_projects') ?? 0;
-  const ctaTotal = estimate + (byName.get('cta_consult') ?? 0);
+  const g = (n: string) => byName.get(n) ?? 0;
+  const ctaTotal = g('cta_estimate') + g('cta_consult');
+  const projects = g('cta_projects');
+  const messenger = g('contact_telegram') + g('contact_instagram') + g('contact_phone');
+  const popupShown = g('popup_shown');
+  const popupLead = g('popup_lead');
 
   // Nothing wired yet in this window — skip the block entirely.
-  if (ctaTotal === 0 && projects === 0 && leads === 0) return '';
+  if (ctaTotal === 0 && projects === 0 && messenger === 0 && popupShown === 0 && leads === 0) return '';
 
   const pct = (n: number) => (visits > 0 ? ` (${Math.round((n / visits) * 100)}%)` : '');
   // Built from the code point at runtime: as a source literal this emoji gets
   // escaped to a broken "🎯" string by the Vercel build minifier.
   const target = String.fromCodePoint(0x1f3af);
-  return [
+  const lines = [
     '',
     `${target} <b>Конверсія:</b>`,
     `Кліки «Прорахунок»: ${ctaTotal}${pct(ctaTotal)}`,
     `Кліки «Переглянути проєкти»: ${projects}${pct(projects)}`,
-    `Заявки: <b>${leads}</b>${pct(leads)}`,
-  ].join('\n');
+  ];
+  if (messenger > 0) lines.push(`Кліки в месенджер: ${messenger}${pct(messenger)}`);
+  if (popupShown > 0) lines.push(`Спливне вікно: показів ${popupShown} → заявок ${popupLead}`);
+  lines.push(`Заявки: <b>${leads}</b>${pct(leads)}`);
+  return lines.join('\n');
 }
 
 /** Engagement block from PageStat beacons (time on page, scroll depth). */

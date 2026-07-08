@@ -4,7 +4,11 @@ import { rateLimit, clientIp } from '@/lib/rate-limit';
 
 // Only known event names are stored, so a public beacon endpoint can't be
 // used to flood the table with arbitrary strings.
-const ALLOWED = new Set(['cta_estimate', 'cta_consult', 'cta_projects', 'lead_submitted']);
+const ALLOWED = new Set([
+  'cta_estimate', 'cta_consult', 'cta_projects', 'lead_submitted',
+  'contact_open', 'contact_telegram', 'contact_instagram', 'contact_phone',
+  'popup_shown', 'popup_start', 'popup_lead',
+]);
 
 export async function POST(req: NextRequest) {
   const ip = clientIp(req);
