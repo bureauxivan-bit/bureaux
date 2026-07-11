@@ -29,6 +29,13 @@ export async function POST(req: NextRequest) {
     ? body.page.slice(0, 200)
     : null;
 
-  await prisma.event.create({ data: { name, page } });
+  // First-touch acquisition channel, stamped by middleware at landing.
+  let source: string | null = null;
+  const raw = req.cookies.get('bx_src')?.value;
+  if (raw) {
+    try { source = decodeURIComponent(raw).slice(0, 40); } catch { source = raw.slice(0, 40); }
+  }
+
+  await prisma.event.create({ data: { name, page, source } });
   return Response.json({ ok: true });
 }

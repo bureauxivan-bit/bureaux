@@ -1,4 +1,5 @@
 import { prisma } from '@/lib/prisma';
+import { channelLabel } from '@/lib/source';
 
 export const MONTH_NAMES = [
   'січень', 'лютий', 'березень', 'квітень', 'травень', 'червень',
@@ -13,30 +14,9 @@ function esc(s: string) {
   return s.replace(/[&<>]/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]!));
 }
 
-/** Human label for a referrer URL. */
+/** Human label for a referrer URL — shared with middleware attribution. */
 function sourceLabel(referrer: string | null, siteHost: string): string {
-  if (!referrer || referrer === 'Пряме відвідування') return 'прямі';
-  if (referrer === 'Google Ads') return 'Google Ads';
-  try {
-    const host = new URL(referrer).hostname.replace(/^(www|l|lm|m)\./, '');
-    if (host.includes(siteHost)) return 'внутрішні';
-    if (host.includes('instagram')) return 'Instagram';
-    if (host.includes('facebook') || host === 'fb.com') return 'Facebook';
-    // AI assistants — checked before Google so gemini.google.com isn't
-    // swallowed by the generic google match. Relevant for AEO tracking.
-    if (host.includes('chatgpt') || host.includes('openai')) return 'ChatGPT';
-    if (host.includes('claude') || host.includes('anthropic')) return 'Claude';
-    if (host.includes('perplexity')) return 'Perplexity';
-    if (host.includes('gemini')) return 'Gemini';
-    if (host.includes('copilot')) return 'Copilot';
-    if (host.includes('google')) return 'Google';
-    if (host.includes('t.me') || host.includes('telegram')) return 'Telegram';
-    if (host.includes('tiktok')) return 'TikTok';
-    if (host.includes('bing')) return 'Bing';
-    return host;
-  } catch {
-    return 'прямі';
-  }
+  return channelLabel(referrer, siteHost);
 }
 
 function top(counter: Map<string, number>, n: number): [string, number][] {
@@ -49,23 +29,24 @@ function fmtDuration(totalSeconds: number): string {
   return `${Math.floor(s / 60)} хв ${String(s % 60).padStart(2, '0')} с`;
 }
 
-/** Conversion funnel: visits → CTA clicks → submitted leads, in one window. */
+/** Conversion funnel: visits → CTA clicks → submitted leads, plus a per-channel
+ *  breakdown of conversion actions (attributed via the first-touch bx_src). */
 async function buildFunnel(start: Date, end: Date, visits: number): Promise<string> {
   const [events, leads] = await Promise.all([
     prisma.event.groupBy({
-      by: ['name'],
+      by: ['name', 'source'],
       where: { createdAt: { gte: start, lt: end } },
       _count: true,
     }),
     prisma.lead.count({ where: { source: 'site', createdAt: { gte: start, lt: end } } }),
   ]);
-  const byName = new Map(events.map((e) => [e.name, e._count]));
-  const g = (n: string) => byName.get(n) ?? 0;
-  const ctaTotal = g('cta_estimate') + g('cta_consult');
-  const projects = g('cta_projects');
-  const messenger = g('contact_telegram') + g('contact_instagram') + g('contact_phone');
-  const popupShown = g('popup_shown');
-  const popupLead = g('popup_lead');
+  const total = (name: string) =>
+    events.filter((e) => e.name === name).reduce((a, e) => a + e._count, 0);
+  const ctaTotal = total('cta_estimate') + total('cta_consult');
+  const projects = total('cta_projects');
+  const messenger = total('contact_telegram') + total('contact_instagram') + total('contact_phone');
+  const popupShown = total('popup_shown');
+  const popupLead = total('popup_lead');
 
   // Nothing wired yet in this window — skip the block entirely.
   if (ctaTotal === 0 && projects === 0 && messenger === 0 && popupShown === 0 && leads === 0) return '';
@@ -82,7 +63,20 @@ async function buildFunnel(start: Date, end: Date, visits: number): Promise<stri
   ];
   if (messenger > 0) lines.push(`Кліки в месенджер: ${messenger}${pct(messenger)}`);
   if (popupShown > 0) lines.push(`Спливне вікно: показів ${popupShown} → заявок ${popupLead}`);
-  lines.push(`Заявки: <b>${leads}</b>${pct(leads)}`);
+  lines.push(`Заявки з форми: <b>${leads}</b>${pct(leads)}`);
+
+  // Which channel actually converts — the money question with paid ads running.
+  // Attribution starts when bx_src was added, so early events have no source.
+  const conv = new Map<string, number>();
+  for (const e of events) {
+    if (e.name === 'lead_submitted' || e.name === 'popup_lead' || e.name === 'cta_estimate') {
+      if (e.source) conv.set(e.source, (conv.get(e.source) ?? 0) + e._count);
+    }
+  }
+  if (conv.size > 0) {
+    lines.push('', '<b>Заявки/кліки за каналом:</b>');
+    for (const [src, n] of top(conv, 6)) lines.push(`${esc(src)} — ${n}`);
+  }
   return lines.join('\n');
 }
 

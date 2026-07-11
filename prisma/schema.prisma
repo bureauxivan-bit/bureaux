@@ -343,6 +343,7 @@ model Event {
   id        String   @id @default(cuid())
   name      String
   page      String?
+  source    String?
   createdAt DateTime @default(now())
 
   @@index([createdAt])

@@ -5,11 +5,16 @@ import { routing } from '@/i18n/routing';
 import { notifyVisit } from '@/lib/telegram';
 import { lookupGeo, isDatacenterIsp } from '@/lib/geo';
 import { parseUserAgent, isBotUserAgent } from '@/lib/ua';
+import { channelLabel } from '@/lib/source';
 
 const ADMIN_COOKIE = 'bx_session';
 const CLIENT_COOKIE = 'bx_client';
 const VISITOR_COOKIE = 'bx_vid';
 const VISIT_SESSION_COOKIE = 'bx_visit_sid';
+// First-touch acquisition channel, stamped once and read by the conversion
+// endpoints (/api/track/event) to attribute clicks/leads to a source.
+const SOURCE_COOKIE = 'bx_src';
+const SOURCE_MAX_AGE = 60 * 60 * 24 * 30; // 30-day attribution window
 const VISIT_SESSION_MAX_AGE = 30 * 60; // one Telegram notification per 30 min per visitor
 const VISITOR_MAX_AGE = 60 * 60 * 24 * 365;
 
@@ -21,6 +26,8 @@ const TRACKED_PREFIXES = [
   '/projects',
   '/posluhy',
   '/services', // en slug of /posluhy
+  '/statti',
+  '/articles', // en slug of /statti
   '/studio',
   '/kontakty',
   '/contacts', // en slug of /kontakty
@@ -119,6 +126,19 @@ async function trackVisit(req: NextRequest, res: NextResponse) {
   if (isNewVisitor) {
     res.cookies.set(VISITOR_COOKIE, '1', {
       maxAge: VISITOR_MAX_AGE,
+      httpOnly: true,
+      sameSite: 'lax',
+    });
+  }
+
+  // First-touch attribution: stamp the acquisition channel once, so later
+  // conversions (CTA clicks, leads) can be attributed to a traffic source.
+  if (!req.cookies.has(SOURCE_COOKIE)) {
+    const sp = req.nextUrl.searchParams;
+    const paid = sp.has('gclid') || sp.has('gbraid') || sp.has('wbraid') || sp.get('gad_source') != null;
+    const ref = paid ? 'Google Ads' : req.headers.get('referer') || 'Пряме відвідування';
+    res.cookies.set(SOURCE_COOKIE, encodeURIComponent(channelLabel(ref)), {
+      maxAge: SOURCE_MAX_AGE,
       httpOnly: true,
       sameSite: 'lax',
     });

@@ -12,6 +12,7 @@ export const dynamic = 'force-dynamic';
 //   /stats          — current month so far
 //   /stats week     — last 7 days   (also: тиждень, неделя)
 //   /stats today    — today         (also: сьогодні, сегодня)
+//   /stats all      — all time      (also: все, весь)
 export async function POST(req: NextRequest) {
   if (req.headers.get('x-telegram-bot-api-secret-token') !== process.env.CRON_SECRET) {
     return Response.json({ error: 'Unauthorized' }, { status: 401 });
@@ -43,6 +44,9 @@ export async function POST(req: NextRequest) {
   } else if (['week', 'тиждень', 'неделя'].includes(arg)) {
     start = new Date(now - 7 * 24 * 3600_000);
     label = 'останні 7 днів';
+  } else if (['all', 'все', 'весь', 'усе'].includes(arg)) {
+    start = new Date('2026-07-01T00:00:00Z'); // tracking began 2026-07-04
+    label = 'весь час';
   } else {
     start = new Date(Date.UTC(kyivNow.getUTCFullYear(), kyivNow.getUTCMonth(), 1) - KYIV_OFFSET_MS);
     label = `${MONTH_NAMES[kyivNow.getUTCMonth()]} ${kyivNow.getUTCFullYear()} (поточний)`;
