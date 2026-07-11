@@ -80,6 +80,11 @@ async function buildFunnel(start: Date, end: Date, visits: number): Promise<stri
   return lines.join('\n');
 }
 
+// Even though the tracker only counts visible time, a foreground tab left idle
+// still accrues seconds. Cap each pageview so one abandoned tab can't turn an
+// "average read time" into 30 minutes.
+const MAX_ENGAGED_SEC = 600;
+
 /** Engagement block from PageStat beacons (time on page, scroll depth). */
 async function buildEngagement(start: Date, end: Date): Promise<string> {
   const stats = await prisma.pageStat.findMany({
@@ -88,14 +93,15 @@ async function buildEngagement(start: Date, end: Date): Promise<string> {
   });
   if (stats.length === 0) return '';
 
-  const avgSeconds = stats.reduce((a, s) => a + s.seconds, 0) / stats.length;
+  const capped = (s: number) => Math.min(s, MAX_ENGAGED_SEC);
+  const avgSeconds = stats.reduce((a, s) => a + capped(s.seconds), 0) / stats.length;
   const avgScroll = stats.reduce((a, s) => a + s.scroll, 0) / stats.length;
 
   // Pages people actually read: highest average time, needs 2+ views to count.
   const perPage = new Map<string, { sec: number; n: number }>();
   for (const s of stats) {
     const e = perPage.get(s.page) ?? { sec: 0, n: 0 };
-    e.sec += s.seconds;
+    e.sec += capped(s.seconds);
     e.n += 1;
     perPage.set(s.page, e);
   }
