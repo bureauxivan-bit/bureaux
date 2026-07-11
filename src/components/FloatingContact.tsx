@@ -2,6 +2,7 @@
 
 import { useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { trackEvent } from '@/lib/track';
 
 type Props = { phone?: string | null; telegram?: string | null; instagram?: string | null };
@@ -9,12 +10,13 @@ type Props = { phone?: string | null; telegram?: string | null; instagram?: stri
 // Passive, always-available contact affordance for the Instagram/mobile
 // audience that prefers messaging over filling a form. Monochrome, square.
 export function FloatingContact({ phone, telegram, instagram }: Props) {
+  const t = useTranslations('floatingContact');
   const [open, setOpen] = useState(false);
 
   const links: { label: string; href: string; event: string }[] = [];
   if (telegram) links.push({ label: 'Telegram', href: telegram, event: 'contact_telegram' });
   if (instagram) links.push({ label: 'Instagram Direct', href: instagram, event: 'contact_instagram' });
-  if (phone) links.push({ label: 'Зателефонувати', href: `tel:${phone}`, event: 'contact_phone' });
+  if (phone) links.push({ label: t('call'), href: `tel:${phone}`, event: 'contact_phone' });
   if (links.length === 0) return null;
 
   const toggle = () => {
@@ -54,7 +56,7 @@ export function FloatingContact({ phone, telegram, instagram }: Props) {
       <button
         type="button"
         onClick={toggle}
-        aria-label={open ? 'Закрити контакти' : 'Звʼязатися з нами'}
+        aria-label={open ? t('close') : t('open')}
         aria-expanded={open}
         className="flex h-14 w-14 items-center justify-center bg-ink text-paper shadow-xl transition-transform duration-200 hover:scale-105"
       >

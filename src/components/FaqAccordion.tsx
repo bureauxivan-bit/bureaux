@@ -1,11 +1,13 @@
 'use client';
 import { useState } from 'react';
 import { motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import { Reveal } from './Reveal';
 
 type FaqItem = { id: string; question: string; answer: string };
 
 export function FaqAccordion({ faqs }: { faqs: FaqItem[] }) {
+  const t = useTranslations('faq');
   const [open, setOpen] = useState<string | null>(null);
   const toggle = (id: string) => setOpen((prev) => (prev === id ? null : id));
 
@@ -13,7 +15,7 @@ export function FaqAccordion({ faqs }: { faqs: FaqItem[] }) {
     <>
       <Reveal>
         <h2 className="display-xl mb-16 text-center text-[clamp(2rem,5vw,4rem)]">
-          Часті запитання
+          {t('heading')}
         </h2>
       </Reveal>
 

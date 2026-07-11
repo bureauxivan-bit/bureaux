@@ -1,7 +1,7 @@
-import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Reveal } from '@/components/Reveal';
-import { CATEGORY_LABELS } from '@/lib/constants';
 
 type P = {
   id: string; slug: string; title: string; year: number; category: string;
@@ -27,18 +27,20 @@ const PATTERNS = [
 ];
 
 export function FeaturedWorks({ projects }: { projects: P[] }) {
+  const t = useTranslations('featuredWorks');
+  const tCat = useTranslations('categories');
   return (
     <section id="projects" className="scroll-mt-24">
 
       {/* Section header */}
       <div className="container-wide border-y border-line py-6">
         <div className="flex items-center justify-between">
-          <h2 className="display-xl text-[clamp(1.4rem,3vw,2.4rem)]">Проєкти</h2>
+          <h2 className="display-xl text-[clamp(1.4rem,3vw,2.4rem)]">{t('heading')}</h2>
           <Link
             href="/projects"
             className="hidden bg-ink px-5 py-2.5 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-ink/70 sm:inline-flex"
           >
-            Дивитися всі →
+            {t('viewAll')} →
           </Link>
         </div>
       </div>
@@ -52,7 +54,7 @@ export function FeaturedWorks({ projects }: { projects: P[] }) {
               const url = coverUrl(p);
               return (
                 <Reveal key={p.id} delay={i % 3 === 0 ? 0 : i % 3 === 1 ? 80 : 160} className={offset}>
-                  <Link href={`/projects/${p.slug}`} className="group mb-7 block sm:mb-9">
+                  <Link href={{ pathname: '/projects/[slug]', params: { slug: p.slug } }} className="group mb-7 block sm:mb-9">
 
                     {/* Image */}
                     <div className={`relative ${ar} overflow-hidden bg-ink/5`}>
@@ -81,7 +83,7 @@ export function FeaturedWorks({ projects }: { projects: P[] }) {
 
                     {/* Category tag */}
                     <p className="mt-1.5 text-[11px] uppercase tracking-wider text-muted/60">
-                      {CATEGORY_LABELS[p.category]}
+                      {tCat(p.category)}
                     </p>
 
                   </Link>
@@ -93,12 +95,12 @@ export function FeaturedWorks({ projects }: { projects: P[] }) {
           {/* Mobile "all projects" link */}
           <div className="mt-2 sm:hidden">
             <Link href="/projects" className="btn-ghost w-full justify-center">
-              Дивитися всі проєкти
+              {t('viewAllProjects')}
             </Link>
           </div>
         </div>
       ) : (
-        <p className="container-wide py-16 text-muted">Проєкти зʼявляться найближчим часом.</p>
+        <p className="container-wide py-16 text-muted">{t('empty')}</p>
       )}
 
     </section>

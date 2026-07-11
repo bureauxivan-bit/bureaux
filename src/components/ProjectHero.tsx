@@ -1,7 +1,8 @@
 'use client';
 import { useRef } from 'react';
 import { motion, useScroll, useTransform } from 'framer-motion';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 
 type Meta = { label: string; value: string };
 
@@ -14,6 +15,7 @@ export function ProjectHero({
   title: string;
   meta: Meta[];
 }) {
+  const t = useTranslations('projectHero');
   const containerRef = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
     target: containerRef,
@@ -50,7 +52,7 @@ export function ProjectHero({
           href="/projects"
           className="mb-8 inline-flex w-fit items-center gap-2 text-[10px] uppercase tracking-[0.25em] text-paper/50 transition-colors hover:text-paper"
         >
-          ← Усі проєкти
+          ← {t('allProjects')}
         </Link>
 
         {/* Title + meta grid */}

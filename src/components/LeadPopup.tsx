@@ -1,8 +1,9 @@
 'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { usePathname } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
+import { usePathname } from '@/i18n/navigation';
 import { trackEvent } from '@/lib/track';
 
 // Exit-intent lead magnet: a 1-minute "free estimate" mini-quiz shown once per
@@ -16,10 +17,12 @@ const DISMISS_DAYS = 3;
 const ELIGIBLE_MS = 25_000;   // "engaged enough to ask" threshold
 const HARD_MS = 50_000;       // fallback if no exit signal fires
 
-const OBJECTS = ['Квартира', 'Будинок', 'Комерція', 'Інше'];
-const AREAS = ['до 50 м²', '50–100 м²', '100–200 м²', '200+ м²'];
-
 export function LeadPopup() {
+  const t = useTranslations('leadPopup');
+  const OBJECTS = t.raw('objects') as string[];
+  const AREAS = t.raw('areas') as string[];
+  // i18n usePathname returns the internal (unprefixed) pathname, so the
+  // suppression check below works for both / and /en URLs.
   const pathname = usePathname();
   const [visible, setVisible] = useState(false);
   const [step, setStep] = useState(0);
@@ -115,14 +118,14 @@ export function LeadPopup() {
       });
       if (!res.ok) {
         const d = await res.json().catch(() => ({}));
-        throw new Error(d.error || 'Сталася помилка. Спробуйте ще раз.');
+        throw new Error(d.error || t('genericError'));
       }
       try { localStorage.setItem(DONE_KEY, '1'); } catch {}
       trackEvent('popup_lead');
       if (typeof window !== 'undefined' && (window as any).fbq) (window as any).fbq('track', 'Lead');
       setStep(3);
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Помилка');
+      setError(err instanceof Error ? err.message : t('genericErrorShort'));
     } finally {
       setSubmitting(false);
     }
@@ -142,7 +145,7 @@ export function LeadPopup() {
         >
           <div className="absolute inset-0 bg-ink/70 backdrop-blur-sm" onClick={close} />
           <motion.div
-            role="dialog" aria-modal="true" aria-label="Безкоштовний прорахунок"
+            role="dialog" aria-modal="true" aria-label={t('ariaLabel')}
             className="relative w-full max-w-md bg-paper p-7 shadow-2xl sm:p-9"
             initial={{ y: 40, opacity: 0, scale: 0.98 }}
             animate={{ y: 0, opacity: 1, scale: 1 }}
@@ -150,7 +153,7 @@ export function LeadPopup() {
             transition={{ type: 'spring', damping: 26, stiffness: 280 }}
           >
             <button
-              onClick={close} aria-label="Закрити"
+              onClick={close} aria-label={t('close')}
               className="absolute right-5 top-5 text-2xl leading-none text-muted transition-colors hover:text-ink"
             >
               ×
@@ -160,12 +163,12 @@ export function LeadPopup() {
               <>
                 <p className="eyebrow mb-3">BUREAUX</p>
                 <h3 className="display-xl text-2xl leading-tight">
-                  Безкоштовний прорахунок<br />за 1 хвилину
+                  {t('titleLine1')}<br />{t('titleLine2')}
                 </h3>
                 <p className="mb-6 mt-2 text-sm text-muted">
-                  {step === 0 && 'Який у вас об’єкт?'}
-                  {step === 1 && 'Орієнтовна площа?'}
-                  {step === 2 && 'Куди надіслати прорахунок?'}
+                  {step === 0 && t('stepObject')}
+                  {step === 1 && t('stepArea')}
+                  {step === 2 && t('stepContact')}
                 </p>
 
                 {step === 0 && (
@@ -191,11 +194,11 @@ export function LeadPopup() {
                 {step === 2 && (
                   <form onSubmit={submit} className="space-y-3" noValidate>
                     <input
-                      className={field} placeholder="Ваше ім’я" value={name}
+                      className={field} placeholder={t('namePlaceholder')} value={name}
                       onChange={(e) => setName(e.target.value)} required minLength={2}
                     />
                     <input
-                      className={field} placeholder="Телефон" type="tel" value={phone}
+                      className={field} placeholder={t('phonePlaceholder')} type="tel" value={phone}
                       onChange={(e) => setPhone(e.target.value)} required
                     />
                     {error && <p className="text-sm text-red-600">{error}</p>}
@@ -203,7 +206,7 @@ export function LeadPopup() {
                       type="submit" disabled={submitting}
                       className="w-full bg-ink px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-paper transition-opacity hover:opacity-85 disabled:opacity-60"
                     >
-                      {submitting ? 'Надсилаємо…' : 'Отримати прорахунок'}
+                      {submitting ? t('submitting') : t('submit')}
                     </button>
                     <p className="text-center text-[11px] text-muted">
                       {objectType} · {area}
@@ -220,15 +223,15 @@ export function LeadPopup() {
             ) : (
               <div className="py-4 text-center">
                 <p className="eyebrow mb-3">BUREAUX</p>
-                <h3 className="display-xl text-2xl">Дякуємо!</h3>
+                <h3 className="display-xl text-2xl">{t('thanksTitle')}</h3>
                 <p className="mx-auto mt-3 max-w-xs text-sm text-muted">
-                  Ми зв’яжемося з вами найближчим часом і надішлемо орієнтовний прорахунок.
+                  {t('thanksText')}
                 </p>
                 <button
                   onClick={close}
                   className="mt-6 border border-ink/15 px-6 py-3 text-xs font-normal uppercase tracking-widest text-ink transition-colors hover:bg-ink hover:text-paper"
                 >
-                  Закрити
+                  {t('closeBtn')}
                 </button>
               </div>
             )}

@@ -1,6 +1,6 @@
-import Link from 'next/link';
 import Image from 'next/image';
-import { CATEGORY_LABELS } from '@/lib/constants';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 
 type CardProject = {
   slug: string;
@@ -20,9 +20,10 @@ function cover(p: CardProject) {
 }
 
 export function ProjectCard({ project, ratio = 'aspect-[3/4]' }: { project: CardProject; ratio?: string }) {
+  const tCat = useTranslations('categories');
   const url = cover(project);
   return (
-    <Link href={`/projects/${project.slug}`} className="group block">
+    <Link href={{ pathname: '/projects/[slug]', params: { slug: project.slug } }} className="group block">
       <div className={`relative ${ratio} overflow-hidden bg-ink/5`}>
         {url ? (
           <Image
@@ -39,7 +40,7 @@ export function ProjectCard({ project, ratio = 'aspect-[3/4]' }: { project: Card
         )}
         <div className="absolute inset-0 bg-gradient-to-t from-ink/60 via-transparent to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100" />
         <span className="absolute left-4 top-4 bg-paper/85 px-3 py-1 text-[11px] font-normal uppercase tracking-wider backdrop-blur">
-          {CATEGORY_LABELS[project.category] ?? project.category}
+          {tCat(project.category)}
         </span>
       </div>
       <div className="mt-4 flex items-baseline justify-between">

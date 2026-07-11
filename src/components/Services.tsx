@@ -1,20 +1,30 @@
-import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Reveal } from './Reveal';
 
-type Service = { id: string; number: number; title: string; description: string | null; coverUrl: string | null };
+type Service = {
+  id: string;
+  number: number;
+  title: string;
+  description: string | null;
+  coverUrl: string | null;
+  /** Original Ukrainian title — the href mapping keys off Ukrainian keywords. */
+  ukTitle?: string;
+};
 
-function getServiceHref(title: string): string {
+function getServiceHref(title: string) {
   const t = title.toLowerCase();
-  if (t.includes('інтер')) return '/posluhy/dyzajn-intereru';
-  if (t.includes('архітектур')) return '/posluhy/arkhitektura';
-  if (t.includes('ремонт')) return '/posluhy/remont-pid-klyuch';
-  if (t.includes('комерц')) return '/posluhy/komertsiini-prymishchennia';
-  if (t.includes('приватн')) return '/posluhy/pryvatni-prostory';
-  return '/posluhy';
+  if (t.includes('інтер')) return '/posluhy/dyzajn-intereru' as const;
+  if (t.includes('архітектур')) return '/posluhy/arkhitektura' as const;
+  if (t.includes('ремонт')) return '/posluhy/remont-pid-klyuch' as const;
+  if (t.includes('комерц')) return '/posluhy/komertsiini-prymishchennia' as const;
+  if (t.includes('приватн')) return '/posluhy/pryvatni-prostory' as const;
+  return '/posluhy' as const;
 }
 
 export function Services({ services }: { services: Service[] }) {
+  const t = useTranslations('services');
   if (!services.length) return null;
 
   return (
@@ -24,7 +34,7 @@ export function Services({ services }: { services: Service[] }) {
       <div className="container-wide mb-10 flex flex-col gap-6 sm:flex-row sm:items-end sm:justify-between">
         <Reveal>
           <p className="display-xl max-w-xs text-[clamp(1rem,2vw,1.5rem)] uppercase leading-tight tracking-tight">
-            Усі проєкти ми виконуємо у нашому авторському українському стилі
+            {t('heading')}
           </p>
         </Reveal>
         <Reveal delay={100}>
@@ -33,7 +43,7 @@ export function Services({ services }: { services: Service[] }) {
             className="inline-flex shrink-0 items-center gap-3 bg-ink px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-paper transition-opacity duration-200 hover:opacity-75"
           >
             <span>→</span>
-            Всі послуги
+            {t('allServices')}
           </Link>
         </Reveal>
       </div>
@@ -41,7 +51,7 @@ export function Services({ services }: { services: Service[] }) {
       {/* images grid */}
       <div className="container-wide grid grid-cols-1 gap-2.5 sm:grid-cols-3">
         {services.map((s, i) => {
-          const href = getServiceHref(s.title);
+          const href = getServiceHref(s.ukTitle ?? s.title);
           return (
             <Reveal key={s.id} delay={i * 80}>
               <Link href={href} className="group block">
@@ -49,7 +59,7 @@ export function Services({ services }: { services: Service[] }) {
                   {s.coverUrl ? (
                     <Image
                       src={s.coverUrl}
-                      alt={`${s.title} — дизайн інтер'єру bureau X Київ`}
+                      alt={t('imageAlt', { title: s.title })}
                       fill
                       sizes="(max-width: 640px) 100vw, 33vw"
                       className="object-cover transition-transform duration-700 group-hover:scale-105"

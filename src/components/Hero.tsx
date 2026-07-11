@@ -1,9 +1,11 @@
 ﻿import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { CtaButton } from './CtaButton';
 import { ProjectsButton } from './ProjectsButton';
 import { ScrollCue } from './ScrollCue';
 
 export function Hero({ heroImage }: { heroImage?: string | null }) {
+  const t = useTranslations('hero');
   const src = heroImage || '/images/hero.jpg';
 
   return (
@@ -12,7 +14,7 @@ export function Hero({ heroImage }: { heroImage?: string | null }) {
       <div className="absolute inset-0">
         <Image
           src={src}
-          alt="bureau X — дизайн інтер'єру та архітектура під ключ, Київ"
+          alt={t('imageAlt')}
           fill
           sizes="100vw"
           className="object-cover object-center"
@@ -30,13 +32,11 @@ export function Hero({ heroImage }: { heroImage?: string | null }) {
           <div className="max-w-3xl">
             <h1 className="display-xl text-[clamp(1.8rem,3.5vw,3.5rem)] leading-[1.1]">
               bureau <em>X</em>{' '}
-              дизайн інтер&rsquo;єру<br className="hidden sm:block" />{' '}
-              та архітектура під ключ
+              {t('titleLine1')}<br className="hidden sm:block" />{' '}
+              {t('titleLine2')}
             </h1>
             <p className="mt-6 max-w-lg text-base leading-relaxed text-paper/65 sm:text-lg">
-              Функціональність, естетика та затишок у дусі сучасного молодого
-              українського архітектурного стилю. Простір, що працює для вас.
-              Реалізуємо проєкти по всій Україні та світу.
+              {t('subtitle')}
             </p>
           </div>
 
@@ -47,7 +47,7 @@ export function Hero({ heroImage }: { heroImage?: string | null }) {
               className="group inline-flex items-center justify-center gap-3 bg-paper px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-coal transition-opacity duration-200 hover:opacity-85"
             >
               <span className="inline-block transition-transform duration-300 group-hover:translate-x-1">→</span>
-              Безкоштовний прорахунок
+              {t('cta')}
             </CtaButton>
             <ProjectsButton
               className="inline-flex items-center justify-center border border-paper/40 px-6 py-3.5 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-paper/10"

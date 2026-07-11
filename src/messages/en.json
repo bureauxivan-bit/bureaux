@@ -1,0 +1,235 @@
+{
+  "notFound": {
+    "message": "Page not found.",
+    "home": "Back to home"
+  },
+  "common": {
+    "viewProjects": "View projects"
+  },
+  "categories": {
+    "PRIVATE": "Private spaces",
+    "COMMERCIAL": "Commercial spaces",
+    "ARCHITECTURE": "Architecture & construction"
+  },
+  "header": {
+    "nav": {
+      "about": "About",
+      "projects": "Projects",
+      "services": "Services"
+    },
+    "estimate": "Project estimate",
+    "freeEstimate": "Free estimate",
+    "menu": "Menu"
+  },
+  "footer": {
+    "tagline": "Turnkey interior design and architecture in the spirit of the Young Ukrainian Architectural Style.",
+    "contacts": "Contacts",
+    "socials": "Social media",
+    "shop": "shop",
+    "rights": "© 2026. BUREAUX. All rights reserved.",
+    "muas": "What is MUAS",
+    "terms": "Terms & Conditions",
+    "privacy": "Privacy Policy"
+  },
+  "hero": {
+    "imageAlt": "bureau X — turnkey interior design and architecture, Kyiv",
+    "titleLine1": "interior design",
+    "titleLine2": "& turnkey architecture",
+    "subtitle": "Functionality, aesthetics and comfort in the spirit of the modern Young Ukrainian Architectural Style. Space that works for you. We deliver projects across Ukraine and worldwide.",
+    "cta": "Get a free estimate"
+  },
+  "about": {
+    "eyebrow": "About us",
+    "titleLine1": "Architecture",
+    "titleLine2": "and design",
+    "titleLine3": "studio",
+    "p1": "We are an architecture and design studio founded by a young married couple — architects by education and by passion. For over 5 years we have been bringing people joy throughout the design and renovation journey.",
+    "p2": "We created the <strong>Young Ukrainian Architectural Style (MUAS)</strong> — actively promoting a new style of Ukrainian design that blends contemporary trends with Ukrainian traditions."
+  },
+  "services": {
+    "heading": "Every project is designed in our signature Ukrainian style",
+    "allServices": "All services",
+    "imageAlt": "{title} — interior design by bureau X, Kyiv"
+  },
+  "featuredWorks": {
+    "heading": "Projects",
+    "viewAll": "View all",
+    "viewAllProjects": "View all projects",
+    "empty": "Projects are coming soon."
+  },
+  "whyUs": {
+    "heading": "Why clients choose",
+    "muasAlt": "MUAS — Young Ukrainian Architectural Style",
+    "items": {
+      "experience": {
+        "title": "Hands-on experience",
+        "desc": "10,000+ m² designed and 5+ cottage communities built."
+      },
+      "fullCycle": {
+        "title": "Full-cycle studio",
+        "desc": "We design houses and interiors, supervise, furnish, build — and even help you move in."
+      },
+      "youth": {
+        "title": "Youth as an advantage",
+        "desc": "Young architects with a contemporary outlook and innovative ideas who aren't afraid to experiment."
+      },
+      "meaning": {
+        "title": "Design with meaning",
+        "desc": "Three principles: Personal — about you. Functional — about the place. Meaningful — about what this space should be."
+      },
+      "individual": {
+        "title": "Individual approach",
+        "desc": "We work across styles — minimalism, loft — at the same level as our signature projects."
+      },
+      "ukrainianCode": {
+        "title": "Ukrainian identity",
+        "desc": "We created MUAS: contemporary aesthetics combined with deep meaning, national symbols and the client's own story."
+      }
+    }
+  },
+  "howWeWork": {
+    "eyebrow": "Process",
+    "heading": "How we work",
+    "note": "Every stage includes unlimited micro-revisions within the brief. A complete concept change is billed separately — we agree on this upfront.",
+    "steps": [
+      {
+        "title": "Brief",
+        "desc": "Introduction, discussing your goals, wishes and budget. Site visit or video call."
+      },
+      {
+        "title": "Concept",
+        "desc": "Layout solution, mood board, colour palette. We lock the direction before moving on."
+      },
+      {
+        "title": "Visualizations",
+        "desc": "3D renders of the key areas. You see the result before renovation begins."
+      },
+      {
+        "title": "Working drawings",
+        "desc": "A complete documentation package: layouts, sections, material and furniture specifications."
+      },
+      {
+        "title": "Procurement",
+        "desc": "Selecting and ordering furniture, lighting and textiles. Partner discounts for our clients."
+      },
+      {
+        "title": "Author supervision",
+        "desc": "On-site control of the build. We make sure the result matches the project."
+      }
+    ]
+  },
+  "team": {
+    "link": "About the studio & team"
+  },
+  "reviews": {
+    "heading": "Reviews"
+  },
+  "faq": {
+    "heading": "Frequently asked questions"
+  },
+  "pricing": {
+    "eyebrow": "Pricing",
+    "heading": "Service pricing",
+    "caption": "bureau X service pricing",
+    "colService": "Service",
+    "colPrice": "Price",
+    "colNote": "Note",
+    "footnote": "Estimated turnkey budget (design + renovation) starts at $1,400/m². Use it for overall budget planning; the design itself is $60/m².",
+    "rows": [
+      {
+        "name": "Interior design",
+        "price": "from $60/m²",
+        "note": "Full project: layouts, visualizations, drawings, specifications — everything needed to build"
+      },
+      {
+        "name": "Architectural design",
+        "price": "from $40/m²",
+        "note": "Full project: sketch, layouts, structural solutions, working drawings — from concept to building permit"
+      },
+      {
+        "name": "Author supervision",
+        "price": "$800/mo",
+        "note": "Kyiv; other cities and countries recalculated on request. Billed separately from the project"
+      },
+      {
+        "name": "Minimum project",
+        "price": "from 120 m²",
+        "note": "Smaller properties are billed as 120 m²: design from $7,200, architecture from $4,800"
+      }
+    ]
+  },
+  "finalCta": {
+    "heading": "Ready to create the space of your dreams?",
+    "subtitle": "Request a free project estimate and consultation. Let's discuss your idea."
+  },
+  "itemX": {
+    "eyebrow": "Interior objects store",
+    "heading": "objects in the MUAS style",
+    "subtitle": "Signature interior objects that add character and meaning to a space.",
+    "cta": "Visit the store"
+  },
+  "leadForm": {
+    "namePlaceholder": "Name",
+    "nameRequired": "Please enter your name",
+    "nameTooShort": "Too short",
+    "phoneRequired": "Please enter your phone number",
+    "phoneInvalid": "Invalid number",
+    "emailPlaceholder": "Email (optional)",
+    "emailInvalid": "Invalid email",
+    "submitting": "Sending…",
+    "submit": "Send request",
+    "privacyNote": "By clicking the button you agree to the privacy policy.",
+    "genericError": "Something went wrong. Please try again.",
+    "genericErrorShort": "Error"
+  },
+  "leadModal": {
+    "close": "Close",
+    "estimate": {
+      "title": "Project estimate",
+      "subtitle": "Request a free project estimate and consultation."
+    },
+    "consult": {
+      "title": "Consultation",
+      "subtitle": "Request a free consultation."
+    }
+  },
+  "leadPopup": {
+    "objects": ["Apartment", "House", "Commercial", "Other"],
+    "areas": ["up to 50 m²", "50–100 m²", "100–200 m²", "200+ m²"],
+    "ariaLabel": "Free estimate",
+    "close": "Close",
+    "titleLine1": "Free estimate",
+    "titleLine2": "in 1 minute",
+    "stepObject": "What kind of property do you have?",
+    "stepArea": "Approximate area?",
+    "stepContact": "Where should we send the estimate?",
+    "namePlaceholder": "Your name",
+    "phonePlaceholder": "Phone",
+    "submitting": "Sending…",
+    "submit": "Get my estimate",
+    "thanksTitle": "Thank you!",
+    "thanksText": "We'll get in touch shortly and send you a preliminary estimate.",
+    "closeBtn": "Close",
+    "genericError": "Something went wrong. Please try again.",
+    "genericErrorShort": "Error"
+  },
+  "projectsGrid": {
+    "all": "All",
+    "empty": "No projects in this category yet."
+  },
+  "projectHero": {
+    "allProjects": "All projects"
+  },
+  "projectGallery": {
+    "empty": "Photos coming soon"
+  },
+  "scrollCue": {
+    "ariaLabel": "Scroll down",
+    "label": "Scroll"
+  },
+  "floatingContact": {
+    "call": "Call us",
+    "open": "Contact us",
+    "close": "Close contacts"
+  }
+}

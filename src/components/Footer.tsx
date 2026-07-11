@@ -1,9 +1,11 @@
-import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Reveal } from './Reveal';
 import type { Settings } from '@/lib/types';
 
 export function Footer({ settings }: { settings: Settings }) {
+  const t = useTranslations('footer');
   const socials = [
     settings.behance && { label: 'Behance', href: settings.behance },
     settings.facebook && { label: 'Facebook', href: settings.facebook },
@@ -20,14 +22,14 @@ export function Footer({ settings }: { settings: Settings }) {
               <Image src="/images/logo_big_inv.png" alt="bureau x" width={0} height={0}
                 sizes="200px" className="h-10 w-auto object-contain" />
               <p className="mt-4 max-w-sm text-sm text-paper/55">
-                Дизайн інтер'єру та архітектура під ключ у дусі Молодого Українського Архітектурного Стилю.
+                {t('tagline')}
               </p>
             </div>
           </Reveal>
 
           <Reveal delay={100}>
             <div className="space-y-2 text-sm">
-              <p className="eyebrow mb-4 text-paper/50">Контакти</p>
+              <p className="eyebrow mb-4 text-paper/50">{t('contacts')}</p>
               {settings.address && <p className="text-paper/70">{settings.address}</p>}
               {settings.phone && (
                 <a href={`tel:${settings.phone.replace(/\s/g, '')}`} className="block link-underline">{settings.phone}</a>
@@ -39,13 +41,13 @@ export function Footer({ settings }: { settings: Settings }) {
 
           <Reveal delay={200}>
             <div className="space-y-2 text-sm">
-              <p className="eyebrow mb-4 text-paper/50">Соцмережі</p>
+              <p className="eyebrow mb-4 text-paper/50">{t('socials')}</p>
               {socials.map((s) => (
                 <a key={s.label} href={s.href} target="_blank" rel="noopener" className="block link-underline">{s.label} ↗</a>
               ))}
               {settings.itemXUrl && (
                 <a href={settings.itemXUrl} target="_blank" rel="noopener" className="mt-3 block text-paper underline">
-                  item <em>X</em> — магазин ↗
+                  item <em>X</em> — {t('shop')} ↗
                 </a>
               )}
             </div>
@@ -54,11 +56,11 @@ export function Footer({ settings }: { settings: Settings }) {
         </div>
 
         <div className="mt-16 flex flex-col gap-4 border-t border-paper/10 pt-8 text-xs text-paper/55 sm:flex-row sm:items-center sm:justify-between">
-          <p>© 2026. BUREAUX. Усі права захищені.</p>
+          <p>{t('rights')}</p>
           <div className="flex gap-6">
-            <Link href="/muas" className="link-underline">Що таке МУАС</Link>
-            <Link href="/terms" className="link-underline">Правила та умови</Link>
-            <Link href="/privacy" className="link-underline">Політика конфіденційності</Link>
+            <Link href="/muas" className="link-underline">{t('muas')}</Link>
+            <Link href="/terms" className="link-underline">{t('terms')}</Link>
+            <Link href="/privacy" className="link-underline">{t('privacy')}</Link>
           </div>
         </div>
       </div>

@@ -28,6 +28,9 @@ export const projectSchema = z.object({
   description: z.string().optional().nullable(),
   areaM2: z.coerce.number().int().positive().optional().nullable(),
   location: z.string().optional().nullable(),
+  titleEn: z.string().optional().nullable(),
+  descriptionEn: z.string().optional().nullable(),
+  locationEn: z.string().optional().nullable(),
   isTop: z.coerce.boolean().optional(),
 });
 

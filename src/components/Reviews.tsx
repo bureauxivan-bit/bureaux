@@ -1,3 +1,4 @@
+import { useTranslations } from 'next-intl';
 import { Reveal } from './Reveal';
 
 type Review = { id: string; author: string; projectName: string | null; text: string };
@@ -6,12 +7,13 @@ type Review = { id: string; author: string; projectName: string | null; text: st
 // (розмітку відгуків про компанію на її ж сайті), а без reviewRating вона
 // ще й невалідна. Текст відгуків у HTML — цього достатньо для AI-краулерів.
 export function Reviews({ reviews }: { reviews: Review[] }) {
+  const t = useTranslations('reviews');
   if (!reviews.length) return null;
 
   return (
     <section className="container-wide py-24 lg:py-36">
       <Reveal>
-        <h2 className="display-xl text-[clamp(2rem,5vw,4rem)]">Відгуки</h2>
+        <h2 className="display-xl text-[clamp(2rem,5vw,4rem)]">{t('heading')}</h2>
       </Reveal>
 
       {/* Desktop grid */}

@@ -1,6 +1,7 @@
 'use client';
 import { useRef } from 'react';
 import { motion, useInView } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 
 type Img = {
   id: string;
@@ -49,10 +50,11 @@ export function ProjectGallery({
    *  "Дизайн інтер'єру — Малеч, Київ · bureau X". */
   altPrefix?: string;
 }) {
+  const t = useTranslations('projectGallery');
   if (!images.length) {
     return (
       <div className="flex aspect-[16/9] items-center justify-center bg-ink/5 text-sm text-muted">
-        Фото буде додано
+        {t('empty')}
       </div>
     );
   }

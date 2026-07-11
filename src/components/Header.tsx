@@ -1,17 +1,20 @@
-﻿'use client';
+'use client';
 import { useState } from 'react';
-import Link from 'next/link';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
+import { LanguageSwitcher } from './LanguageSwitcher';
 import { useLeadModal } from './LeadModal';
 import type { Settings } from '@/lib/types';
 
 const NAV = [
-  { label: 'Про нас', href: '/#about' },
-  { label: 'Проєкти', href: '/#projects' },
-  { label: 'Послуги', href: '/#services' },
-];
+  { key: 'about', hash: '#about' },
+  { key: 'projects', hash: '#projects' },
+  { key: 'services', hash: '#services' },
+] as const;
 
 export function Header({ settings }: { settings: Settings }) {
+  const t = useTranslations('header');
   const { openEstimate } = useLeadModal();
   const [menu, setMenu] = useState(false);
 
@@ -35,13 +38,13 @@ export function Header({ settings }: { settings: Settings }) {
         {/* Desktop nav — always black rectangles */}
         <nav className="hidden items-center gap-2 text-xs font-normal uppercase tracking-widest lg:flex">
           {NAV.map((n) => (
-            <a
-              key={n.href}
-              href={n.href}
+            <Link
+              key={n.key}
+              href={{ pathname: '/', hash: n.hash }}
               className="bg-ink px-3 py-1.5 text-paper transition-colors duration-200 hover:bg-ink/70"
             >
-              {n.label}
-            </a>
+              {t(`nav.${n.key}`)}
+            </Link>
           ))}
           {settings.itemXUrl && (
             <a
@@ -53,6 +56,7 @@ export function Header({ settings }: { settings: Settings }) {
               item <em>X</em>
             </a>
           )}
+          <LanguageSwitcher />
         </nav>
 
         {/* CTA — black rectangle */}
@@ -62,14 +66,14 @@ export function Header({ settings }: { settings: Settings }) {
             className="group flex items-center gap-3 bg-ink px-5 py-2 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-ink/70"
           >
             <span className="transition-transform duration-300 group-hover:translate-x-1">⟶</span>
-            Прорахунок проєкту
+            {t('estimate')}
           </button>
         </div>
 
         {/* Mobile burger */}
         <button
           onClick={() => setMenu((m) => !m)}
-          aria-label="Меню"
+          aria-label={t('menu')}
           className="flex h-10 w-10 items-center justify-center bg-ink text-paper lg:hidden"
         >
           <span className="relative block h-3 w-6">
@@ -81,18 +85,18 @@ export function Header({ settings }: { settings: Settings }) {
       </div>
 
       {/* Mobile menu */}
-      <div className={`overflow-hidden lg:hidden ${menu ? 'max-h-[420px]' : 'max-h-0'} transition-all duration-500`}>
+      <div className={`overflow-hidden lg:hidden ${menu ? 'max-h-[460px]' : 'max-h-0'} transition-all duration-500`}>
         <div className="container-wide flex flex-col gap-1 bg-ink py-6">
           {NAV.map((n) => (
-            <a
-              key={n.href}
-              href={n.href}
+            <Link
+              key={n.key}
+              href={{ pathname: '/', hash: n.hash }}
               onClick={() => setMenu(false)}
               className="flex items-center gap-3 py-2 text-sm font-normal uppercase tracking-widest text-paper/80 hover:text-paper"
             >
               <span className="inline-block h-1.5 w-1.5 bg-paper opacity-50" />
-              {n.label}
-            </a>
+              {t(`nav.${n.key}`)}
+            </Link>
           ))}
           {settings.itemXUrl && (
             <a
@@ -110,8 +114,11 @@ export function Header({ settings }: { settings: Settings }) {
             className="mt-4 flex items-center gap-3 bg-paper px-5 py-3 text-xs font-normal uppercase tracking-widest text-coal transition-opacity duration-200 hover:opacity-85"
           >
             <span>⟶</span>
-            Безкоштовний прорахунок
+            {t('freeEstimate')}
           </button>
+          <div className="mt-4 flex items-center">
+            <LanguageSwitcher variant="light" />
+          </div>
           <div className="mt-4 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-paper/50">
             {settings.phone && (
               <a href={`tel:${settings.phone.replace(/\s/g, '')}`} className="underline underline-offset-2">{settings.phone}</a>

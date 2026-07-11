@@ -1,7 +1,8 @@
 'use client';
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ProjectCard } from '@/components/ProjectCard';
-import { CATEGORY_LABELS, CATEGORY_ORDER } from '@/lib/constants';
+import { CATEGORY_ORDER } from '@/lib/constants';
 
 type P = {
   id: string; slug: string; title: string; year: number; category: string;
@@ -9,12 +10,14 @@ type P = {
 };
 
 export function ProjectsGrid({ projects }: { projects: P[] }) {
+  const t = useTranslations('projectsGrid');
+  const tCat = useTranslations('categories');
   const [cat, setCat] = useState<string | 'ALL'>('ALL');
   const filtered = cat === 'ALL' ? projects : projects.filter((p) => p.category === cat);
 
   const tabs: { key: string; label: string }[] = [
-    { key: 'ALL', label: 'Усі' },
-    ...CATEGORY_ORDER.map((c) => ({ key: c, label: CATEGORY_LABELS[c] })),
+    { key: 'ALL', label: t('all') },
+    ...CATEGORY_ORDER.map((c) => ({ key: c, label: tCat(c) })),
   ];
 
   return (
@@ -38,7 +41,7 @@ export function ProjectsGrid({ projects }: { projects: P[] }) {
           {filtered.map((p) => <ProjectCard key={p.id} project={p} />)}
         </div>
       ) : (
-        <p className="mt-12 text-muted">У цій категорії поки немає проєктів.</p>
+        <p className="mt-12 text-muted">{t('empty')}</p>
       )}
     </>
   );

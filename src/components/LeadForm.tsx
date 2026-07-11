@@ -1,7 +1,8 @@
 'use client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
 import { useForm, Controller } from 'react-hook-form';
+import { useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/navigation';
 import type { LeadType } from '@/lib/types';
 import { PhoneInput } from './PhoneInput';
 import { trackEvent } from '@/lib/track';
@@ -17,6 +18,7 @@ export function LeadForm({
   variant?: 'light' | 'dark';
   onBeforeRedirect?: () => void;
 }) {
+  const t = useTranslations('leadForm');
   const router = useRouter();
   const { register, handleSubmit, reset, control, formState: { errors } } = useForm<FormValues>({
     defaultValues: { phone: '' },
@@ -34,7 +36,7 @@ export function LeadForm({
       });
       if (!res.ok) {
         const data = await res.json().catch(() => ({}));
-        throw new Error(data.error || 'Сталася помилка. Спробуйте ще раз.');
+        throw new Error(data.error || t('genericError'));
       }
       reset();
       if (typeof window !== 'undefined' && (window as any).fbq) {
@@ -46,7 +48,7 @@ export function LeadForm({
       setTimeout(() => router.push('/thank-you'), onBeforeRedirect ? 350 : 0);
     } catch (e) {
       setState('error');
-      setErrMsg(e instanceof Error ? e.message : 'Помилка');
+      setErrMsg(e instanceof Error ? e.message : t('genericErrorShort'));
     }
   };
 
@@ -67,9 +69,9 @@ export function LeadForm({
       />
       <div>
         <input
-          placeholder="Ім'я"
+          placeholder={t('namePlaceholder')}
           className={`${fieldBase} ${fieldTone} ${errors.name ? 'border-ink' : ''}`}
-          {...register('name', { required: "Вкажіть ім'я", minLength: { value: 2, message: 'Закоротко' } })}
+          {...register('name', { required: t('nameRequired'), minLength: { value: 2, message: t('nameTooShort') } })}
         />
         {errors.name && <p className="mt-1 text-xs text-ink">{errors.name.message}</p>}
       </div>
@@ -78,9 +80,9 @@ export function LeadForm({
           name="phone"
           control={control}
           rules={{
-            required: 'Вкажіть телефон',
+            required: t('phoneRequired'),
             validate: (v) =>
-              v.replace(/\D/g, '').length >= 7 || 'Невірний номер',
+              v.replace(/\D/g, '').length >= 7 || t('phoneInvalid'),
           }}
           render={({ field }) => (
             <PhoneInput
@@ -97,10 +99,10 @@ export function LeadForm({
         <input
           type="email"
           inputMode="email"
-          placeholder="Email (необов'язково)"
+          placeholder={t('emailPlaceholder')}
           className={`${fieldBase} ${fieldTone} ${errors.email ? 'border-ink' : ''}`}
           {...register('email', {
-            pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: 'Невірний email' },
+            pattern: { value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/, message: t('emailInvalid') },
           })}
         />
         {errors.email && <p className="mt-1 text-xs text-ink">{errors.email.message}</p>}
@@ -109,10 +111,10 @@ export function LeadForm({
       {state === 'error' && <p className="text-sm text-ink">{errMsg}</p>}
 
       <button type="submit" disabled={state === 'loading'} className="btn-terra w-full disabled:opacity-60">
-        {state === 'loading' ? 'Надсилаємо…' : 'Відправити заявку'}
+        {state === 'loading' ? t('submitting') : t('submit')}
       </button>
       <p className={`text-center text-[11px] ${dark ? 'text-paper/40' : 'text-muted'}`}>
-        Натискаючи кнопку, ви погоджуєтесь з політикою конфіденційності.
+        {t('privacyNote')}
       </p>
     </form>
   );

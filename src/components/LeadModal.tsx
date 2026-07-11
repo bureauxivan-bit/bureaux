@@ -1,22 +1,14 @@
 'use client';
 import { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
+import { useTranslations } from 'next-intl';
 import type { LeadType } from '@/lib/types';
 import { LeadForm } from './LeadForm';
 
-type ModalConfig = { type: LeadType; title: string; subtitle: string };
-
-const PRESETS: Record<'estimate' | 'consult', ModalConfig> = {
-  estimate: {
-    type: 'ESTIMATE',
-    title: 'Прорахунок проєкту',
-    subtitle: 'Залиште заявку на безкоштовний прорахунок проєкту та консультацію.',
-  },
-  consult: {
-    type: 'CONSULT',
-    title: 'Консультація',
-    subtitle: 'Залиште заявку на безкоштовну консультацію.',
-  },
+type Preset = 'estimate' | 'consult';
+const PRESET_TYPE: Record<Preset, LeadType> = {
+  estimate: 'ESTIMATE',
+  consult: 'CONSULT',
 };
 
 type Ctx = { openEstimate: () => void; openConsult: () => void };
@@ -25,15 +17,19 @@ const LeadModalCtx = createContext<Ctx>({ openEstimate: () => {}, openConsult: (
 export const useLeadModal = () => useContext(LeadModalCtx);
 
 export function LeadModalProvider({ children }: { children: React.ReactNode }) {
-  const [config, setConfig] = useState<ModalConfig | null>(null);
+  const t = useTranslations('leadModal');
+  const [preset, setPreset] = useState<Preset | null>(null);
+  const config = preset
+    ? { type: PRESET_TYPE[preset], title: t(`${preset}.title`), subtitle: t(`${preset}.subtitle`) }
+    : null;
 
-  const openEstimate = useCallback(() => setConfig(PRESETS.estimate), []);
-  const openConsult = useCallback(() => setConfig(PRESETS.consult), []);
-  const close = useCallback(() => setConfig(null), []);
+  const openEstimate = useCallback(() => setPreset('estimate'), []);
+  const openConsult = useCallback(() => setPreset('consult'), []);
+  const close = useCallback(() => setPreset(null), []);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === 'Escape' && close();
-    if (config) {
+    if (preset) {
       document.addEventListener('keydown', onKey);
       document.body.style.overflow = 'hidden';
     }
@@ -41,7 +37,7 @@ export function LeadModalProvider({ children }: { children: React.ReactNode }) {
       document.removeEventListener('keydown', onKey);
       document.body.style.overflow = '';
     };
-  }, [config, close]);
+  }, [preset, close]);
 
   return (
     <LeadModalCtx.Provider value={{ openEstimate, openConsult }}>
@@ -62,7 +58,7 @@ export function LeadModalProvider({ children }: { children: React.ReactNode }) {
               transition={{ type: 'spring', damping: 26, stiffness: 280 }}
             >
               <button
-                onClick={close} aria-label="Закрити"
+                onClick={close} aria-label={t('close')}
                 className="absolute right-5 top-5 text-2xl leading-none text-muted transition-colors hover:text-ink"
               >
                 ×

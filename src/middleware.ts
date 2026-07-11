@@ -1,5 +1,7 @@
 import { NextResponse, type NextRequest, type NextFetchEvent } from 'next/server';
+import createMiddleware from 'next-intl/middleware';
 import { jwtVerify } from 'jose';
+import { routing } from '@/i18n/routing';
 import { notifyVisit } from '@/lib/telegram';
 import { lookupGeo, isDatacenterIsp } from '@/lib/geo';
 import { parseUserAgent, isBotUserAgent } from '@/lib/ua';
@@ -18,8 +20,10 @@ const VISITOR_MAX_AGE = 60 * 60 * 24 * 365;
 const TRACKED_PREFIXES = [
   '/projects',
   '/posluhy',
+  '/services', // en slug of /posluhy
   '/studio',
   '/kontakty',
+  '/contacts', // en slug of /kontakty
   '/muas',
   '/privacy',
   '/terms',
@@ -30,9 +34,18 @@ const TRACKED_PREFIXES = [
 ];
 
 function isTrackedPath(pathname: string): boolean {
-  if (pathname === '/') return true;
-  return TRACKED_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`));
+  // /en/... is the same public site — strip the locale prefix before matching.
+  const p =
+    pathname === '/en' ? '/' : pathname.startsWith('/en/') ? pathname.slice(3) : pathname;
+  if (p === '/') return true;
+  return TRACKED_PREFIXES.some((x) => p === x || p.startsWith(`${x}/`));
 }
+
+// Routes that live outside the [locale] tree (src/app/(internal)) — the intl
+// middleware must not rewrite them to /uk/... or they would 404.
+const NON_LOCALIZED_PREFIXES = ['/admin', '/miy-proekt', '/kp', '/login', '/register'];
+
+const intlMiddleware = createMiddleware(routing);
 
 async function isValid(token: string | undefined, secret: string, role?: string) {
   if (!token) return false;
@@ -255,8 +268,13 @@ export async function middleware(req: NextRequest, event: NextFetchEvent) {
     } else {
       response = NextResponse.next();
     }
-  } else {
+  } else if (NON_LOCALIZED_PREFIXES.some((p) => pathname === p || pathname.startsWith(`${p}/`))) {
     response = NextResponse.next();
+  } else {
+    // Public site: next-intl resolves the locale (uk at /, en at /en/...)
+    // and rewrites localized slugs (/en/services → /en/posluhy) to the
+    // physical [locale] routes.
+    response = intlMiddleware(req);
   }
 
   event.waitUntil(trackVisit(req, response));

@@ -1,10 +1,12 @@
 import Image from 'next/image';
-import Link from 'next/link';
+import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
 import { Reveal } from './Reveal';
 
 type Member = { id: string; name: string; role: string; quote: string | null; photoUrl: string | null };
 
 export function Team({ team }: { team: Member[] }) {
+  const t = useTranslations('team');
   if (!team.length) return null;
   return (
     <section className="border-t border-line">
@@ -46,13 +48,13 @@ export function Team({ team }: { team: Member[] }) {
           href="/studio"
           className="hidden bg-ink px-5 py-2.5 text-xs font-normal uppercase tracking-widest text-paper transition-colors duration-200 hover:bg-ink/70 sm:inline-flex"
         >
-          Про студію та команду →
+          {t('link')} →
         </Link>
         <Link
           href="/studio"
           className="btn-ghost w-full justify-center sm:hidden"
         >
-          Про студію та команду →
+          {t('link')} →
         </Link>
       </div>
     </section>

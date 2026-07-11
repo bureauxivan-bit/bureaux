@@ -1,7 +1,9 @@
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { Reveal } from './Reveal';
 
 export function ItemX({ url }: { url?: string | null }) {
+  const t = useTranslations('itemX');
   return (
     <section className="container-wide pt-24 pb-12 lg:pt-32 lg:pb-16">
       <Reveal>
@@ -12,12 +14,12 @@ export function ItemX({ url }: { url?: string | null }) {
 
           {/* Text */}
           <div className="relative px-8 pb-8 pt-12 sm:max-w-[52%] sm:px-16 sm:py-24 lg:min-h-[420px] lg:flex lg:flex-col lg:justify-center">
-            <p className="eyebrow text-paper/50 -ml-10">Магазин предметів інтер&apos;єру</p>
+            <p className="eyebrow text-paper/50 -ml-10">{t('eyebrow')}</p>
             <h2 className="display-xl mt-5 text-[clamp(2rem,5vw,4rem)]">
-              item <em>X</em> — предмети у стилі МУАС
+              item <em>X</em> — {t('heading')}
             </h2>
             <p className="mt-5 text-paper/60">
-              Авторські предмети інтер&apos;єру, що доповнюють простір характером та сенсом.
+              {t('subtitle')}
             </p>
             {/* Desktop only — button stays in text column */}
             <a
@@ -26,7 +28,7 @@ export function ItemX({ url }: { url?: string | null }) {
               rel="noopener"
               className="mt-9 hidden sm:inline-flex items-center gap-2 bg-terra px-7 py-3.5 text-xs font-light uppercase tracking-widest text-paper transition-opacity duration-200 hover:opacity-80"
             >
-              Перейти до магазину ↗
+              {t('cta')} ↗
             </a>
           </div>
 
@@ -48,7 +50,7 @@ export function ItemX({ url }: { url?: string | null }) {
               rel="noopener"
               className="inline-flex items-center gap-2 bg-terra px-7 py-3.5 text-xs font-light uppercase tracking-widest text-paper transition-opacity duration-200 hover:opacity-80"
             >
-              Перейти до магазину ↗
+              {t('cta')} ↗
             </a>
           </div>
 

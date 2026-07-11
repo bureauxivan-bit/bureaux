@@ -1,50 +1,32 @@
+import { useTranslations } from 'next-intl';
 import { Reveal } from './Reveal';
 
-const ROWS = [
-  {
-    name: "Дизайн інтер'єру",
-    price: 'від $60/м²',
-    note: 'Повний проєкт: планування, візуалізації, креслення, специфікації — усе для реалізації ремонту',
-  },
-  {
-    name: 'Архітектурне проєктування',
-    price: 'від $40/м²',
-    note: 'Повний проєкт: ескіз, планування, конструктивні рішення, робочі креслення — від концепції до дозволу на будівництво',
-  },
-  {
-    name: 'Авторський супровід реалізації',
-    price: '$800/міс',
-    note: 'Київ; інші міста та країни — перерахунок за запитом. Окремо від вартості проєкту',
-  },
-  {
-    name: 'Мінімальний проєкт',
-    price: 'від 120 м²',
-    note: "Менші об'єкти рахуємо як 120 м²: дизайн від $7200, архітектура від $4800",
-  },
-];
+type PricingRow = { name: string; price: string; note: string };
 
 export function PricingBlock() {
+  const t = useTranslations('pricing');
+  const rows = t.raw('rows') as PricingRow[];
   return (
     <section id="pricing" className="container-wide scroll-mt-24 py-24 lg:py-36">
       <Reveal>
-        <p className="eyebrow">Вартість</p>
-        <h2 className="display-xl mt-5 text-[clamp(2rem,5vw,4rem)]">Вартість послуг</h2>
+        <p className="eyebrow">{t('eyebrow')}</p>
+        <h2 className="display-xl mt-5 text-[clamp(2rem,5vw,4rem)]">{t('heading')}</h2>
       </Reveal>
 
       {/* Семантична таблиця цін (AEO): на мобільних клітинки стають блоками,
           на sm+ — звичайні табличні рядки, як у попередній div-сітці. */}
       <Reveal>
         <table className="mt-14 w-full border-collapse border-t border-line text-left">
-          <caption className="sr-only">Вартість послуг bureau X</caption>
+          <caption className="sr-only">{t('caption')}</caption>
           <thead className="sr-only">
             <tr>
-              <th scope="col">Послуга</th>
-              <th scope="col">Вартість</th>
-              <th scope="col">Примітка</th>
+              <th scope="col">{t('colService')}</th>
+              <th scope="col">{t('colPrice')}</th>
+              <th scope="col">{t('colNote')}</th>
             </tr>
           </thead>
           <tbody>
-            {ROWS.map((r) => (
+            {rows.map((r) => (
               <tr
                 key={r.name}
                 className="block border-b border-line py-5 sm:table-row sm:py-0"
@@ -69,8 +51,7 @@ export function PricingBlock() {
 
       <Reveal delay={340}>
         <p className="mt-7 border-l-2 border-line pl-5 text-xs leading-relaxed text-muted">
-          Орієнтовний бюджет реалізації «під ключ» (проєкт + ремонт) — від $1400/м².
-          Для планування загального бюджету; вартість самого проєктування — $60/м².
+          {t('footnote')}
         </p>
       </Reveal>
     </section>
