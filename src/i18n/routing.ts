@@ -13,9 +13,8 @@ export const routing = defineRouting({
     '/': '/',
     '/projects': '/projects',
     '/projects/[slug]': '/projects/[slug]',
-    // Articles are uk-only for now; en hides the section until translated.
-    '/statti': '/statti',
-    '/statti/[slug]': '/statti/[slug]',
+    '/statti': { uk: '/statti', en: '/articles' },
+    '/statti/[slug]': { uk: '/statti/[slug]', en: '/articles/[slug]' },
     '/studio': '/studio',
     '/muas': '/muas',
     '/privacy': '/privacy',

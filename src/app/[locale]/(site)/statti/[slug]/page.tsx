@@ -1,23 +1,74 @@
 import { unstable_setRequestLocale } from 'next-intl/server';
 import type { Metadata } from 'next';
-import Link from 'next/link';
+import NextLink from 'next/link';
 import { notFound } from 'next/navigation';
-import { ARTICLES, getArticle, type Block } from '@/lib/articles';
+import { Link } from '@/i18n/navigation';
+import { ARTICLES, getArticle, type Article, type Block } from '@/lib/articles';
+import { ARTICLES_EN, getArticleEn, enSlugForUk } from '@/lib/articles-en';
 import { FinalCta } from '@/components/FinalCta';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
-export function generateStaticParams() {
-  return ARTICLES.map((a) => ({ slug: a.slug }));
+const COPY = {
+  uk: {
+    notFoundTitle: 'Статтю не знайдено',
+    breadcrumbHome: 'Головна',
+    breadcrumbArticles: 'Статті',
+    eyebrow: 'Стаття',
+    readNext: 'Читати далі',
+    dateLocale: 'uk-UA',
+    ldLanguage: 'uk',
+    indexPath: '/statti',
+  },
+  en: {
+    notFoundTitle: 'Article not found',
+    breadcrumbHome: 'Home',
+    breadcrumbArticles: 'Articles',
+    eyebrow: 'Article',
+    readNext: 'Read next',
+    dateLocale: 'en-US',
+    ldLanguage: 'en',
+    indexPath: '/en/articles',
+  },
+} as const;
+
+function copyFor(locale: string) {
+  return locale === 'en' ? COPY.en : COPY.uk;
 }
 
-export function generateMetadata({ params }: { params: { slug: string } }): Metadata {
-  const a = getArticle(params.slug);
-  if (!a) return { title: 'Статтю не знайдено' };
+function resolveArticle(locale: string, slug: string): Article | undefined {
+  return locale === 'en' ? getArticleEn(slug) : getArticle(slug);
+}
+
+/** uk/en URL pair for hreflang: en slugs differ from uk slugs per article. */
+function articleAlternates(locale: string, slug: string) {
+  const ukSlug = locale === 'en' ? getArticleEn(slug)?.ukSlug : slug;
+  const enSlug = locale === 'en' ? slug : enSlugForUk(slug);
+  const uk = ukSlug ? `/statti/${ukSlug}` : undefined;
+  const en = enSlug ? `/en/articles/${enSlug}` : undefined;
+  return {
+    canonical: locale === 'en' ? en : uk,
+    languages: uk && en ? { uk, en, 'x-default': uk } : undefined,
+  };
+}
+
+export function generateStaticParams({ params }: { params: { locale: string } }) {
+  const source = params?.locale === 'en' ? ARTICLES_EN : ARTICLES;
+  return source.map((a) => ({ slug: a.slug }));
+}
+
+export function generateMetadata({
+  params,
+}: {
+  params: { locale: string; slug: string };
+}): Metadata {
+  const c = copyFor(params.locale);
+  const a = resolveArticle(params.locale, params.slug);
+  if (!a) return { title: c.notFoundTitle };
   return {
     title: { absolute: `${a.title} · bureau X` },
     description: a.description,
-    alternates: { canonical: `/statti/${a.slug}` },
+    alternates: articleAlternates(params.locale, params.slug),
     openGraph: {
       type: 'article',
       title: a.title,
@@ -26,10 +77,6 @@ export function generateMetadata({ params }: { params: { slug: string } }): Meta
       modifiedTime: a.dateModified,
     },
   };
-}
-
-function fmtDate(iso: string): string {
-  return new Date(iso).toLocaleDateString('uk-UA', { day: 'numeric', month: 'long', year: 'numeric' });
 }
 
 function BlockView({ block }: { block: Block }) {
@@ -88,18 +135,23 @@ function BlockView({ block }: { block: Block }) {
 
 export default function ArticlePage({ params }: { params: { locale: string; slug: string } }) {
   unstable_setRequestLocale(params.locale);
-  const a = getArticle(params.slug);
+  const c = copyFor(params.locale);
+  const isEn = params.locale === 'en';
+  const a = resolveArticle(params.locale, params.slug);
   if (!a) notFound();
 
-  const url = `${SITE_URL}/statti/${a.slug}`;
+  const url = `${SITE_URL}${isEn ? `/en/articles/${a.slug}` : `/statti/${a.slug}`}`;
   const faqBlock = a.blocks.find((b): b is Extract<Block, { type: 'faq' }> => b.type === 'faq');
+
+  const fmtDate = (iso: string) =>
+    new Date(iso).toLocaleDateString(c.dateLocale, { day: 'numeric', month: 'long', year: 'numeric' });
 
   const breadcrumbLd = {
     '@context': 'https://schema.org',
     '@type': 'BreadcrumbList',
     itemListElement: [
-      { '@type': 'ListItem', position: 1, name: 'Головна', item: SITE_URL },
-      { '@type': 'ListItem', position: 2, name: 'Статті', item: `${SITE_URL}/statti` },
+      { '@type': 'ListItem', position: 1, name: c.breadcrumbHome, item: isEn ? `${SITE_URL}/en` : SITE_URL },
+      { '@type': 'ListItem', position: 2, name: c.breadcrumbArticles, item: `${SITE_URL}${c.indexPath}` },
       { '@type': 'ListItem', position: 3, name: a.title, item: url },
     ],
   };
@@ -109,7 +161,7 @@ export default function ArticlePage({ params }: { params: { locale: string; slug
     headline: a.title,
     description: a.description,
     url,
-    inLanguage: 'uk',
+    inLanguage: c.ldLanguage,
     datePublished: a.datePublished,
     dateModified: a.dateModified,
     author: { '@id': `${SITE_URL}/#organization` },
@@ -139,16 +191,16 @@ export default function ArticlePage({ params }: { params: { locale: string; slug
 
       <nav className="container-wide pt-28 pb-0 text-xs text-muted lg:pt-36" aria-label="Breadcrumb">
         <ol className="flex flex-wrap items-center gap-1.5">
-          <li><Link href="/" className="transition-colors hover:text-ink">Головна</Link></li>
+          <li><Link href="/" className="transition-colors hover:text-ink">{c.breadcrumbHome}</Link></li>
           <li aria-hidden="true">/</li>
-          <li><Link href="/statti" className="transition-colors hover:text-ink">Статті</Link></li>
+          <li><Link href="/statti" className="transition-colors hover:text-ink">{c.breadcrumbArticles}</Link></li>
           <li aria-hidden="true">/</li>
           <li className="text-ink" aria-current="page">{a.title}</li>
         </ol>
       </nav>
 
       <header className="container-wide pt-8 pb-4">
-        <p className="eyebrow">Стаття</p>
+        <p className="eyebrow">{c.eyebrow}</p>
         <h1 className="display-xl mt-5 max-w-4xl text-[clamp(2rem,5vw,3.5rem)]">{a.title}</h1>
         <p className="mt-4 text-xs text-muted">
           <time dateTime={a.datePublished}>{fmtDate(a.datePublished)}</time>
@@ -161,13 +213,15 @@ export default function ArticlePage({ params }: { params: { locale: string; slug
 
         {a.related.length > 0 && (
           <div className="mt-16 max-w-2xl border-t border-line pt-8">
-            <p className="eyebrow mb-4">Читати далі</p>
+            <p className="eyebrow mb-4">{c.readNext}</p>
             <ul className="space-y-2">
+              {/* related hrefs are final URLs per locale (uk data: /posluhy/…,
+                  en data: /en/services/…), so a plain link is correct here. */}
               {a.related.map((r) => (
                 <li key={r.href}>
-                  <Link href={r.href} className="text-base underline decoration-ink/30 underline-offset-4 transition-colors hover:decoration-ink">
+                  <NextLink href={r.href} className="text-base underline decoration-ink/30 underline-offset-4 transition-colors hover:decoration-ink">
                     {r.label}
-                  </Link>
+                  </NextLink>
                 </li>
               ))}
             </ul>

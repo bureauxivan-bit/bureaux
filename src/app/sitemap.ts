@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { getAllProjects } from '@/lib/data';
 import { ARTICLES } from '@/lib/articles';
+import { enSlugForUk } from '@/lib/articles-en';
 
 const BASE = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://bureaux.com.ua';
 
@@ -28,14 +29,19 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const projects = await getAllProjects().catch(() => []);
   return [
     ...localized('', '/en', { changeFrequency: 'monthly', priority: 1 }),
-    // Статті поки лише українською — en-версії немає в sitemap.
-    { url: `${BASE}/statti`, changeFrequency: 'weekly', priority: 0.6 },
-    ...ARTICLES.map((a) => ({
-      url: `${BASE}/statti/${a.slug}`,
-      lastModified: new Date(a.dateModified),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    })),
+    ...localized('/statti', '/en/articles', { changeFrequency: 'weekly', priority: 0.6 }),
+    ...ARTICLES.flatMap((a) => {
+      const enSlug = enSlugForUk(a.slug);
+      const opts: Opts = {
+        lastModified: new Date(a.dateModified),
+        changeFrequency: 'monthly',
+        priority: 0.7,
+      };
+      // Пара uk/en, якщо переклад існує; інакше лише українська версія.
+      return enSlug
+        ? localized(`/statti/${a.slug}`, `/en/articles/${enSlug}`, opts)
+        : [{ url: `${BASE}/statti/${a.slug}`, ...opts }];
+    }),
     ...localized('/posluhy', '/en/services', { changeFrequency: 'monthly', priority: 0.9 }),
     ...localized('/posluhy/dyzajn-intereru', '/en/services/interior-design', { changeFrequency: 'monthly', priority: 0.9 }),
     ...localized('/posluhy/arkhitektura', '/en/services/architecture', { changeFrequency: 'monthly', priority: 0.8 }),
