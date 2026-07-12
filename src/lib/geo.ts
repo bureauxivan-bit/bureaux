@@ -14,11 +14,12 @@ export type GeoHints = {
 const UNKNOWN = 'Невідомо';
 const LOCAL: GeoInfo = { country: 'Локально', city: '—', isp: '—' };
 
-// Datacenter/hosting providers — traffic from them is scrapers, not people.
-// Cloudflare deliberately NOT listed: iCloud Private Relay routes real Safari
-// users through Cloudflare IPs.
+// Datacenter/hosting/proxy providers — traffic from them is scrapers and
+// rotating-proxy bots (e.g. Oxylabs runs hit a single URL through dozens of
+// one-shot IPs worldwide), not people. Cloudflare deliberately NOT listed:
+// iCloud Private Relay routes real Safari users through Cloudflare IPs.
 const DATACENTER_RE =
-  /amazon|aws|google llc|google cloud|microsoft|azure|digitalocean|hetzner|ovh|alibaba|tencent|huawei cloud|oracle|linode|akamai|vultr|leaseweb|m247|datacamp|contabo|scaleway|fastly|f\.n\.s\. holdings|hosting|data ?cent|facebook|meta platforms|twitter|bytedance|tiktok/i;
+  /amazon|aws|google llc|google cloud|microsoft|azure|digitalocean|hetzner|ovh|alibaba|tencent|huawei cloud|oracle|linode|akamai|vultr|leaseweb|m247|datacamp|contabo|scaleway|fastly|f\.n\.s\. holdings|hosting|host\b|data ?cent|\bserver|\bcolo\b|colocation|\bvps\b|proxy|\bvpn\b|facebook|meta platforms|twitter|bytedance|tiktok|oxylabs|code200|oculus network|web2objects|latitude\.sh|hostroyale|b2 net|gtt communications|charles river|radar wisp|packethub|bright ?data|smartproxy|netnut|iproyal|quadranet|choopa|psychz|nforce|hostwinds|colocrossing|internet vikings|bluevps|glesys|globalconnect/i;
 
 export function isDatacenterIsp(isp: string): boolean {
   return DATACENTER_RE.test(isp);
