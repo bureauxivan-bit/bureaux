@@ -3,8 +3,8 @@ import createMiddleware from 'next-intl/middleware';
 import { jwtVerify } from 'jose';
 import { routing } from '@/i18n/routing';
 import { notifyVisit } from '@/lib/telegram';
-import { lookupGeo, isDatacenterIsp } from '@/lib/geo';
-import { parseUserAgent, isBotUserAgent } from '@/lib/ua';
+import { lookupGeo, isDatacenterIsp, isResidentialProxyIsp } from '@/lib/geo';
+import { parseUserAgent, isBotUserAgent, isStaleDesktopChrome } from '@/lib/ua';
 import { channelLabel } from '@/lib/source';
 
 const ADMIN_COOKIE = 'bx_session';
@@ -202,7 +202,11 @@ async function trackVisit(req: NextRequest, res: NextResponse) {
       return;
     }
 
-    console.log('[analytics] visit:', { ip, url, isNewVisitor });
+    // Rotating residential-proxy scrapers (one visit per IP, pinned stale
+    // Chrome) still count in stats but must not spam the Telegram chat.
+    const muteNotify = isResidentialProxyIsp(isp) || isStaleDesktopChrome(parsedUa);
+
+    console.log('[analytics] visit:', { ip, url, isNewVisitor, muteNotify });
     const visit = {
       ip,
       country,
@@ -218,7 +222,7 @@ async function trackVisit(req: NextRequest, res: NextResponse) {
       isNewVisitor,
     };
     await Promise.all([
-      notifyVisit({ timestamp: new Date(), ...visit }),
+      muteNotify ? Promise.resolve() : notifyVisit({ timestamp: new Date(), ...visit }),
       logVisit(req.nextUrl.origin, visit),
     ]);
   } catch (err) {

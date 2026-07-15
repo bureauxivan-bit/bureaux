@@ -25,6 +25,19 @@ export function isDatacenterIsp(isp: string): boolean {
   return DATACENTER_RE.test(isp);
 }
 
+// Residential-proxy exit networks seen in scraper waves (July 2026: one visit
+// per IP on /statti/* with a pinned stale Chrome UA). Real consumer ISPs that
+// also carry proxy traffic (Cox, Comcast, Charter) are deliberately NOT listed —
+// real people use them too; the stale-Chrome check covers that part instead.
+// Unlike DATACENTER_RE these visits still count in stats — they only mute the
+// Telegram notification.
+const RESIDENTIAL_PROXY_RE =
+  /bite lietuva|dzcrd networks|lonconnect|contact consumers|proper support/i;
+
+export function isResidentialProxyIsp(isp: string): boolean {
+  return RESIDENTIAL_PROXY_RE.test(isp);
+}
+
 function isLocalIp(ip: string): boolean {
   return (
     ip === 'unknown' ||

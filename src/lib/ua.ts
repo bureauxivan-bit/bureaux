@@ -16,6 +16,19 @@ export function isBotUserAgent(uaString: string): boolean {
   return BOT_RE.test(uaString);
 }
 
+// Proxy scrapers pin a months-old desktop Chrome build ("Chrome 142.0.0.0"
+// while real visitors run 150+). Auto-update keeps real desktop Chrome within
+// a couple of majors of current, so anything this far behind is a bot fleet.
+// Bump the floor every few months as Chrome moves on (current stable ≈ 150,
+// July 2026).
+const CHROME_STALE_BELOW = 146;
+
+export function isStaleDesktopChrome({ device, browser }: ParsedUA): boolean {
+  if (device !== 'Desktop') return false;
+  const major = browser.match(/^Chrome (\d+)/);
+  return major !== null && Number(major[1]) < CHROME_STALE_BELOW;
+}
+
 export function parseUserAgent(uaString: string): ParsedUA {
   const parser = new UAParser(uaString);
   const device = parser.getDevice();
