@@ -202,6 +202,26 @@ async function trackVisit(req: NextRequest, res: NextResponse) {
       return;
     }
 
+    // Residential-proxy scraper signature. A rotating-proxy bot hammers one
+    // article through real consumer-ISP exit nodes (Cox, Comcast, Bite Lietuva),
+    // so isDatacenterIsp can't catch it. But every hit is Desktop, non-uk/ru
+    // Accept-Language, from outside Ukraine, on a Ukrainian-locale page, with a
+    // direct/search referrer. Real prospects are in-country, or uk/ru speakers,
+    // or on the English /en site, or arrive from social — all spared below.
+    const langLc = (req.headers.get('accept-language') || '').toLowerCase();
+    const fromSearchOrDirect =
+      referrer === 'Пряме відвідування' || /\b(?:google|bing|duckduckgo|yahoo)\./i.test(referrer);
+    if (
+      device === 'Desktop' &&
+      !/\b(uk|ru)\b/.test(langLc) &&
+      country !== 'Ukraine' &&
+      !req.nextUrl.pathname.startsWith('/en') &&
+      fromSearchOrDirect
+    ) {
+      console.log('[analytics] skipped proxy-scraper visit:', { ip, country, language, url });
+      return;
+    }
+
     // Rotating residential-proxy scrapers (one visit per IP, pinned stale
     // Chrome) still count in stats but must not spam the Telegram chat.
     const muteNotify = isResidentialProxyIsp(isp) || isStaleDesktopChrome(parsedUa);
