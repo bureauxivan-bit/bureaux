@@ -195,7 +195,7 @@
   },
   "leadPopup": {
     "objects": ["Apartment", "House", "Commercial", "Other"],
-    "areas": ["up to 50 m²", "50–100 m²", "100–200 m²", "200+ m²"],
+    "areas": ["up to 100 m²", "100–200 m²", "200+ m²"],
     "ariaLabel": "Free estimate",
     "close": "Close",
     "titleLine1": "Free estimate",
