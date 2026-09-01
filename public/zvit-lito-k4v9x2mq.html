@@ -1,0 +1,309 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow, noarchive">
+<title>Воронка Bureau X</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;400;500&family=Golos+Text:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --paper:#F7F7F4; --ink:#141414; --ink-2:#4A4A46; --muted:#6E6E68;
+    --hair:#D9D9D3; --hair-soft:#E7E7E1; --bar:#8A8A82; --bar-soft:#C9C9C1;
+    --red:#C4372B; --red-soft:#F2DEDB; --good:#2E6B3F; --card:#FDFDFB;
+  }
+  @media (prefers-color-scheme: dark){
+    :root:not([data-theme="light"]){
+      --paper:#171716; --ink:#ECECE7; --ink-2:#BDBDB6; --muted:#8F8F88;
+      --hair:#34342F; --hair-soft:#262622; --bar:#7A7A72; --bar-soft:#44443E;
+      --red:#E05548; --red-soft:#3A211D; --good:#7FBF8F; --card:#1D1D1B;
+    }
+  }
+  *{box-sizing:border-box}
+  body{
+    background:var(--paper); color:var(--ink);
+    font-family:"Golos Text",system-ui,-apple-system,sans-serif;
+    font-size:16px; line-height:1.55; margin:0; padding:0 20px 80px;
+  }
+  .sheet{max-width:1060px;margin:0 auto}
+  header.stamp{
+    border:1px solid var(--ink); margin-top:28px;
+    display:grid; grid-template-columns:1fr auto; align-items:stretch;
+  }
+  .stamp-name{padding:26px 28px 22px; border-right:1px solid var(--ink)}
+  .stamp-name h1{
+    font-family:Unbounded,sans-serif; font-weight:400; font-size:clamp(22px,4vw,34px);
+    margin:0; letter-spacing:.01em; text-wrap:balance;
+  }
+  .stamp-name .sub{color:var(--muted); margin-top:8px; font-size:14px}
+  .stamp-meta{display:flex; flex-direction:column; min-width:230px}
+  .stamp-meta div{padding:10px 18px; border-bottom:1px solid var(--hair); font-family:"IBM Plex Mono",monospace; font-size:12.5px; color:var(--ink-2); display:flex; justify-content:space-between; gap:18px}
+  .stamp-meta div:last-child{border-bottom:none}
+  .stamp-meta b{color:var(--ink); font-weight:500}
+  @media(max-width:640px){ header.stamp{grid-template-columns:1fr} .stamp-name{border-right:none;border-bottom:1px solid var(--ink)} }
+
+  .verdict{border-left:3px solid var(--red); padding:6px 0 6px 18px; margin:34px 0 8px; max-width:62ch}
+  .verdict p{margin:0; font-size:18.5px; font-weight:500}
+  .verdict .why{font-weight:400; color:var(--ink-2); font-size:15.5px; margin-top:6px}
+
+  .tiles{display:grid; grid-template-columns:repeat(auto-fit,minmax(215px,1fr)); gap:1px; background:var(--hair); border:1px solid var(--hair); margin-top:26px}
+  .tile{background:var(--card); padding:18px 20px 16px}
+  .tile .lbl{font-size:12px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted)}
+  .tile .val{font-family:"IBM Plex Mono",monospace; font-size:34px; font-weight:500; margin-top:6px; font-variant-numeric:tabular-nums}
+  .tile .cmp{font-size:13.5px; color:var(--ink-2); margin-top:4px}
+  .tile .cmp .neg{color:var(--red); font-weight:600}
+  .tile .cmp .pos{color:var(--good); font-weight:600}
+
+  section{margin-top:56px}
+  .sec-h{display:flex; align-items:baseline; gap:14px; border-bottom:1px solid var(--ink); padding-bottom:10px; margin-bottom:20px}
+  .sec-h .no{font-family:Unbounded,sans-serif; font-weight:300; font-size:15px; color:var(--muted)}
+  .sec-h h2{font-family:Unbounded,sans-serif; font-weight:400; font-size:19px; margin:0; letter-spacing:.01em}
+  .note{color:var(--ink-2); max-width:68ch; font-size:15px}
+  .footnote{color:var(--muted); font-size:13px; max-width:70ch; margin-top:14px}
+  .redmark{color:var(--red); font-weight:600}
+
+  .chart-wrap{overflow-x:auto; border:1px solid var(--hair); background:var(--card); padding:18px 14px 8px; margin-top:6px}
+  .legend{display:flex; gap:22px; font-size:13px; color:var(--ink-2); padding:0 6px 10px}
+  .sw{display:inline-block; width:14px; height:10px; margin-right:7px; vertical-align:baseline}
+  #tt{position:fixed; pointer-events:none; background:var(--ink); color:var(--paper); font-family:"IBM Plex Mono",monospace; font-size:12px; padding:7px 10px; opacity:0; transition:opacity .12s; z-index:9; white-space:nowrap}
+  @media(prefers-reduced-motion:reduce){ #tt{transition:none} }
+
+  .tbl-wrap{overflow-x:auto; border:1px solid var(--hair)}
+  table{border-collapse:collapse; width:100%; background:var(--card); font-size:14.5px}
+  th{font-size:11.5px; letter-spacing:.07em; text-transform:uppercase; color:var(--muted); font-weight:500; text-align:left; padding:11px 14px; border-bottom:1px solid var(--ink)}
+  td{padding:10px 14px; border-bottom:1px solid var(--hair-soft); font-variant-numeric:tabular-nums}
+  td.num,th.num{text-align:right; font-family:"IBM Plex Mono",monospace; font-size:13.5px}
+  tr:last-child td{border-bottom:none}
+  tr.hot td{background:var(--red-soft)}
+
+  .funnel{display:flex; flex-wrap:wrap; gap:1px; background:var(--hair); border:1px solid var(--hair)}
+  .fstep{flex:1 1 150px; background:var(--card); padding:16px 18px; position:relative}
+  .fstep .n{font-family:"IBM Plex Mono",monospace; font-size:28px; font-weight:500}
+  .fstep .l{font-size:13px; color:var(--ink-2); margin-top:3px}
+  .fstep .p{font-family:"IBM Plex Mono",monospace; font-size:12px; color:var(--muted); margin-top:6px}
+  .fstep .p b{color:var(--red); font-weight:500}
+
+  .cols{display:grid; grid-template-columns:1fr 1fr; gap:26px}
+  @media(max-width:800px){ .cols{grid-template-columns:1fr} }
+  .chip{display:inline-block; border:1px solid var(--hair); padding:2px 9px; font-size:12.5px; color:var(--ink-2); margin:3px 4px 0 0}
+
+  .rec{border:1px solid var(--hair); background:var(--card); padding:18px 20px; margin-top:14px; display:grid; grid-template-columns:auto 1fr; gap:16px}
+  .rec .pri{font-family:Unbounded,sans-serif; font-weight:300; font-size:14px; color:var(--red); white-space:nowrap; padding-top:2px}
+  .rec h3{margin:0 0 6px; font-size:16px; font-weight:600}
+  .rec p{margin:0; color:var(--ink-2); font-size:14.5px; max-width:72ch}
+  details{margin-top:12px}
+  summary{cursor:pointer; color:var(--muted); font-size:13.5px}
+  a{color:inherit}
+</style>
+</head>
+<body>
+<div class="sheet">
+  <header class="stamp">
+    <div class="stamp-name">
+      <h1>Воронка Bureau&nbsp;X</h1>
+      <div class="sub">Визиты · каналы · заявки · КП — сводный аналитический лист</div>
+    </div>
+    <div class="stamp-meta">
+      <div><span>период</span><b>01.07 — 31.08.2026</b></div>
+      <div><span>источник</span><b>собственная аналитика сайта</b></div>
+      <div><span>составлено</span><b>31.08.2026</b></div>
+      <div><span>лист</span><b>01</b></div>
+    </div>
+  </header>
+
+  <div class="verdict">
+    <p>Трафик вырос в 4 раза — заявки не выросли. Продают соцсети и квиз, а не Performance&nbsp;Max.</p>
+    <p class="why">Весь августовский прирост дал PMax-эксперимент (13–25.08): 3&nbsp;082 клика → 2 заявки. Instagram и Facebook при впятеро меньшем трафике дали 23 из 25 атрибутированных заявок августа.</p>
+  </div>
+
+  <div class="tiles">
+    <div class="tile"><div class="lbl">Визиты · август</div><div class="val">5 044</div><div class="cmp">июль 1 220 · <span class="pos">×4,1</span></div></div>
+    <div class="tile"><div class="lbl">Заявки с сайта · август</div><div class="val">20</div><div class="cmp">июль 21 · <span class="neg">без роста</span></div></div>
+    <div class="tile"><div class="lbl">Конверсия визит → заявка</div><div class="val">0,40%</div><div class="cmp">июль 1,72% · <span class="neg">разбавил PMax</span></div></div>
+    <div class="tile"><div class="lbl">КП выставлено · август</div><div class="val">11</div><div class="cmp">июль 9 · открываемость <span class="pos">86%</span></div></div>
+  </div>
+
+  <section>
+    <div class="sec-h"><span class="no">01</span><h2>Трафик по дням</h2></div>
+    <p class="note">Два месяца день за днём. Тёмное — обычный трафик (соцсети, прямые, органика), светлое — Google&nbsp;Ads. Запуск Performance&nbsp;Max 13.08 виден без подписи; после его отключения ~26.08 соцсети сами дали всплеск 29–30.08.</p>
+    <div class="chart-wrap">
+      <div class="legend">
+        <span><span class="sw" style="background:var(--ink)"></span>обычный трафик</span>
+        <span><span class="sw" style="background:var(--bar-soft);outline:1px solid var(--hair)"></span>Google Ads</span>
+      </div>
+      <div id="chart"></div>
+    </div>
+    <p class="footnote">27–28.08 — аномальный провал записи (24 и 9 визитов): совпадает с ограничением квоты хостинга БД, часть визитов могла не записаться. Боты вычищены из данных: два прогона скрейперов (~500 строк) удалены, фильтры стоят на входе.</p>
+    <details><summary>Таблица по дням</summary><div class="tbl-wrap" style="margin-top:8px"><table id="daytbl"></table></div></details>
+  </section>
+
+  <section>
+    <div class="sec-h"><span class="no">02</span><h2>Каналы: кто приводит, кто продаёт</h2></div>
+    <p class="note">Главная таблица отчёта. «Намерение» — клики по «Прорахунок», телефону и мессенджерам; «заявки» — отправленные формы и квизы, привязанные к каналу первого захода.</p>
+    <div class="tbl-wrap" style="margin-top:14px">
+      <table>
+        <thead><tr><th>Канал · август</th><th class="num">Визиты</th><th class="num">Намерение</th><th class="num">Заявки</th><th class="num">Визит→заявка</th></tr></thead>
+        <tbody>
+          <tr><td>Facebook</td><td class="num">659</td><td class="num">12</td><td class="num">12</td><td class="num"><b>1,82%</b></td></tr>
+          <tr><td>Instagram</td><td class="num">803</td><td class="num">18</td><td class="num">11</td><td class="num"><b>1,37%</b></td></tr>
+          <tr class="hot"><td>Google Ads (PMax)</td><td class="num">3 082</td><td class="num">140</td><td class="num">2</td><td class="num"><b class="redmark">0,06%</b></td></tr>
+          <tr><td>Прямые / мессенджер</td><td class="num">329</td><td class="num">2</td><td class="num">0</td><td class="num">—</td></tr>
+          <tr><td>Google органика</td><td class="num">62</td><td class="num">1</td><td class="num">0</td><td class="num">—</td></tr>
+          <tr><td>AI-ассистенты (ChatGPT и др.)</td><td class="num">16</td><td class="num">0</td><td class="num">0</td><td class="num">—</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note" style="margin-top:16px">Для сравнения, июль: Instagram — <b>2,69%</b> (297 визитов → 8 заявок), прямые — 1,78%, поисковая реклама (до PMax) — <b>1,07%</b>, Facebook — 1,32%. Июльская поисковая кампания конвертировала в 17 раз лучше августовского PMax: проблема не в «Google Ads вообще», а в типе кампании и её цели обучения.</p>
+    <p class="footnote">140 «намерений» от PMax при 2 заявках — сигнатура случайных тапов в приложениях: люди открывают форму и тут же уходят. Атрибуция first-touch по cookie; 5 кликов остались без метки канала.</p>
+  </section>
+
+  <section>
+    <div class="sec-h"><span class="no">03</span><h2>Воронка сайта · август</h2></div>
+    <div class="funnel">
+      <div class="fstep"><div class="n">5 044</div><div class="l">визитов</div><div class="p">100%</div></div>
+      <div class="fstep"><div class="n">465</div><div class="l">проявили намерение — клик по CTA, телефону, мессенджеру, старт квиза</div><div class="p">9,2% визитов</div></div>
+      <div class="fstep"><div class="n">138</div><div class="l">начали квиз в попапе</div><div class="p">6,1% от 2 263 показов</div></div>
+      <div class="fstep"><div class="n">20</div><div class="l">заявок отправлено</div><div class="p">0,40% визитов</div></div>
+      <div class="fstep"><div class="n">11</div><div class="l">дошло до КП</div><div class="p">55% заявок</div></div>
+    </div>
+    <p class="note" style="margin-top:18px"><b>Квиз-попап — главный генератор заявок: 11 из 20 (55%).</b> Стрелка «листайте вниз», вторая кнопка и попап, добавленные в июле, работают: до них конверсия сайта была около нуля. Слабое звено попапа — открываемость: из 2&nbsp;263 показов квиз начинают 138 (6%), но из начавших до конца доходит каждый десятый.</p>
+  </section>
+
+  <section>
+    <div class="sec-h"><span class="no">04</span><h2>Заявки: 47 за всё время</h2></div>
+    <div class="cols">
+      <div>
+        <div class="tbl-wrap">
+          <table>
+            <thead><tr><th>Статус</th><th class="num">Лидов</th><th class="num">Доля</th></tr></thead>
+            <tbody>
+              <tr><td>Новые / в работе</td><td class="num">14</td><td class="num">30%</td></tr>
+              <tr><td>Квалифицированы</td><td class="num">6</td><td class="num">13%</td></tr>
+              <tr><td>КП отправлено / просмотрено</td><td class="num">2</td><td class="num">4%</td></tr>
+              <tr><td><b>Договор</b></td><td class="num"><b>1</b></td><td class="num">2%</td></tr>
+              <tr><td>Отложены</td><td class="num">4</td><td class="num">9%</td></tr>
+              <tr><td>Потеряны</td><td class="num">9</td><td class="num">19%</td></tr>
+              <tr class="hot"><td>Нецелевые (not_client)</td><td class="num">17</td><td class="num"><b class="redmark">36%</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div>
+        <p class="note" style="margin-top:0">Темп стабильный: 21 заявка в июле, 20 в августе, примерно <b>заявка каждые полтора дня</b>. Но треть заявок — нецелевые, и это до звонка не видно: квиз пока не спрашивает бюджет и сроки.</p>
+        <p class="note">Что спрашивают в квизе чаще всего:</p>
+        <div>
+          <span class="chip">Квартира до 100 м² — 8</span>
+          <span class="chip">Дом 100–200+ м² — 6</span>
+          <span class="chip">Другое — 2</span>
+        </div>
+        <p class="footnote">10 заявок из 47 привязаны к выставленным КП. Один договор закрыт — лид из ранних.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sec-h"><span class="no">05</span><h2>Коммерческие предложения</h2></div>
+    <div class="funnel">
+      <div class="fstep"><div class="n">22</div><div class="l">КП создано (июнь–август)</div><div class="p">100%</div></div>
+      <div class="fstep"><div class="n">19</div><div class="l">просмотрено клиентом</div><div class="p">86% — отличная открываемость</div></div>
+      <div class="fstep"><div class="n">1</div><div class="l">клик по CTA внутри КП</div><div class="p"><b>5%</b></div></div>
+      <div class="fstep"><div class="n">0</div><div class="l">встреч назначено</div><div class="p"><b>обрыв воронки</b></div></div>
+      <div class="fstep"><div class="n">3</div><div class="l">отказа</div><div class="p">14%</div></div>
+    </div>
+    <p class="note" style="margin-top:18px">КП открывают почти все — и по несколько раз (в среднем 5 просмотров, рекорд 16 у дома 196&nbsp;м²). Клиент возвращается к документу, но <b>после просмотра не происходит ничего</b>: ни встреч, ни договоров из КП за два месяца. Между «посмотрел» и «подписал» сейчас нет шага — некому и нечему подтолкнуть.</p>
+    <p class="note">Хорошая новость августа — сдвиг к коммерческим объектам: из 11 КП четыре — <b>клиника, офис, ресторан, коммерция</b> (в июле почти только жильё). Средние чеки там выше.</p>
+    <p class="footnote">Гигиена данных: статус «отправлено» проставлен лишь у 5 КП из 22, при этом просмотрены 19 — статусы в админке не ведутся, из-за этого воронка КП в отчётах выглядит хуже, чем есть.</p>
+  </section>
+
+  <section>
+    <div class="sec-h"><span class="no">06</span><h2>Что делать: по приоритету</h2></div>
+
+    <div class="rec"><div class="pri">P1</div><div>
+      <h3>PMax: переобучить на заявки — или перелить бюджет в соцсети</h3>
+      <p>0,06% против 1,4–1,8% у соцсетей — платить за это дальше нет смысла. Минимальное требование: цель кампании — импортированные из GA4 события lead_submitted и popup_lead (не клики), исключить показы в мобильных приложениях, сузить гео до Киева и области. Нет улучшения за 2 недели — бюджет в Facebook/Instagram, где заявка стоит в разы дешевле.</p>
+    </div></div>
+
+    <div class="rec"><div class="pri">P2</div><div>
+      <h3>КП: добавить шаг между «посмотрел» и «подписал»</h3>
+      <p>86% открываемости пропадает зря. Правило: просмотр КП (уведомление уже приходит в Telegram) → звонок в течение 24 часов с предложением встречи. Внутри КП — кнопка «Обсудить проект» со ссылкой на Telegram и слот календаря. Это самый дешёвый способ получить договор: люди уже читают цены по 5 раз.</p>
+    </div></div>
+
+    <div class="rec"><div class="pri">P3</div><div>
+      <h3>Соцсети — масштабировать, это работающий канал</h3>
+      <p>23 из 25 атрибутированных заявок августа — Instagram и Facebook. Пик 29–30.08 (160 и 102 визита) случился уже после отключения рекламы — контент сам приводит людей. Больше того формата, что дал этот всплеск; в рекламном кабинете FB — дублировать связки, которые дали 12 заявок.</p>
+    </div></div>
+
+    <div class="rec"><div class="pri">P4</div><div>
+      <h3>Квиз: квалифицировать и поднять открываемость</h3>
+      <p>Квиз даёт 55% заявок, но 36% всех лидов — нецелевые. Добавить в квиз вопрос о бюджете или сроках — отсеет мусор до звонка. И поработать над первым экраном попапа: 6% стартов с 2 263 показов — есть запас минимум до 10%.</p>
+    </div></div>
+
+    <div class="rec"><div class="pri">P5</div><div>
+      <h3>Органика и AI — росточки, которые стоит поливать</h3>
+      <p>Англоязычные статьи уже в топе страниц (44 визита на две статьи о ценах), переходы из ChatGPT и других ассистентов выросли с 3 до 16 за месяц, органика Google держит ~60. Это бесплатный трафик с длинным хвостом: продолжать статьи (теперь и на английском), закрыть домашку по Google Business Profile.</p>
+    </div></div>
+  </section>
+
+  <p class="footnote" style="margin-top:44px">Данные: собственная аналитика bureaux.com.ua (визиты с фильтрацией ботов, события кликов, заявки, КП) за 01.07–31.08.2026. Заявки по каналам — атрибуция первого касания; итоговые количества — по таблице заявок. Составлено автоматически. Служебная страница, не индексируется.</p>
+</div>
+
+<div id="tt" role="presentation"></div>
+
+<script>
+(function(){
+  var days = [
+    ["04.07",16,0],["05.07",47,0],["06.07",38,0],["07.07",50,0],["08.07",55,6],["09.07",59,27],["10.07",51,25],["11.07",27,8],["12.07",42,11],["13.07",42,8],["14.07",68,21],["15.07",29,7],["16.07",44,16],["17.07",72,17],["18.07",52,21],["19.07",61,18],["20.07",36,20],["21.07",24,6],["22.07",39,15],["23.07",39,19],["24.07",46,17],["25.07",37,18],["26.07",41,16],["27.07",43,19],["28.07",42,17],["29.07",34,14],["30.07",46,16],["31.07",40,13],
+    ["01.08",18,8],["02.08",23,2],["03.08",36,0],["04.08",44,0],["05.08",45,0],["06.08",53,9],["07.08",54,21],["08.08",43,16],["09.08",60,21],["10.08",52,0],["11.08",13,0],["12.08",65,16],["13.08",269,145],["14.08",539,436],["15.08",707,590],["16.08",446,308],["17.08",215,158],["18.08",542,474],["19.08",247,190],["20.08",270,237],["21.08",123,51],["22.08",82,3],["23.08",69,3],["24.08",330,248],["25.08",223,140],["26.08",106,3],["27.08",24,1],["28.08",9,0],["29.08",160,1],["30.08",102,0],["31.08",75,1]
+  ];
+  var css = getComputedStyle(document.documentElement);
+  function paint(){
+    var ink = css.getPropertyValue('--ink').trim(), soft = css.getPropertyValue('--bar-soft').trim(),
+        hair = css.getPropertyValue('--hair').trim(), muted = css.getPropertyValue('--muted').trim(),
+        red = css.getPropertyValue('--red').trim();
+    var bw=11, gap=3, H=190, pad=26, W=days.length*(bw+gap)+56;
+    var max=707, sc=(H-6)/max;
+    var s='<svg width="'+W+'" height="'+(H+pad+14)+'" style="display:block;min-width:'+W+'px" role="img" aria-label="Визиты по дням, июль и август">';
+    [0,200,400,600].forEach(function(g){
+      var y=H-g*sc;
+      s+='<line x1="44" y1="'+y+'" x2="'+W+'" y2="'+y+'" stroke="'+hair+'" stroke-width="1"/>';
+      s+='<text x="38" y="'+(y+4)+'" text-anchor="end" font-size="10" font-family="IBM Plex Mono,monospace" fill="'+muted+'">'+g+'</text>';
+    });
+    days.forEach(function(d,i){
+      var x=48+i*(bw+gap), other=d[1]-d[2], hO=other*sc, hA=d[2]*sc;
+      s+='<g class="db" data-i="'+i+'">';
+      s+='<rect x="'+x+'" y="'+(H-hO)+'" width="'+bw+'" height="'+Math.max(hO,other>0?1.5:0)+'" fill="'+ink+'"/>';
+      if(d[2]>0) s+='<rect x="'+x+'" y="'+(H-hO-hA-1)+'" width="'+bw+'" height="'+Math.max(hA,1.5)+'" fill="'+soft+'"/>';
+      s+='<rect x="'+(x-gap/2)+'" y="0" width="'+(bw+gap)+'" height="'+H+'" fill="transparent"/>';
+      s+='</g>';
+      if(d[0]==="01.07"||d[0]==="04.07"||d[0]==="01.08"||d[0]==="13.08"||d[0]==="31.08"||d[0]==="15.08")
+        s+='<text x="'+(x+bw/2)+'" y="'+(H+13)+'" text-anchor="middle" font-size="10" font-family="IBM Plex Mono,monospace" fill="'+muted+'">'+d[0]+'</text>';
+    });
+    var xp=48+40*(bw+gap);
+    s+='<line x1="'+xp+'" y1="0" x2="'+xp+'" y2="'+H+'" stroke="'+red+'" stroke-width="1" stroke-dasharray="3 3"/>';
+    s+='<text x="'+(xp+5)+'" y="12" font-size="10.5" font-family="IBM Plex Mono,monospace" fill="'+red+'">запуск PMax</text>';
+    s+='</svg>';
+    document.getElementById('chart').innerHTML=s;
+  }
+  paint();
+  if(window.matchMedia){ try{ window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',function(){ css=getComputedStyle(document.documentElement); paint(); }); }catch(e){} }
+
+  var tt=document.getElementById('tt');
+  document.getElementById('chart').addEventListener('mousemove',function(e){
+    var g=e.target.closest('.db');
+    if(!g){ tt.style.opacity=0; return; }
+    var d=days[+g.dataset.i];
+    tt.textContent=d[0]+' · всего '+d[1]+' · ads '+d[2]+' · обычных '+(d[1]-d[2]);
+    tt.style.opacity=1;
+    tt.style.left=Math.min(e.clientX+14,window.innerWidth-tt.offsetWidth-8)+'px';
+    tt.style.top=(e.clientY-34)+'px';
+  });
+  document.getElementById('chart').addEventListener('mouseleave',function(){ tt.style.opacity=0; });
+
+  var t='<thead><tr><th>День</th><th class="num">Всего</th><th class="num">Google Ads</th><th class="num">Обычные</th></tr></thead><tbody>';
+  days.forEach(function(d){ t+='<tr><td>'+d[0]+'</td><td class="num">'+d[1]+'</td><td class="num">'+d[2]+'</td><td class="num">'+(d[1]-d[2])+'</td></tr>'; });
+  document.getElementById('daytbl').innerHTML=t+'</tbody>';
+})();
+</script>
+</body>
+</html>
