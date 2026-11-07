@@ -42,7 +42,7 @@ export async function notifyTelegram(lead: Lead, ctx: LeadContext = {}): Promise
     lead.message ? `Повідомлення: ${escapeHtml(lead.message)}` : '',
     `📍 Місто: ${escapeHtml([ctx.city, ctx.country].filter(Boolean).join(', ') || 'невідомо')}`,
     `↩️ Канал: ${escapeHtml(ctx.channel || 'невідомо')}`,
-    `📣 Кампанія: ${escapeHtml(ctx.campaign || '—')}`,
+    ctx.campaign ? `📣 Кампанія: ${escapeHtml(ctx.campaign)}` : '',
     ctx.page ? `🔗 Сторінка: ${escapeHtml(ctx.page)}` : '',
     `🕒 ${lead.createdAt.toLocaleString('uk-UA', { timeZone: 'Europe/Kyiv' })}`,
   ].filter(Boolean);
