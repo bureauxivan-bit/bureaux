@@ -5,7 +5,7 @@ import { routing } from '@/i18n/routing';
 import { notifyVisit } from '@/lib/telegram';
 import { lookupGeo, isDatacenterIsp, isResidentialProxyIsp } from '@/lib/geo';
 import { parseUserAgent, isBotUserAgent, isStaleDesktopChrome } from '@/lib/ua';
-import { channelLabel } from '@/lib/source';
+import { channelLabel, DIRECT } from '@/lib/source';
 
 const ADMIN_COOKIE = 'bx_session';
 const CLIENT_COOKIE = 'bx_client';
@@ -15,6 +15,9 @@ const VISIT_SESSION_COOKIE = 'bx_visit_sid';
 // endpoints (/api/track/event) to attribute clicks/leads to a source.
 const SOURCE_COOKIE = 'bx_src';
 const SOURCE_MAX_AGE = 60 * 60 * 24 * 30; // 30-day attribution window
+// Last-touch ad campaign (utm_* / Google Ads gad_campaignid), shown on the lead
+// notification. Overwritten by every new tagged click, kept for the same window.
+const CAMPAIGN_COOKIE = 'bx_cmp';
 const VISIT_SESSION_MAX_AGE = 30 * 60; // one Telegram notification per 30 min per visitor
 const VISITOR_MAX_AGE = 60 * 60 * 24 * 365;
 
@@ -71,6 +74,18 @@ function clientIp(req: NextRequest): string {
     req.headers.get('x-real-ip') ||
     'unknown'
   );
+}
+
+/** "source / medium / campaign / content", plus the Google Ads campaign id that
+ *  auto-tagging appends (gad_campaignid) — so untagged Ads clicks still show
+ *  which campaign they came from. Empty string when the URL carries neither. */
+function campaignLabel(sp: URLSearchParams): string {
+  const parts = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content']
+    .map((k) => sp.get(k)?.trim())
+    .filter(Boolean) as string[];
+  const gadCampaign = sp.get('gad_campaignid')?.trim();
+  if (gadCampaign) parts.push(parts.length ? `id ${gadCampaign}` : `Google Ads, кампанія ${gadCampaign}`);
+  return parts.join(' / ').slice(0, 200);
 }
 
 // Same-visitor duplicate guard (per edge isolate): parallel requests race past
@@ -137,7 +152,22 @@ async function trackVisit(req: NextRequest, res: NextResponse) {
     const sp = req.nextUrl.searchParams;
     const paid = sp.has('gclid') || sp.has('gbraid') || sp.has('wbraid') || sp.get('gad_source') != null;
     const ref = paid ? 'Google Ads' : req.headers.get('referer') || 'Пряме відвідування';
-    res.cookies.set(SOURCE_COOKIE, encodeURIComponent(channelLabel(ref)), {
+    // Instagram/Facebook in-app browsers often drop the referrer, so those
+    // clicks would read as direct. Meta appends fbclid to every outbound click.
+    let channel = channelLabel(ref);
+    if (channel === DIRECT && sp.has('fbclid')) channel = 'Meta (FB/IG)';
+    res.cookies.set(SOURCE_COOKIE, encodeURIComponent(channel), {
+      maxAge: SOURCE_MAX_AGE,
+      httpOnly: true,
+      sameSite: 'lax',
+    });
+  }
+
+  // Last-touch campaign: only tagged landings overwrite it, so internal
+  // navigation keeps the campaign that actually brought the visitor in.
+  const campaign = campaignLabel(req.nextUrl.searchParams);
+  if (campaign) {
+    res.cookies.set(CAMPAIGN_COOKIE, encodeURIComponent(campaign), {
       maxAge: SOURCE_MAX_AGE,
       httpOnly: true,
       sameSite: 'lax',
