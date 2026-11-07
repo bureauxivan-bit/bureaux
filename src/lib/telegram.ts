@@ -9,6 +9,18 @@ type Lead = {
   createdAt: Date;
 };
 
+/** Where the lead came from — for quick triage in the chat. All optional. */
+export type LeadContext = {
+  city?: string;
+  country?: string;
+  /** First-touch channel (bx_src), e.g. "Instagram", "Google Ads". */
+  channel?: string;
+  /** Last-touch campaign (bx_cmp), e.g. "google / cpc / kyiv_design". */
+  campaign?: string;
+  /** Page the form was submitted from. */
+  page?: string;
+};
+
 const TYPE_LABEL: Record<string, string> = {
   ESTIMATE: 'Прорахунок проєкту',
   CONSULT: 'Консультація',
@@ -16,7 +28,7 @@ const TYPE_LABEL: Record<string, string> = {
 };
 
 /** Sends a lead notification to the bureau's Telegram chat. Best-effort. */
-export async function notifyTelegram(lead: Lead): Promise<void> {
+export async function notifyTelegram(lead: Lead, ctx: LeadContext = {}): Promise<void> {
   const token = process.env.TELEGRAM_BOT_TOKEN;
   const chatId = process.env.TELEGRAM_CHAT_ID;
   if (!token || !chatId) return; // notifications disabled — silently skip
@@ -28,6 +40,10 @@ export async function notifyTelegram(lead: Lead): Promise<void> {
     lead.phone ? `Телефон: <b>${escapeHtml(lead.phone)}</b>` : '',
     lead.email ? `Email: <b>${escapeHtml(lead.email)}</b>` : '',
     lead.message ? `Повідомлення: ${escapeHtml(lead.message)}` : '',
+    `📍 Місто: ${escapeHtml([ctx.city, ctx.country].filter(Boolean).join(', ') || 'невідомо')}`,
+    `↩️ Канал: ${escapeHtml(ctx.channel || 'невідомо')}`,
+    `📣 Кампанія: ${escapeHtml(ctx.campaign || '—')}`,
+    ctx.page ? `🔗 Сторінка: ${escapeHtml(ctx.page)}` : '',
     `🕒 ${lead.createdAt.toLocaleString('uk-UA', { timeZone: 'Europe/Kyiv' })}`,
   ].filter(Boolean);
 

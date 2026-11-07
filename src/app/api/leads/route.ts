@@ -1,7 +1,8 @@
 import { NextRequest } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { leadSchema } from '@/lib/validation';
-import { notifyTelegram } from '@/lib/telegram';
+import { notifyTelegram, type LeadContext } from '@/lib/telegram';
+import { lookupGeo } from '@/lib/geo';
 import { rateLimit, clientIp } from '@/lib/rate-limit';
 import { recordStatusChange } from '@/lib/leads';
 
@@ -37,7 +38,46 @@ export async function POST(req: NextRequest) {
   });
 
   await recordStatusChange(lead.id, 'new');
-  await notifyTelegram(lead);
+  await notifyTelegram(lead, await leadContext(req, ip));
 
   return Response.json({ ok: true });
+}
+
+function cookieValue(req: NextRequest, name: string): string | undefined {
+  const raw = req.cookies.get(name)?.value;
+  if (!raw) return undefined;
+  try { return decodeURIComponent(raw).slice(0, 200); } catch { return raw.slice(0, 200); }
+}
+
+function header(req: NextRequest, name: string): string | undefined {
+  const v = req.headers.get(name);
+  if (!v) return undefined;
+  try { return decodeURIComponent(v); } catch { return v; }
+}
+
+/** City (Vercel edge geo headers, ipwho.is only as fallback — keeps the form
+ *  fast), first-touch channel and last-touch campaign stamped by middleware,
+ *  and the page the form was sent from. Never throws. */
+async function leadContext(req: NextRequest, ip: string): Promise<LeadContext> {
+  let city = header(req, 'x-vercel-ip-city');
+  let country = header(req, 'x-vercel-ip-country');
+  if (!city) {
+    const geo = await lookupGeo(ip, { country });
+    city = geo.city;
+    country = geo.country;
+  }
+
+  let page: string | undefined;
+  try {
+    const ref = req.headers.get('referer');
+    if (ref) page = new URL(ref).pathname;
+  } catch {}
+
+  return {
+    city,
+    country,
+    channel: cookieValue(req, 'bx_src'),
+    campaign: cookieValue(req, 'bx_cmp'),
+    page,
+  };
 }
