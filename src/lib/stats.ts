@@ -47,9 +47,10 @@ async function buildFunnel(start: Date, end: Date, visits: number): Promise<stri
   const messenger = total('contact_telegram') + total('contact_instagram') + total('contact_phone');
   const popupShown = total('popup_shown');
   const popupLead = total('popup_lead');
+  const quizView = total('quiz_view');
 
   // Nothing wired yet in this window — skip the block entirely.
-  if (ctaTotal === 0 && projects === 0 && messenger === 0 && popupShown === 0 && leads === 0) return '';
+  if (ctaTotal === 0 && projects === 0 && messenger === 0 && popupShown === 0 && quizView === 0 && leads === 0) return '';
 
   const pct = (n: number) => (visits > 0 ? ` (${Math.round((n / visits) * 100)}%)` : '');
   // Built from the code point at runtime: as a source literal this emoji gets
@@ -63,6 +64,13 @@ async function buildFunnel(start: Date, end: Date, visits: number): Promise<stri
   ];
   if (messenger > 0) lines.push(`Кліки в месенджер: ${messenger}${pct(messenger)}`);
   if (popupShown > 0) lines.push(`Спливне вікно: показів ${popupShown} → заявок ${popupLead}`);
+  if (quizView > 0) {
+    // Where ad traffic drops off: how many reached each step of /quiz.
+    const steps = [2, 3, 4, 5, 6, 7].map((n) => total(`quiz_step_${n}`));
+    lines.push(
+      `Квіз: відкрили ${quizView} → кроки 2–7: ${steps.join(' → ')} → заявок ${total('quiz_lead')}`,
+    );
+  }
   lines.push(`Заявки з форми: <b>${leads}</b>${pct(leads)}`);
 
   // Which channel actually converts — the money question with paid ads running.

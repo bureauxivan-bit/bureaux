@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { AnimatePresence, motion } from 'framer-motion';
 import { PhoneInput } from '@/components/PhoneInput';
@@ -68,6 +68,14 @@ function buildMessage(a: Answers) {
   ].filter(Boolean).join('\n');
 }
 
+/** PhoneInput emits "+<dial><national>". Ukraine: exactly 9 national digits;
+ *  elsewhere require a plausible length (dial code + at least 7 digits). */
+function isValidPhone(phone: string) {
+  const digits = phone.replace(/\D/g, '');
+  if (digits.startsWith('380')) return digits.length === 12;
+  return digits.length >= 9 && digits.length <= 15;
+}
+
 export function Quiz() {
   const router = useRouter();
   const [step, setStep] = useState(0);
@@ -75,8 +83,6 @@ export function Quiz() {
   const [a, setA] = useState<Answers>(EMPTY);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
-  const started = useRef(false);
-
   useEffect(() => { trackEvent('quiz_view'); }, []);
 
   const set = <K extends keyof Answers>(k: K, v: Answers[K]) => {
@@ -88,10 +94,8 @@ export function Quiz() {
     setDir(next > step ? 1 : -1);
     setError('');
     setStep(next);
-    if (!started.current && next > 0) {
-      started.current = true;
-      trackEvent('quiz_start');
-    }
+    // Per-step reach (quiz_step_2 … quiz_step_7) → drop-off funnel in /stats.
+    if (next > step) trackEvent(`quiz_step_${next + 1}`);
     window.scrollTo({ top: 0 });
   };
 
@@ -121,8 +125,7 @@ export function Quiz() {
     e.preventDefault();
     if (!a.contact) return setError('Оберіть зручний спосіб зв’язку');
     if (a.name.trim().length < 2) return setError('Вкажіть ваше ім’я');
-    const digits = a.phone.replace(/\D/g, '');
-    if (digits.length < 9) return setError('Вкажіть номер телефону');
+    if (!isValidPhone(a.phone)) return setError('Перевірте номер телефону');
 
     setSubmitting(true);
     setError('');
@@ -132,7 +135,7 @@ export function Quiz() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: a.name.trim(),
-          phone: a.phone.trim(),
+          phone: a.phone.replace(/[^\d+]/g, ''), // "+38067 123 45 67" → "+380671234567"
           type: 'ESTIMATE',
           message: buildMessage(a),
           company: a.company,
@@ -156,12 +159,12 @@ export function Quiz() {
 
   const chip = (active: boolean) =>
     `w-full border px-5 py-4 text-left text-[15px] leading-snug transition-colors ${
-      active ? 'border-ink bg-ink text-paper' : 'border-ink/15 text-ink hover:border-ink/50'
+      active ? 'border-ink bg-ink text-paper' : 'border-ink/15 text-ink [@media(hover:hover)]:hover:border-ink/50'
     }`;
   const field =
     'w-full border border-ink/15 bg-transparent px-4 py-3.5 text-base text-ink outline-none transition-colors placeholder:text-ink/40 focus:border-ink/50';
   const primary =
-    'w-full bg-ink px-6 py-4 text-xs font-normal uppercase tracking-widest text-paper transition-opacity hover:opacity-85 disabled:opacity-60';
+    'w-full bg-ink px-6 py-4 text-xs font-normal uppercase tracking-widest text-paper transition-opacity [@media(hover:hover)]:hover:opacity-85 disabled:opacity-60';
 
   const onEnter = (fn: () => void) => (e: React.KeyboardEvent) => {
     if (e.key === 'Enter') { e.preventDefault(); fn(); }
@@ -218,7 +221,7 @@ export function Quiz() {
             {step === 0 && (
               <div className="space-y-2.5">
                 {PROPERTY.map((o) => (
-                  <button key={o} type="button" className={chip(a.property === o)} onClick={() => pick('property', o)}>
+                  <button key={o} type="button" aria-pressed={a.property === o} className={chip(a.property === o)} onClick={() => pick('property', o)}>
                     {o}
                   </button>
                 ))}
@@ -228,7 +231,7 @@ export function Quiz() {
             {step === 1 && (
               <div className="space-y-2.5">
                 {SERVICES.map((o) => (
-                  <button key={o} type="button" className={chip(a.service === o)} onClick={() => pick('service', o)}>
+                  <button key={o} type="button" aria-pressed={a.service === o} className={chip(a.service === o)} onClick={() => pick('service', o)}>
                     {o}
                   </button>
                 ))}
@@ -241,6 +244,7 @@ export function Quiz() {
                   <input
                     autoFocus
                     inputMode="decimal"
+                    aria-label="Площа, м²"
                     className={`${field} pr-14`}
                     placeholder="Наприклад, 120"
                     value={a.area}
@@ -256,7 +260,7 @@ export function Quiz() {
             {step === 3 && (
               <div className="space-y-2.5">
                 {STAGES.map((o) => (
-                  <button key={o} type="button" className={chip(a.stage === o)} onClick={() => pick('stage', o)}>
+                  <button key={o} type="button" aria-pressed={a.stage === o} className={chip(a.stage === o)} onClick={() => pick('stage', o)}>
                     {o}
                   </button>
                 ))}
@@ -269,6 +273,7 @@ export function Quiz() {
                   autoFocus
                   className={field}
                   placeholder="Місто, країна"
+                  aria-label="Місто та країна"
                   autoComplete="address-level2"
                   value={a.location}
                   maxLength={120}
@@ -284,6 +289,7 @@ export function Quiz() {
                 <textarea
                   autoFocus
                   rows={5}
+                  aria-label="Побажання до проєкту"
                   className={`${field} resize-none`}
                   placeholder="Стиль, кількість кімнат, терміни, бюджет — усе, що важливо (необов’язково)"
                   value={a.wishes}
@@ -298,11 +304,11 @@ export function Quiz() {
 
             {step === 6 && (
               <form onSubmit={submit} noValidate className="space-y-6">
-                <div className="grid grid-cols-1 gap-2.5 sm:grid-cols-3">
+                <div className="grid grid-cols-3 gap-2">
                   {CONTACT.map((o) => (
                     <button
-                      key={o} type="button"
-                      className={`${chip(a.contact === o)} sm:text-center`}
+                      key={o} type="button" aria-pressed={a.contact === o}
+                      className={`${chip(a.contact === o)} flex min-h-[56px] items-center justify-center !px-2 !py-3 text-center !text-sm`}
                       onClick={() => pick('contact', o)}
                     >
                       {o}
