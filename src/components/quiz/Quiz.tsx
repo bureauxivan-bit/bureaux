@@ -24,6 +24,8 @@ const STAGES = [
   'Зараз шукаю або обираю нерухомість',
   'Ремонт уже розпочався',
 ];
+// Same floor as the site popup — the studio doesn't take small apartments.
+const AREAS = ['до 100 м²', '100–200 м²', '200–400 м²', '400+ м²'];
 const CONTACT = ['Telegram', 'Viber', 'Телефонний дзвінок'];
 
 type Answers = {
@@ -60,7 +62,7 @@ function buildMessage(a: Answers) {
     'Квіз «Безкоштовний розрахунок»',
     `Тип: ${a.property}`,
     `Послуга: ${a.service}`,
-    `Площа: ${a.area} м²`,
+    `Площа: ${AREAS.includes(a.area) ? a.area : `${a.area} м²`}`,
     `Етап: ${a.stage}`,
     `Локація: ${a.location}`,
     a.wishes.trim() ? `Побажання: ${a.wishes.trim()}` : '',
@@ -83,6 +85,7 @@ export function Quiz() {
   const [a, setA] = useState<Answers>(EMPTY);
   const [error, setError] = useState('');
   const [submitting, setSubmitting] = useState(false);
+  const [customArea, setCustomArea] = useState(false);
   useEffect(() => { trackEvent('quiz_view'); }, []);
 
   const set = <K extends keyof Answers>(k: K, v: Answers[K]) => {
@@ -102,6 +105,17 @@ export function Quiz() {
   const pick = (k: 'property' | 'service' | 'stage' | 'contact', v: string) => {
     set(k, v);
     if (k !== 'contact') setTimeout(() => go(step + 1), 180);
+  };
+
+  const pickArea = (v: string) => {
+    setCustomArea(false);
+    set('area', v);
+    setTimeout(() => go(step + 1), 180);
+  };
+
+  const openCustomArea = () => {
+    setCustomArea(true);
+    if (AREAS.includes(a.area)) set('area', '');
   };
 
   const nextFromArea = () => {
@@ -199,6 +213,25 @@ export function Quiz() {
               Дайте відповідь на кілька запитань, щоб ми краще зрозуміли ваш запит
               і могли підготувати для вас індивідуальну пропозицію.
             </p>
+            <div className="mt-6 flex flex-wrap items-center gap-x-6 gap-y-3 border-t border-line pt-5 text-sm">
+              <span>
+                <span className="font-display text-xl font-light text-ink">100+</span>
+                <span className="ml-1.5 text-muted">проєктів</span>
+              </span>
+              <span className="flex items-center gap-2 text-muted">
+                <span className="h-1.5 w-1.5 rounded-full bg-terra" aria-hidden="true" />
+                Відповімо протягом 5 хв
+              </span>
+              <a
+                href="/projects"
+                target="_blank"
+                rel="noopener"
+                onClick={() => trackEvent('cta_projects')}
+                className="text-ink underline decoration-ink/30 underline-offset-4 transition-colors [@media(hover:hover)]:hover:decoration-ink"
+              >
+                Переглянути проєкти →
+              </a>
+            </div>
           </div>
         )}
 
@@ -239,21 +272,40 @@ export function Quiz() {
             )}
 
             {step === 2 && (
-              <div className="space-y-4">
-                <div className="relative">
-                  <input
-                    autoFocus
-                    inputMode="decimal"
-                    aria-label="Площа, м²"
-                    className={`${field} pr-14`}
-                    placeholder="Наприклад, 120"
-                    value={a.area}
-                    onChange={(e) => set('area', e.target.value.replace(/[^\d.,]/g, '').slice(0, 7))}
-                    onKeyDown={onEnter(nextFromArea)}
-                  />
-                  <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-muted">м²</span>
+              <div className="space-y-2.5">
+                <div className="grid grid-cols-2 gap-2.5">
+                  {AREAS.map((o) => (
+                    <button
+                      key={o} type="button" aria-pressed={!customArea && a.area === o}
+                      className={chip(!customArea && a.area === o)}
+                      onClick={() => pickArea(o)}
+                    >
+                      {o}
+                    </button>
+                  ))}
                 </div>
-                <button type="button" className={primary} onClick={nextFromArea}>Далі</button>
+                {!customArea ? (
+                  <button type="button" className={chip(false)} onClick={openCustomArea}>
+                    Вказати свою площу
+                  </button>
+                ) : (
+                  <div className="space-y-2.5 pt-2">
+                    <div className="relative">
+                      <input
+                        autoFocus
+                        inputMode="decimal"
+                        aria-label="Площа, м²"
+                        className={`${field} pr-14`}
+                        placeholder="Ваша площа, наприклад 120"
+                        value={a.area}
+                        onChange={(e) => set('area', e.target.value.replace(/[^\d.,]/g, '').slice(0, 7))}
+                        onKeyDown={onEnter(nextFromArea)}
+                      />
+                      <span className="pointer-events-none absolute right-4 top-1/2 -translate-y-1/2 text-muted">м²</span>
+                    </div>
+                    <button type="button" className={primary} onClick={nextFromArea}>Далі</button>
+                  </div>
+                )}
               </div>
             )}
 
