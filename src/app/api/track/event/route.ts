@@ -8,6 +8,9 @@ const ALLOWED = new Set([
   'cta_estimate', 'cta_consult', 'cta_projects', 'lead_submitted',
   'contact_open', 'contact_telegram', 'contact_instagram', 'contact_phone',
   'popup_shown', 'popup_start', 'popup_lead',
+  // /quiz ad landing: open → reach of each step → submitted
+  'quiz_view', 'quiz_step_2', 'quiz_step_3', 'quiz_step_4', 'quiz_step_5',
+  'quiz_step_6', 'quiz_step_7', 'quiz_lead',
 ]);
 
 export async function POST(req: NextRequest) {

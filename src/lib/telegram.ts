@@ -39,7 +39,9 @@ export async function notifyTelegram(lead: Lead, ctx: LeadContext = {}): Promise
     lead.name ? `Ім'я: <b>${escapeHtml(lead.name)}</b>` : '',
     lead.phone ? `Телефон: <b>${escapeHtml(lead.phone)}</b>` : '',
     lead.email ? `Email: <b>${escapeHtml(lead.email)}</b>` : '',
-    lead.message ? `Повідомлення: ${escapeHtml(lead.message)}` : '',
+    lead.message
+      ? `Повідомлення:${lead.message.includes('\n') ? '\n' : ' '}${escapeHtml(lead.message)}`
+      : '',
     `📍 Місто: ${escapeHtml([ctx.city, ctx.country].filter(Boolean).join(', ') || 'невідомо')}`,
     `↩️ Канал: ${escapeHtml(ctx.channel || 'невідомо')}`,
     ctx.campaign ? `📣 Кампанія: ${escapeHtml(ctx.campaign)}` : '',

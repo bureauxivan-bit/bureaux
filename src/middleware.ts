@@ -41,6 +41,7 @@ const TRACKED_PREFIXES = [
   '/kp',
   '/login',
   '/register',
+  '/quiz', // ad landing — must stamp bx_src/bx_cmp for lead attribution
 ];
 
 function isTrackedPath(pathname: string): boolean {
@@ -53,7 +54,7 @@ function isTrackedPath(pathname: string): boolean {
 
 // Routes that live outside the [locale] tree (src/app/(internal)) — the intl
 // middleware must not rewrite them to /uk/... or they would 404.
-const NON_LOCALIZED_PREFIXES = ['/admin', '/miy-proekt', '/kp', '/login', '/register'];
+const NON_LOCALIZED_PREFIXES = ['/admin', '/miy-proekt', '/kp', '/login', '/register', '/quiz'];
 
 const intlMiddleware = createMiddleware(routing);
 
